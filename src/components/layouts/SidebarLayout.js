@@ -1,5 +1,5 @@
 /**
- * SidebarLayout — the original three-panel layout.
+ * SidebarLayout — three-panel layout with a polished dark sidebar.
  *
  * ┌──────────────┬──────────────────────────────┬──────────────┐
  * │  Agent list  │         Chat window          │  Trace log   │
@@ -17,6 +17,48 @@ import {
     EmptyState,
 } from '../shared/SharedComponents.js';
 
+// ---------------------------------------------------------------------------
+// Avatar color palette — cycles per agent index
+// ---------------------------------------------------------------------------
+const AVATAR_COLORS = [
+    { bg: '#EEEDFE', color: '#3C3489' },
+    { bg: '#E1F5EE', color: '#085041' },
+    { bg: '#E6F1FB', color: '#0C447C' },
+    { bg: '#FAECE7', color: '#993C1D' },
+    { bg: '#FBEAF0', color: '#72243E' },
+    { bg: '#FAEEDA', color: '#633806' },
+];
+
+function avatarStyle(index) {
+    return AVATAR_COLORS[index % AVATAR_COLORS.length];
+}
+
+function agentInitials(name) {
+    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+// ---------------------------------------------------------------------------
+// StatusPill — compact badge for the chat header
+// ---------------------------------------------------------------------------
+function StatusPill({ status }) {
+    const map = {
+        active:   { label: 'Online',  cls: 'sl-pill-online'  },
+        inactive: { label: 'Offline', cls: 'sl-pill-offline' },
+        busy:     { label: 'Busy',    cls: 'sl-pill-busy'    },
+        unknown:  { label: 'Unknown', cls: 'sl-pill-offline' },
+    };
+    const { label, cls } = map[status] || map.unknown;
+    return (
+        <span className={`sl-status-pill ${cls}`}>
+            <span className={`sl-dot ${cls}`} />
+            {label}
+        </span>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// SidebarLayout — main export
+// ---------------------------------------------------------------------------
 export function SidebarLayout(props) {
     const {
         agents, filteredAgents,
@@ -34,45 +76,50 @@ export function SidebarLayout(props) {
         setSearchQuery, setShowTrace,
     } = props;
 
-    return (
-        <div className="app-container">
+    const selectedIndex = agents.findIndex(a => a.id === selectedAgentId);
+    const { bg, color } = selectedAgent ? avatarStyle(selectedIndex >= 0 ? selectedIndex : 0) : {};
+    const initials = selectedAgent ? agentInitials(selectedAgent.name) : '';
 
-            {/* ── Left Sidebar: Agent List ── */}
-            <div className="sidebar">
-                <div className="sidebar-header">
-                    <div className="sidebar-header-top">
-                        <h2>Agents</h2>
-                        <button className="refresh-btn" onClick={fetchAgents} title="Refresh agent list">
+    return (
+        <div className="sl-container">
+
+            {/* ── Left Sidebar ── */}
+            <div className="sl-sidebar">
+                <div className="sl-sidebar-top">
+                    <div className="sl-sidebar-brand">
+                        <span className="sl-brand-name">Agents</span>
+                        <button className="sl-refresh-btn" onClick={fetchAgents} title="Refresh agent list">
                             Refresh
                         </button>
                     </div>
-                    <div className="sidebar-search">
+                    <div className="sl-search-wrap">
                         <input
+                            className="sl-search"
                             type="text"
-                            placeholder="Search agents..."
+                            placeholder="Search agents…"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
                 </div>
 
-                <ul className="agent-list">
+                <ul className="sl-agent-list">
                     {filteredAgents.length === 0 ? (
-                        <div className="no-agents-found">No agents found.</div>
+                        <div className="sl-no-agents">No agents found.</div>
                     ) : (
-                        filteredAgents.map(agent => (
+                        filteredAgents.map((agent, i) => (
                             <li
                                 key={agent.id}
-                                className={`agent-list-item ${selectedAgentId === agent.id ? 'selected' : ''}`}
+                                className={`sl-agent-item ${selectedAgentId === agent.id ? 'sl-selected' : ''}`}
                                 onClick={() => handleSelectAgent(agent.id)}
                                 title={agent.description}
                             >
-                                <div className="agent-item-header">
+                                <div className="sl-item-row">
                                     <StatusDot status={agent.status} />
-                                    <span className="agent-name">{agent.name}</span>
+                                    <span className="sl-agent-name">{agent.name}</span>
                                 </div>
                                 {agent.description && (
-                                    <span className="agent-description">{agent.description}</span>
+                                    <span className="sl-agent-desc">{agent.description}</span>
                                 )}
                             </li>
                         ))
@@ -81,20 +128,33 @@ export function SidebarLayout(props) {
             </div>
 
             {/* ── Main Chat Window ── */}
-            <div className="chat-container">
+            <div className="sl-chat-container">
                 {selectedAgent ? (
                     <>
-                        <div className="chat-header">
-                            <span>{selectedAgent.name} Chat</span>
-                            <div className="header-actions">
+                        <div className="sl-chat-header">
+                            <div className="sl-chat-header-left">
+                                <div className="sl-chat-avatar" style={{ background: bg, color }}>
+                                    {initials}
+                                </div>
+                                <div>
+                                    <div className="sl-chat-agent-name">{selectedAgent.name}</div>
+                                    <div className="sl-chat-agent-meta">
+                                        {selectedAgent.description && (
+                                            <span className="sl-chat-agent-desc">{selectedAgent.description}</span>
+                                        )}
+                                        <StatusPill status={selectedAgent.status} />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="sl-header-actions">
                                 <button
-                                    className="toggle-trace-btn"
+                                    className="sl-trace-btn"
                                     onClick={() => setShowTrace(!showTrace)}
                                 >
-                                    {showTrace ? 'Hide Trace Log' : 'Show Trace Log'}
+                                    {showTrace ? 'Hide trace' : 'Show trace'}
                                 </button>
-                                <button className="clear-session-btn" onClick={handleClearSession}>
-                                    Clear Session
+                                <button className="sl-clear-btn" onClick={handleClearSession}>
+                                    Clear
                                 </button>
                             </div>
                         </div>
@@ -124,7 +184,7 @@ export function SidebarLayout(props) {
                 )}
             </div>
 
-            {/* ── Right Sidebar: Trace Logs (collapsible) ── */}
+            {/* ── Right Trace Sidebar ── */}
             {showTrace && (
                 <TraceLogSidebar
                     logs={currentTraceLogs}
@@ -133,7 +193,6 @@ export function SidebarLayout(props) {
                     onClose={() => setShowTrace(false)}
                 />
             )}
-
         </div>
     );
 }

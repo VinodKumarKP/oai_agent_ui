@@ -1,7 +1,360 @@
 /*
  * styles-cardchat.css
- * Styles exclusive to CardChatLayout.
+ * Styles for CardChatLayout — professional agent registry + chat view.
  */
+
+/* ── Registry shell ──────────────────────────────────────────────────────── */
+.ccl-registry {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #ffffff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Registry header ─────────────────────────────────────────────────────── */
+.ccl-registry-header {
+    padding: 20px 24px 0;
+    border-bottom: 0.5px solid #e2e8f0;
+    background: #ffffff;
+    flex-shrink: 0;
+}
+
+.ccl-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.ccl-header-title {
+    font-size: 17px;
+    font-weight: 500;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+
+.ccl-header-sub {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.ccl-count-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: #f1f5f9;
+    border: 0.5px solid #e2e8f0;
+    color: #64748b;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
+.ccl-tabs {
+    display: flex;
+    gap: 0;
+}
+
+.ccl-tab-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 400;
+    color: #64748b;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    font-family: inherit;
+}
+
+.ccl-tab-btn:hover:not(.ccl-tab-active) {
+    color: #0f172a;
+}
+
+.ccl-tab-active {
+    color: #0f172a;
+    border-bottom-color: #0f172a;
+    font-weight: 500;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────── */
+.ccl-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    border-bottom: 0.5px solid #e2e8f0;
+    background: #ffffff;
+    flex-shrink: 0;
+}
+
+.ccl-search-wrap {
+    flex: 1;
+    position: relative;
+}
+
+.ccl-search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.ccl-search-input {
+    width: 100%;
+    height: 34px;
+    padding: 0 12px 0 32px;
+    border-radius: 8px;
+    border: 0.5px solid #cbd5e1;
+    background: #f8fafc;
+    font-size: 13px;
+    color: #0f172a;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.ccl-search-input:focus {
+    border-color: #94a3b8;
+    background: #ffffff;
+}
+
+.ccl-search-input::placeholder {
+    color: #94a3b8;
+}
+
+/* ── View toggle ─────────────────────────────────────────────────────────── */
+.ccl-view-toggle {
+    display: flex;
+    border: 0.5px solid #cbd5e1;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.ccl-vt-btn {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: all 0.12s;
+}
+
+.ccl-vt-btn:hover:not(.ccl-vt-active) {
+    background: #f8fafc;
+    color: #64748b;
+}
+
+.ccl-vt-active {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+/* ── Grid / List wrapper ─────────────────────────────────────────────────── */
+.ccl-grid-wrap {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    background: #f8fafc;
+}
+
+.ccl-list-wrap {
+    padding: 0;
+    background: #ffffff;
+}
+
+/* ── Agent grid ──────────────────────────────────────────────────────────── */
+.ccl-agent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1px;
+    background: #e2e8f0;
+    border: 0.5px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* ── Agent list (alternate view) ─────────────────────────────────────────── */
+.ccl-agent-list {
+    grid-template-columns: 1fr;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+}
+
+/* ── Agent card (grid mode) ──────────────────────────────────────────────── */
+.ccl-agent-card {
+    background: #ffffff;
+    padding: 16px 18px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: background 0.12s;
+    outline: none;
+}
+
+.ccl-agent-card:hover {
+    background: #f8fafc;
+}
+
+.ccl-agent-card:focus-visible {
+    box-shadow: inset 0 0 0 2px #6366f1;
+}
+
+/* ── Agent card (list mode) ──────────────────────────────────────────────── */
+.ccl-list-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 20px;
+}
+
+.ccl-list-card .ccl-card-desc {
+    display: none;
+}
+
+.ccl-list-card .ccl-card-footer {
+    border: none;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+/* ── Card internals ──────────────────────────────────────────────────────── */
+.ccl-card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.ccl-list-card .ccl-card-top {
+    flex: 1;
+    align-items: center;
+    min-width: 0;
+}
+
+.ccl-card-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.ccl-card-meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.ccl-card-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #0f172a;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ccl-card-type {
+    font-size: 12px;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ccl-card-desc {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.ccl-card-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 8px;
+    border-top: 0.5px solid #f1f5f9;
+}
+
+/* ── Status pill ─────────────────────────────────────────────────────────── */
+.ccl-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.ccl-pill-online  { background: #EAF3DE; color: #3B6D11; }
+.ccl-pill-offline { background: #f1f5f9; color: #94a3b8; border: 0.5px solid #e2e8f0; }
+.ccl-pill-busy    { background: #FAEEDA; color: #633806; }
+
+.ccl-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ccl-dot.ccl-pill-online  { background: #639922; }
+.ccl-dot.ccl-pill-offline { background: #94a3b8; }
+.ccl-dot.ccl-pill-busy    { background: #BA7517; }
+
+/* ── Open button ─────────────────────────────────────────────────────────── */
+.ccl-open-btn {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+    background: none;
+    border: 0.5px solid #e2e8f0;
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.12s;
+}
+
+.ccl-open-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+.ccl-empty-msg {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+    font-size: 14px;
+    background: #ffffff;
+}
 
 /* ── Chat View ───────────────────────────────────────────────────────────── */
 .ccl-chat-view {
@@ -9,19 +362,112 @@
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
-    background-color: #f8fafc; /* Softer background */
+    background: #f8fafc;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+.ccl-chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: #ffffff;
+    border-bottom: 0.5px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+.ccl-chat-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.ccl-back-btn {
+    background: #f8fafc;
+    border: 0.5px solid #e2e8f0;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ccl-back-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+.ccl-chat-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.ccl-chat-agent-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+
+.ccl-chat-agent-desc {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.ccl-header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.ccl-toggle-trace-btn,
+.ccl-clear-btn {
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    border: 0.5px solid #e2e8f0;
+    background: #f8fafc;
+    color: #64748b;
+}
+
+.ccl-toggle-trace-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+.ccl-clear-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    border-color: #fca5a5;
+}
+
+/* ── Chat main content ───────────────────────────────────────────────────── */
 .ccl-main-content {
     display: flex;
     flex: 1;
     overflow: hidden;
+    margin: 16px;
     background: #ffffff;
-    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.02);
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
-    margin: 0 16px; /* Floating look */
+    border: 0.5px solid #e2e8f0;
+    border-radius: 12px;
 }
 
 .ccl-chat-area {
@@ -29,236 +475,5 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-}
-
-.ccl-back-btn {
-    background: #f1f5f9;
-    border: 1px solid #e2e8f0;
-    color: #475569;
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 6px 12px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    margin-right: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.ccl-back-btn:hover {
-    color: #0f172a;
-    background: #e2e8f0;
-    border-color: #cbd5e1;
-}
-
-/* ── Chat Header ─────────────────────────────────────────────────────────── */
-.tcl-chat-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 24px;
-    background-color: transparent; /* Seamless blend */
-    border-bottom: none;
-    flex-shrink: 0;
-}
-
-.tcl-chat-header-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.tcl-agent-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #6366f1, #4f46e5); /* Indigo gradient */
-    color: #fff;
-    font-size: 1.1rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    letter-spacing: 0.05em;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
-}
-
-.tcl-agent-name {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #0f172a;
-    letter-spacing: -0.01em;
-}
-
-.tcl-agent-desc {
-    font-size: 0.85rem;
-    color: #64748b;
-    margin-top: 2px;
-}
-
-.header-actions {
-    display: flex;
-    gap: 12px;
-}
-
-.header-actions button {
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-/* ── Card grid launcher ─────────────────────────────────────────────────── */
-.card-grid-launcher {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    padding: 64px 8%;
-    background: linear-gradient(160deg, #f8fafc 0%, #f1f5f9 100%);
-    height: 100vh;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-.card-grid-header {
-    margin-bottom: 40px;
-    text-align: center;
-}
-
-.card-grid-title {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #0f172a;
-    margin: 0 0 12px;
-    letter-spacing: -0.03em;
-}
-
-.card-grid-subtitle {
-    color: #64748b;
-    font-size: 1.05rem;
-    margin: 0 0 32px;
-}
-
-.card-grid-search {
-    max-width: 480px;
-    margin: 0 auto;
-}
-.card-grid-search input {
-    width: 100%;
-    padding: 14px 20px;
-    border-radius: 12px;
-    border: 1px solid #cbd5e1;
-    font-size: 1rem;
-    background-color: #fff;
-    color: #1e293b;
-    box-sizing: border-box;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-}
-.card-grid-search input:focus {
-    outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-}
-
-.agent-card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-}
-
-.card-grid-empty {
-    color: #94a3b8;
-    font-style: italic;
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 40px;
-}
-
-.agent-card {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px 24px;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    background-color: #ffffff;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-}
-.agent-card:hover {
-    border-color: #6366f1;
-    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.1);
-    transform: translateY(-4px);
-}
-.agent-card:active { transform: translateY(0); }
-
-.agent-card-avatar {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    color: #fff;
-    font-size: 1.1rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    letter-spacing: 0.05em;
-    flex-shrink: 0;
-}
-
-.agent-card-info {
-    flex: 1;
     min-width: 0;
-}
-
-.agent-card-name {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.agent-card-description {
-    font-size: 0.85rem;
-    color: #64748b;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 8px;
-}
-
-.agent-card-status {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-}
-.agent-card-status.status-active  { color: #059669; }
-.agent-card-status.status-inactive { color: #64748b; }
-.agent-card-status.status-unknown  { color: #d97706; }
-
-.agent-card-arrow {
-    color: #cbd5e1;
-    font-size: 1.2rem;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-}
-.agent-card:hover .agent-card-arrow {
-    color: #6366f1;
-    transform: translateX(4px);
 }

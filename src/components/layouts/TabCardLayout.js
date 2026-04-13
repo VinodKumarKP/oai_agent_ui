@@ -1,17 +1,17 @@
 /**
- * TabCardLayout — sidebar for browsing + tab bar for open agents.
+ * TabCardLayout — collapsible browse panel + tab bar + card-grid launcher.
  *
- * ┌──────────┬──────────────────────────────────────────────────┐
- * │          │  [Tab A] [Tab B ×] [Tab C ×]   [Trace] [Clear]  │
- * │  Browse  ├──────────────────────────────────────────────────┤
- * │  panel   │                                                  │
- * │          │            Active chat window                    │
- * │  (col-   ├──────────────────────────────────────────────────┤
- * │  laps-   │  [ input area ]                                  │
- * │  ible)   │                                                  │
- * └──────────┴──────────────────────────────────────────────────┘
+ * ┌──────────┬─────────────────────────────────────────────────────┐
+ * │          │  [Tab A] [Tab B ×] [Tab C ×]   [Trace] [Clear]     │
+ * │  Browse  ├─────────────────────────────────────────────────────┤
+ * │  panel   │                                                     │
+ * │          │            Active chat window                       │
+ * │  (col-   ├─────────────────────────────────────────────────────┤
+ * │  laps-   │  [ input area ]                                     │
+ * │  ible)   │                                                     │
+ * └──────────┴─────────────────────────────────────────────────────┘
  *
- * When no agent tabs are open, the center shows a card-grid launcher.
+ * When no agent tabs are open, the center shows the card-grid launcher.
  * Receives all props from useAgentCore() via AgentUI.js.
  */
 import React, { useState } from 'react';
@@ -23,83 +23,143 @@ import {
 } from '../shared/SharedComponents.js';
 
 // ---------------------------------------------------------------------------
-// AgentCard — one card in the grid launcher
+// Avatar color palette — cycles per agent index
 // ---------------------------------------------------------------------------
-function AgentCard({ agent, onOpen }) {
-    const statusLabel = { active: 'Online', inactive: 'Offline', unknown: 'Unknown' };
+const AVATAR_COLORS = [
+    { bg: '#EEEDFE', color: '#3C3489' },
+    { bg: '#E1F5EE', color: '#085041' },
+    { bg: '#E6F1FB', color: '#0C447C' },
+    { bg: '#FAECE7', color: '#993C1D' },
+    { bg: '#FBEAF0', color: '#72243E' },
+    { bg: '#FAEEDA', color: '#633806' },
+];
+
+function avatarStyle(index) {
+    return AVATAR_COLORS[index % AVATAR_COLORS.length];
+}
+
+function agentInitials(name) {
+    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+// ---------------------------------------------------------------------------
+// StatusPill
+// ---------------------------------------------------------------------------
+function StatusPill({ status }) {
+    const map = {
+        active:   { label: 'Online',  cls: 'tcl-pill-online'  },
+        inactive: { label: 'Offline', cls: 'tcl-pill-offline' },
+        busy:     { label: 'Busy',    cls: 'tcl-pill-busy'    },
+        unknown:  { label: 'Unknown', cls: 'tcl-pill-offline' },
+    };
+    const { label, cls } = map[status] || map.unknown;
     return (
-        <button className="agent-card" onClick={() => onOpen(agent.id)}>
-            <div className="agent-card-avatar">
-                {agent.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
-            </div>
-            <div className="agent-card-info">
-                <div className="agent-card-name">{agent.name}</div>
-                {agent.description && (
-                    <div className="agent-card-description">{agent.description}</div>
-                )}
-                <div className={`agent-card-status status-${agent.status || 'unknown'}`}>
-                    <StatusDot status={agent.status} size={7} />
-                    {statusLabel[agent.status] || 'Unknown'}
-                </div>
-            </div>
-            <div className="agent-card-arrow">→</div>
-        </button>
+        <span className={`tcl-status-pill ${cls}`}>
+            <span className={`tcl-dot ${cls}`} />
+            {label}
+        </span>
     );
 }
 
 // ---------------------------------------------------------------------------
-// TabBar — horizontal row of open-agent tabs
+// AgentCard — used in the card-grid launcher
 // ---------------------------------------------------------------------------
-function TabBar({ openAgents, selectedAgentId, unreadCounts, onSelect, onClose }) {
+function AgentCard({ agent, index, onOpen }) {
+    const { bg, color } = avatarStyle(index);
+    const initials = agentInitials(agent.name);
     return (
-        <div className="tab-bar">
-            <div className="tab-list">
-                {openAgents.map(agent => {
-                    const isActive = agent.id === selectedAgentId;
-                    const unread   = unreadCounts?.[agent.id] || 0;
-                    return (
-                        <button
-                            key={agent.id}
-                            className={`tab ${isActive ? 'tab-active' : ''}`}
-                            onClick={() => onSelect(agent.id)}
-                        >
-                            <StatusDot status={agent.status} size={7} />
-                            <span className="tab-name">{agent.name}</span>
-                            {unread > 0 && (
-                                <span className="tab-badge">{unread}</span>
-                            )}
-                            <span
-                                className="tab-close"
-                                onClick={(e) => onClose(agent.id, e)}
-                                title="Close tab"
-                            >
-                                ×
-                            </span>
-                        </button>
-                    );
-                })}
+        <div
+            className="tcl-agent-card"
+            onClick={() => onOpen(agent.id)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && onOpen(agent.id)}
+        >
+            <div className="tcl-card-top">
+                <div className="tcl-card-avatar" style={{ background: bg, color }}>
+                    {initials}
+                </div>
+                <div className="tcl-card-meta">
+                    <div className="tcl-card-name">{agent.name}</div>
+                    {agent.description && (
+                        <div className="tcl-card-type">{agent.description}</div>
+                    )}
+                </div>
+                <StatusPill status={agent.status} />
+            </div>
+            {agent.description && (
+                <div className="tcl-card-desc">{agent.description}</div>
+            )}
+            <div className="tcl-card-footer">
+                <button
+                    className="tcl-open-btn"
+                    onClick={(e) => { e.stopPropagation(); onOpen(agent.id); }}
+                >
+                    Open ↗
+                </button>
             </div>
         </div>
     );
 }
 
 // ---------------------------------------------------------------------------
-// BrowsePanel — collapsible left panel for searching / listing all agents
+// TabBar
+// ---------------------------------------------------------------------------
+function TabBar({ openAgents, selectedAgentId, allAgents, unreadCounts, onSelect, onClose }) {
+    return (
+        <div className="tcl-tab-bar">
+            {openAgents.map((agent) => {
+                const isActive = agent.id === selectedAgentId;
+                const unread   = unreadCounts?.[agent.id] || 0;
+                const agentIdx = allAgents.findIndex(a => a.id === agent.id);
+                const { bg, color } = avatarStyle(agentIdx >= 0 ? agentIdx : 0);
+                return (
+                    <button
+                        key={agent.id}
+                        className={`tcl-tab ${isActive ? 'tcl-tab-active' : ''}`}
+                        onClick={() => onSelect(agent.id)}
+                    >
+                        <div
+                            className="tcl-tab-avatar"
+                            style={{ background: bg, color }}
+                        >
+                            {agentInitials(agent.name)}
+                        </div>
+                        <span className="tcl-tab-name">{agent.name}</span>
+                        {unread > 0 && (
+                            <span className="tcl-tab-badge">{unread}</span>
+                        )}
+                        <span
+                            className="tcl-tab-close"
+                            onClick={(e) => onClose(agent.id, e)}
+                            title="Close tab"
+                        >
+                            ×
+                        </span>
+                    </button>
+                );
+            })}
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// BrowsePanel
 // ---------------------------------------------------------------------------
 function BrowsePanel({
-                         filteredAgents, selectedAgentId,
+                         filteredAgents, selectedAgentId, allAgents,
                          searchQuery, setSearchQuery,
                          onOpen, fetchAgents,
                          isCollapsed, onToggle,
                      }) {
     return (
-        <div className={`browse-panel ${isCollapsed ? 'browse-panel-collapsed' : ''}`}>
-            <div className="browse-panel-header">
+        <div className={`tcl-browse ${isCollapsed ? 'tcl-browse-collapsed' : ''}`}>
+            <div className="tcl-browse-hdr">
                 {!isCollapsed && (
-                    <span className="browse-panel-title">All Agents</span>
+                    <span className="tcl-browse-title">All agents</span>
                 )}
                 <button
-                    className="browse-toggle-btn"
+                    className="tcl-browse-toggle"
                     onClick={onToggle}
                     title={isCollapsed ? 'Expand panel' : 'Collapse panel'}
                 >
@@ -109,8 +169,9 @@ function BrowsePanel({
 
             {!isCollapsed && (
                 <>
-                    <div className="browse-search">
+                    <div className="tcl-browse-search-wrap">
                         <input
+                            className="tcl-browse-search"
                             type="text"
                             placeholder="Search agents…"
                             value={searchQuery}
@@ -118,25 +179,34 @@ function BrowsePanel({
                         />
                     </div>
 
-                    <ul className="browse-agent-list">
+                    <ul className="tcl-browse-list">
                         {filteredAgents.length === 0 ? (
-                            <li className="browse-no-agents">No agents found.</li>
+                            <li className="tcl-browse-empty">No agents found.</li>
                         ) : (
-                            filteredAgents.map(agent => (
-                                <li
-                                    key={agent.id}
-                                    className={`browse-agent-item ${selectedAgentId === agent.id ? 'selected' : ''}`}
-                                    onClick={() => onOpen(agent.id)}
-                                    title={agent.description}
-                                >
-                                    <StatusDot status={agent.status} size={8} />
-                                    <span className="browse-agent-name">{agent.name}</span>
-                                </li>
-                            ))
+                            filteredAgents.map((agent) => {
+                                const idx = allAgents.findIndex(a => a.id === agent.id);
+                                const { bg, color } = avatarStyle(idx >= 0 ? idx : 0);
+                                return (
+                                    <li
+                                        key={agent.id}
+                                        className={`tcl-browse-item ${selectedAgentId === agent.id ? 'tcl-browse-selected' : ''}`}
+                                        onClick={() => onOpen(agent.id)}
+                                        title={agent.description}
+                                    >
+                                        <div
+                                            className="tcl-browse-avatar"
+                                            style={{ background: bg, color }}
+                                        >
+                                            {agentInitials(agent.name)}
+                                        </div>
+                                        <span className="tcl-browse-name">{agent.name}</span>
+                                    </li>
+                                );
+                            })
                         )}
                     </ul>
 
-                    <button className="browse-refresh-btn" onClick={fetchAgents}>
+                    <button className="tcl-browse-refresh" onClick={fetchAgents}>
                         ↻ Refresh
                     </button>
                 </>
@@ -157,14 +227,14 @@ function CardGridLauncher({ agents, searchQuery, setSearchQuery, onOpen }) {
         : agents;
 
     return (
-        <div className="card-grid-launcher">
-            <div className="card-grid-header">
-                <h2 className="card-grid-title">Choose an Agent</h2>
-                <p className="card-grid-subtitle">
-                    Select an agent below to start a conversation.
-                </p>
-                <div className="card-grid-search">
+        <div className="tcl-launcher">
+            <div className="tcl-launcher-header">
+                <div className="tcl-launcher-title">Choose an agent</div>
+                <div className="tcl-launcher-sub">Select an agent below to start a conversation.</div>
+                <div className="tcl-launcher-search-wrap">
+                    <span className="tcl-launcher-search-icon">⌕</span>
                     <input
+                        className="tcl-launcher-search"
                         type="text"
                         placeholder="Search agents…"
                         value={searchQuery}
@@ -172,12 +242,12 @@ function CardGridLauncher({ agents, searchQuery, setSearchQuery, onOpen }) {
                     />
                 </div>
             </div>
-            <div className="agent-card-grid">
+            <div className="tcl-launcher-grid">
                 {filtered.length === 0 ? (
-                    <p className="card-grid-empty">No agents match your search.</p>
+                    <div className="tcl-launcher-empty">No agents match your search.</div>
                 ) : (
-                    filtered.map(agent => (
-                        <AgentCard key={agent.id} agent={agent} onOpen={onOpen} />
+                    filtered.map((agent, i) => (
+                        <AgentCard key={agent.id} agent={agent} index={i} onOpen={onOpen} />
                     ))
                 )}
             </div>
@@ -208,6 +278,10 @@ export function TabCardLayout(props) {
     const [panelCollapsed, setPanelCollapsed] = useState(false);
     const hasOpenTabs = openAgents.length > 0;
 
+    const selectedIndex = agents.findIndex(a => a.id === selectedAgentId);
+    const { bg, color } = selectedAgent ? avatarStyle(selectedIndex >= 0 ? selectedIndex : 0) : {};
+    const initials = selectedAgent ? agentInitials(selectedAgent.name) : '';
+
     return (
         <div className="tcl-container">
 
@@ -215,6 +289,7 @@ export function TabCardLayout(props) {
             <BrowsePanel
                 filteredAgents={filteredAgents}
                 selectedAgentId={selectedAgentId}
+                allAgents={agents}
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 onOpen={handleSelectAgent}
@@ -223,49 +298,45 @@ export function TabCardLayout(props) {
                 onToggle={() => setPanelCollapsed(p => !p)}
             />
 
-            {/* ── Main area (center, between browse panel and trace sidebar) ── */}
+            {/* ── Main area ── */}
             <div className="tcl-main">
                 {hasOpenTabs ? (
                     <>
-                        {/* Tab bar */}
                         <TabBar
                             openAgents={openAgents}
                             selectedAgentId={selectedAgentId}
+                            allAgents={agents}
                             unreadCounts={unreadCounts}
                             onSelect={handleSelectAgent}
                             onClose={handleCloseTab}
                         />
 
-                        {/* Chat area */}
                         <div className="tcl-chat-area">
                             {selectedAgent ? (
                                 <>
-                                    {/* Richer chat header */}
                                     <div className="tcl-chat-header">
                                         <div className="tcl-chat-header-left">
-                                            <div className="tcl-agent-avatar">
-                                                {selectedAgent.name
-                                                    .split(' ')
-                                                    .map(w => w[0])
-                                                    .join('')
-                                                    .slice(0, 2)
-                                                    .toUpperCase()}
+                                            <div className="tcl-chat-avatar" style={{ background: bg, color }}>
+                                                {initials}
                                             </div>
                                             <div>
-                                                <div className="tcl-agent-name">{selectedAgent.name}</div>
-                                                {selectedAgent.description && (
-                                                    <div className="tcl-agent-desc">{selectedAgent.description}</div>
-                                                )}
+                                                <div className="tcl-chat-agent-name">{selectedAgent.name}</div>
+                                                <div className="tcl-chat-agent-meta">
+                                                    {selectedAgent.description && (
+                                                        <span className="tcl-chat-agent-desc">{selectedAgent.description}</span>
+                                                    )}
+                                                    <StatusPill status={selectedAgent.status} />
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="header-actions">
+                                        <div className="tcl-header-actions">
                                             <button
-                                                className="toggle-trace-btn"
+                                                className="tcl-trace-btn"
                                                 onClick={() => setShowTrace(!showTrace)}
                                             >
-                                                {showTrace ? 'Hide Trace' : 'Show Trace'}
+                                                {showTrace ? 'Hide trace' : 'Show trace'}
                                             </button>
-                                            <button className="clear-session-btn" onClick={handleClearSession}>
+                                            <button className="tcl-clear-btn" onClick={handleClearSession}>
                                                 Clear
                                             </button>
                                         </div>
@@ -292,14 +363,13 @@ export function TabCardLayout(props) {
                                     />
                                 </>
                             ) : (
-                                <div className="empty-state">
+                                <div className="tcl-empty-state">
                                     <p>Select a tab above to continue a conversation.</p>
                                 </div>
                             )}
                         </div>
                     </>
                 ) : (
-                    /* Card grid launcher — shown when no tabs are open */
                     <CardGridLauncher
                         agents={agents}
                         searchQuery={searchQuery}
@@ -309,7 +379,7 @@ export function TabCardLayout(props) {
                 )}
             </div>
 
-            {/* ── Trace Sidebar (right) — sibling of tcl-main so it spans full height ── */}
+            {/* ── Trace sidebar (right) ── */}
             {showTrace && (
                 <TraceLogSidebar
                     logs={currentTraceLogs}
@@ -318,7 +388,6 @@ export function TabCardLayout(props) {
                     onClose={() => setShowTrace(false)}
                 />
             )}
-
         </div>
     );
 }

@@ -1,7 +1,6 @@
 /*
  * styles-tabcard.css
- * Styles exclusive to TabCardLayout. The original styles.css handles all
- * shared primitives (messages, trace log, input area, etc.).
+ * Styles exclusive to TabCardLayout.
  */
 
 /* ── Root container ──────────────────────────────────────────────────────── */
@@ -9,142 +8,152 @@
     display: flex;
     height: 100vh;
     overflow: hidden;
-    background-color: #f1f5f9; /* Softer background */
+    background: #f1f5f9;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* ── Browse panel (left) ─────────────────────────────────────────────────── */
-.browse-panel {
-    width: 260px;
-    min-width: 260px;
-    background-color: #0f172a;
-    color: #f1f5f9;
+.tcl-browse {
+    width: 220px;
+    min-width: 220px;
+    background: #0f172a;
     display: flex;
     flex-direction: column;
-    border-right: 1px solid #1e293b;
-    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-                min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-right: 0.5px solid #1e293b;
+    transition: width 0.22s ease, min-width 0.22s ease;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
-.browse-panel-collapsed {
-    width: 52px;
-    min-width: 52px;
+.tcl-browse-collapsed {
+    width: 48px;
+    min-width: 48px;
 }
 
-.browse-panel-header {
+.tcl-browse-hdr {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 14px;
-    background-color: #020617;
-    flex-shrink: 0;
-    height: 60px;
+    padding: 12px 12px;
+    background: #020617;
+    border-bottom: 0.5px solid #1e293b;
+    height: 44px;
     box-sizing: border-box;
+    flex-shrink: 0;
 }
 
-.browse-panel-title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
+.tcl-browse-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748b;
     text-transform: uppercase;
-    color: #94a3b8;
+    letter-spacing: 0.05em;
     white-space: nowrap;
 }
 
-.browse-toggle-btn {
+.tcl-browse-toggle {
     background: none;
     border: none;
-    color: #64748b;
+    color: #475569;
     cursor: pointer;
-    font-size: 1.4rem;
-    padding: 2px 6px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
+    font-size: 1.2rem;
+    padding: 2px 4px;
+    border-radius: 5px;
+    transition: all 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
-.browse-toggle-btn:hover { color: #fff; background: #1e293b; }
+.tcl-browse-toggle:hover { color: #fff; background: #1e293b; }
 
-.browse-search {
-    padding: 12px 14px 8px;
+.tcl-browse-search-wrap {
+    padding: 10px 10px 6px;
 }
-.browse-search input {
+
+.tcl-browse-search {
     width: 100%;
-    padding: 10px 14px;
-    border-radius: 8px;
-    border: 1px solid #334155;
-    background-color: #1e293b;
+    padding: 7px 10px;
+    border-radius: 7px;
+    border: 0.5px solid #334155;
+    background: #1e293b;
     color: #f8fafc;
-    font-size: 0.9rem;
+    font-size: 11px;
+    font-family: inherit;
     box-sizing: border-box;
-    transition: all 0.2s ease;
-}
-.browse-search input:focus {
     outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    transition: all 0.15s;
 }
-.browse-search input::placeholder { color: #64748b; }
+.tcl-browse-search:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.15); }
+.tcl-browse-search::placeholder { color: #475569; }
 
-.browse-agent-list {
+.tcl-browse-list {
     list-style: none;
-    padding: 8px 10px;
+    padding: 6px 8px;
     margin: 0;
     overflow-y: auto;
-    flex-grow: 1;
+    flex: 1;
 }
 
-.browse-agent-item {
+.tcl-browse-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 8px;
+    gap: 8px;
+    padding: 7px 9px;
+    border-radius: 7px;
     cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #cbd5e1;
-    transition: all 0.2s ease;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
+    transition: all 0.12s;
 }
-.browse-agent-item:hover { background-color: #1e293b; color: #f1f5f9; }
-.browse-agent-item.selected {
-    background-color: #6366f1;
-    color: #fff;
-    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+.tcl-browse-item:hover { background: #1e293b; }
+.tcl-browse-selected { background: #6366f1 !important; }
+.tcl-browse-selected .tcl-browse-name { color: #fff !important; }
+
+.tcl-browse-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 500;
+    flex-shrink: 0;
 }
 
-.browse-agent-name {
+.tcl-browse-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #94a3b8;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.browse-no-agents {
-    color: #64748b;
-    font-size: 0.85rem;
+.tcl-browse-empty {
+    color: #475569;
+    font-size: 11px;
     font-style: italic;
-    padding: 16px;
+    padding: 14px;
     text-align: center;
 }
 
-.browse-refresh-btn {
-    margin: 12px;
-    padding: 10px 14px;
+.tcl-browse-refresh {
+    margin: 8px;
+    padding: 8px;
     background: none;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    color: #94a3b8;
-    font-size: 0.85rem;
-    font-weight: 600;
+    border: 0.5px solid #334155;
+    border-radius: 7px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    font-family: inherit;
+    transition: all 0.15s;
     text-align: center;
+    flex-shrink: 0;
 }
-.browse-refresh-btn:hover { background: #1e293b; color: #f1f5f9; border-color: #475569; }
+.tcl-browse-refresh:hover { background: #1e293b; color: #f1f5f9; border-color: #475569; }
 
 /* ── Main area ───────────────────────────────────────────────────────────── */
 .tcl-main {
@@ -153,93 +162,95 @@
     flex-direction: column;
     overflow: hidden;
     min-width: 0;
-    background-color: #f1f5f9; /* Matches container */
 }
 
 /* ── Tab bar ─────────────────────────────────────────────────────────────── */
-.tab-bar {
+.tcl-tab-bar {
     display: flex;
-    align-items: stretch;
-    background-color: #ffffff; /* Contrast against background */
-    border-bottom: 1px solid #e2e8f0;
-    height: 48px;
+    align-items: flex-end;
+    background: #ffffff;
+    border-bottom: 0.5px solid #e2e8f0;
+    height: 44px;
     flex-shrink: 0;
     overflow-x: auto;
     scrollbar-width: none;
-    padding: 0 8px;
+    padding: 0 10px;
+    gap: 2px;
 }
-.tab-bar::-webkit-scrollbar { display: none; }
+.tcl-tab-bar::-webkit-scrollbar { display: none; }
 
-.tab-list {
-    display: flex;
-    align-items: flex-end; /* Tabs sit on the bottom border */
-    gap: 4px;
-    padding: 0;
-    height: 100%;
-}
-
-.tab {
+.tcl-tab {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 0 16px;
-    height: 40px;
+    gap: 7px;
+    padding: 0 12px;
+    height: 36px;
     background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    border: 0.5px solid #e2e8f0;
     border-bottom: none;
-    margin-bottom: 0;
+    border-radius: 8px 8px 0 0;
     cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 500;
     color: #64748b;
     white-space: nowrap;
-    transition: all 0.2s ease;
-    border-radius: 10px 10px 0 0;
+    transition: all 0.15s;
+    font-family: inherit;
 }
-.tab:hover { color: #0f172a; background-color: #f1f5f9; }
-.tab-active {
+.tcl-tab:hover { color: #0f172a; background: #f1f5f9; }
+.tcl-tab-active {
     color: #4f46e5;
-    background-color: #ffffff;
+    background: #ffffff;
     border-bottom: 2px solid #6366f1;
-    padding-bottom: 2px; /* Visual adjustment for the thick border */
-    height: 42px; /* Taller to overlap bottom border */
+    height: 40px;
     z-index: 1;
-    box-shadow: 0 -2px 6px rgba(0,0,0,0.02);
 }
 
-.tab-name {
-    max-width: 140px;
+.tcl-tab-avatar {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.tcl-tab-name {
+    max-width: 120px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.tab-badge {
-    background-color: #ef4444;
+.tcl-tab-badge {
+    background: #ef4444;
     color: #fff;
-    font-size: 0.7rem;
+    font-size: 10px;
     font-weight: 700;
     border-radius: 10px;
-    padding: 2px 6px;
-    min-width: 18px;
+    padding: 1px 5px;
+    min-width: 16px;
     text-align: center;
 }
 
-.tab-close {
+.tcl-tab-close {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     color: #94a3b8;
-    font-size: 1.1rem;
+    font-size: 1rem;
     line-height: 1;
-    margin-left: 4px;
-    transition: all 0.2s ease;
+    transition: all 0.15s;
+    margin-left: 2px;
 }
-.tab-close:hover { background-color: #fee2e2; color: #ef4444; }
+.tcl-tab-close:hover { background: #fee2e2; color: #ef4444; }
 
-/* ── Chat area (inside main, below tabs) ─────────────────────────────────── */
+/* ── Chat area (below tab bar) ───────────────────────────────────────────── */
 .tcl-chat-area {
     flex: 1;
     display: flex;
@@ -247,262 +258,271 @@
     overflow: hidden;
     min-width: 0;
     background: #ffffff;
-    border-radius: 12px;
-    margin: 16px; /* Floating look */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    margin: 12px;
+    border: 0.5px solid #e2e8f0;
 }
 
-/* Chat header (richer than original) */
+/* ── Chat header ─────────────────────────────────────────────────────────── */
 .tcl-chat-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 24px;
-    background-color: transparent;
-    border-bottom: 1px solid #f1f5f9;
+    padding: 12px 18px;
+    border-bottom: 0.5px solid #f1f5f9;
     flex-shrink: 0;
+    background: #ffffff;
 }
 
 .tcl-chat-header-left {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
 }
 
-.tcl-agent-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    color: #fff;
-    font-size: 1rem;
-    font-weight: 700;
+.tcl-chat-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
-    letter-spacing: 0.05em;
+    font-size: 12px;
+    font-weight: 500;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
 }
 
-.tcl-agent-name {
-    font-size: 1.1rem;
-    font-weight: 700;
+.tcl-chat-agent-name {
+    font-size: 14px;
+    font-weight: 500;
     color: #0f172a;
+    margin-bottom: 3px;
 }
 
-.tcl-agent-desc {
-    font-size: 0.85rem;
+.tcl-chat-agent-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tcl-chat-agent-desc {
+    font-size: 11px;
     color: #64748b;
-    margin-top: 2px;
 }
 
-/* ── Card grid launcher ──────────────────────────────────────────────────── */
-.card-grid-launcher {
+/* Status pill */
+.tcl-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+.tcl-pill-online  { background: #EAF3DE; color: #3B6D11; }
+.tcl-pill-offline { background: #f1f5f9; color: #94a3b8; border: 0.5px solid #e2e8f0; }
+.tcl-pill-busy    { background: #FAEEDA; color: #633806; }
+
+.tcl-dot {
+    width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
+}
+.tcl-dot.tcl-pill-online  { background: #639922; }
+.tcl-dot.tcl-pill-offline { background: #94a3b8; }
+.tcl-dot.tcl-pill-busy    { background: #BA7517; }
+
+.tcl-header-actions { display: flex; gap: 8px; }
+
+.tcl-trace-btn,
+.tcl-clear-btn {
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    border: 0.5px solid #e2e8f0;
+    background: #f8fafc;
+    color: #64748b;
+}
+.tcl-trace-btn:hover { background: #f1f5f9; color: #0f172a; border-color: #cbd5e1; }
+.tcl-clear-btn:hover { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
+
+/* ── Empty state (inside chat area, no agent selected) ───────────────────── */
+.tcl-empty-state {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+/* ── Card-grid launcher ──────────────────────────────────────────────────── */
+.tcl-launcher {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    padding: 64px 8%;
-    background: transparent;
+    padding: 40px 32px;
+    background: #f8fafc;
 }
 
-.card-grid-header {
-    margin-bottom: 40px;
+.tcl-launcher-header {
+    margin-bottom: 28px;
     text-align: center;
 }
 
-.card-grid-title {
-    font-size: 2.2rem;
-    font-weight: 800;
+.tcl-launcher-title {
+    font-size: 20px;
+    font-weight: 500;
     color: #0f172a;
-    margin: 0 0 12px;
-    letter-spacing: -0.03em;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
 }
 
-.card-grid-subtitle {
+.tcl-launcher-sub {
     color: #64748b;
-    font-size: 1.05rem;
-    margin: 0 0 32px;
+    font-size: 13px;
+    margin-bottom: 20px;
 }
 
-.card-grid-search {
-    max-width: 480px;
+.tcl-launcher-search-wrap {
+    max-width: 400px;
     margin: 0 auto;
-}
-.card-grid-search input {
-    width: 100%;
-    padding: 14px 20px;
-    border-radius: 12px;
-    border: 1px solid #cbd5e1;
-    font-size: 1rem;
-    background-color: #fff;
-    color: #1e293b;
-    box-sizing: border-box;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-}
-.card-grid-search input:focus {
-    outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    position: relative;
 }
 
-.agent-card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-}
-
-.card-grid-empty {
+.tcl-launcher-search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
     color: #94a3b8;
-    font-style: italic;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.tcl-launcher-search {
+    width: 100%;
+    height: 36px;
+    padding: 0 12px 0 32px;
+    border-radius: 8px;
+    border: 0.5px solid #e2e8f0;
+    font-size: 13px;
+    background: #ffffff;
+    color: #0f172a;
+    box-sizing: border-box;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.15s;
+}
+.tcl-launcher-search:focus { border-color: #94a3b8; }
+.tcl-launcher-search::placeholder { color: #94a3b8; }
+
+.tcl-launcher-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1px;
+    background: #e2e8f0;
+    border: 0.5px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.tcl-launcher-empty {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 40px;
+    padding: 50px 20px;
+    color: #94a3b8;
+    font-size: 13px;
+    background: #ffffff;
 }
 
-/* Agent card */
-.agent-card {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px 24px;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    background-color: #ffffff;
+/* ── Agent card (in launcher grid) ──────────────────────────────────────── */
+.tcl-agent-card {
+    background: #ffffff;
+    padding: 16px 18px;
     cursor: pointer;
-    text-align: left;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-}
-.agent-card:hover {
-    border-color: #6366f1;
-    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.1);
-    transform: translateY(-4px);
-}
-.agent-card:active { transform: translateY(0); }
-
-.agent-card-avatar {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    color: #fff;
-    font-size: 1.1rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    letter-spacing: 0.05em;
-    flex-shrink: 0;
-}
-
-.agent-card-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.agent-card-name {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.agent-card-description {
-    font-size: 0.85rem;
-    color: #64748b;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 8px;
-}
-
-.agent-card-status {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-}
-.agent-card-status.status-active  { color: #059669; }
-.agent-card-status.status-inactive { color: #64748b; }
-.agent-card-status.status-unknown  { color: #d97706; }
-
-.agent-card-arrow {
-    color: #cbd5e1;
-    font-size: 1.2rem;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-}
-.agent-card:hover .agent-card-arrow { color: #6366f1; transform: translateX(4px); }
-
-/* ── Empty state (used in tcl-chat-area when no agent selected) ───────────── */
-.empty-state {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #94a3b8;
-    gap: 16px;
-    padding: 40px;
-    text-align: center;
-    background: transparent;
+    gap: 10px;
+    transition: background 0.12s;
+    outline: none;
 }
+.tcl-agent-card:hover { background: #f8fafc; }
+.tcl-agent-card:focus-visible { box-shadow: inset 0 0 0 2px #6366f1; }
 
-.empty-state-icon { font-size: 3.5rem; }
-
-.empty-state h3 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0;
-}
-
-.empty-state p {
-    font-size: 1rem;
-    color: #64748b;
-    margin: 0;
-    max-width: 320px;
-}
-
-.empty-state-agents {
+.tcl-card-top {
     display: flex;
-    flex-wrap: wrap;
+    align-items: flex-start;
     gap: 12px;
-    justify-content: center;
-    margin-top: 12px;
 }
 
-.empty-state-agent-btn {
+.tcl-card-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    background: #fff;
-    color: #334155;
-    font-size: 0.9rem;
-    font-weight: 600;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.tcl-card-meta { flex: 1; min-width: 0; }
+
+.tcl-card-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #0f172a;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tcl-card-type {
+    font-size: 11px;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tcl-card-desc {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.tcl-card-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 8px;
+    border-top: 0.5px solid #f1f5f9;
+}
+
+.tcl-open-btn {
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748b;
+    background: none;
+    border: 0.5px solid #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 7px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    font-family: inherit;
+    transition: all 0.12s;
 }
-.empty-state-agent-btn:hover {
-    border-color: #6366f1;
-    color: #4f46e5;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
-    transform: translateY(-2px);
-}
+.tcl-open-btn:hover { background: #f1f5f9; color: #0f172a; border-color: #cbd5e1; }
