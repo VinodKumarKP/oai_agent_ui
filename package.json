@@ -1,13 +1,22 @@
 {
   "name": "a2a-react-ui",
   "version": "1.0.0",
-  "description": "A reusable React component for interacting with A2A agents. To run the demo with a custom registry, use an environment variable: AGENT_REGISTRY_URL=http://my-registry.com npm start",
+  "description": "A reusable React component for interacting with A2A agents.",
   "source": "src/index.js",
   "main": "dist/main.js",
   "module": "dist/module.js",
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "start": "parcel demo/index.html",
-    "build": "parcel build"
+    "build": "parcel build",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/a2a-com/ui.git"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
@@ -19,6 +28,9 @@
     "remark-gfm": "^3.0.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.5",
+    "@babel/preset-env": "^7.24.5",
+    "@babel/preset-react": "^7.24.1",
     "buffer": "^6.0.3",
     "parcel": "^2.12.0",
     "process": "^0.11.10",
