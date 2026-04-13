@@ -12,7 +12,8 @@
     "dist",
     "src",
     "demo",
-    "bin"
+    "bin",
+    ".parcelrc"
   ],
   "scripts": {
     "start": "parcel demo/index.html",
