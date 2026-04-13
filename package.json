@@ -5,16 +5,20 @@
   "source": "src/index.js",
   "main": "dist/main.js",
   "module": "dist/module.js",
+  "bin": {
+    "a2a-react-ui-demo": "./bin/run-demo.js"
+  },
   "files": [
     "dist",
     "src",
-    "demo"
+    "demo",
+    "bin"
   ],
   "scripts": {
     "start": "parcel demo/index.html",
     "build": "parcel build",
-    "prepublishOnly": "npm run build",
-    "start:demo": "node demo/run.js"
+    "build:demo": "parcel build demo/index.html --dist-dir demo/dist",
+    "prepublishOnly": "npm run build && npm run build:demo"
   },
   "repository": {
     "type": "git",
