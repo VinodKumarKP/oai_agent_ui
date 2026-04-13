@@ -1,5 +1,6 @@
 .parcel-cache/
 dist/
+demo/dist/
 .DS_Store
 .env
 .idea
