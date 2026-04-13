@@ -17,7 +17,7 @@ root.render(
     <AgentUI 
       agentRegistryUrl={agentRegistryUrl}
       authToken={mySingleToken}
-      layout="cardchat"
+      layout="sidebar"
     />
   </React.StrictMode>
 );

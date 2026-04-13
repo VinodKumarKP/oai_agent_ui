@@ -9,14 +9,19 @@
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
-    background-color: #ffffff;
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: #f8fafc; /* Softer background */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .ccl-main-content {
     display: flex;
     flex: 1;
     overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.02);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    margin: 0 16px; /* Floating look */
 }
 
 .ccl-chat-area {
@@ -27,152 +32,181 @@
 }
 
 .ccl-back-btn {
-    background: none;
-    border: none;
-    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #475569;
     cursor: pointer;
-    font-size: 1.5rem;
-    padding: 2px 8px;
-    border-radius: 4px;
-    transition: color 0.15s, background 0.15s;
-    margin-right: 4px;
+    font-size: 1.2rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.ccl-back-btn:hover { color: #fff; background: #334155; }
+.ccl-back-btn:hover {
+    color: #0f172a;
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
 
-/* Use tcl-chat-header styles from tabcard for consistency */
+/* ── Chat Header ─────────────────────────────────────────────────────────── */
 .tcl-chat-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 20px;
-    background-color: #ffffff;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 16px 24px;
+    background-color: transparent; /* Seamless blend */
+    border-bottom: none;
     flex-shrink: 0;
 }
 
 .tcl-chat-header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .tcl-agent-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5); /* Indigo gradient */
     color: #fff;
-    font-size: 0.8rem;
+    font-size: 1.1rem;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
     letter-spacing: 0.05em;
     flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
 }
 
 .tcl-agent-name {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 700;
     color: #0f172a;
+    letter-spacing: -0.01em;
 }
 
 .tcl-agent-desc {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: #64748b;
-    margin-top: 1px;
+    margin-top: 2px;
 }
 
-/* ── Card grid launcher (copied from tabcard styles) ────────────────────── */
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.header-actions button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+/* ── Card grid launcher ─────────────────────────────────────────────────── */
 .card-grid-launcher {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    padding: 48px 48px 32px;
-    background: linear-gradient(160deg, #f8fafc 0%, #f0f4ff 100%);
+    padding: 64px 8%;
+    background: linear-gradient(160deg, #f8fafc 0%, #f1f5f9 100%);
     height: 100vh;
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .card-grid-header {
-    margin-bottom: 32px;
+    margin-bottom: 40px;
+    text-align: center;
 }
 
 .card-grid-title {
-    font-size: 1.75rem;
-    font-weight: 700;
+    font-size: 2.2rem;
+    font-weight: 800;
     color: #0f172a;
-    margin: 0 0 6px;
-    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+    letter-spacing: -0.03em;
 }
 
 .card-grid-subtitle {
     color: #64748b;
-    font-size: 0.95rem;
-    margin: 0 0 20px;
+    font-size: 1.05rem;
+    margin: 0 0 32px;
 }
 
 .card-grid-search {
-    max-width: 360px;
+    max-width: 480px;
+    margin: 0 auto;
 }
 .card-grid-search input {
     width: 100%;
-    padding: 10px 16px;
-    border-radius: 10px;
-    border: 1px solid #e2e8f0;
-    font-size: 0.95rem;
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    font-size: 1rem;
     background-color: #fff;
     color: #1e293b;
     box-sizing: border-box;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
 }
 .card-grid-search input:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
 .agent-card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 .card-grid-empty {
     color: #94a3b8;
     font-style: italic;
     grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
 }
 
 .agent-card {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 16px 18px;
-    border-radius: 14px;
+    gap: 16px;
+    padding: 20px 24px;
+    border-radius: 16px;
     border: 1px solid #e2e8f0;
     background-color: #ffffff;
     cursor: pointer;
     text-align: left;
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
 }
 .agent-card:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 4px 16px rgba(59,130,246,0.12);
-    transform: translateY(-2px);
+    border-color: #6366f1;
+    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.1);
+    transform: translateY(-4px);
 }
 .agent-card:active { transform: translateY(0); }
 
 .agent-card-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
     color: #fff;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -187,39 +221,44 @@
 }
 
 .agent-card-name {
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: 1.05rem;
+    font-weight: 700;
     color: #0f172a;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .agent-card-description {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: #64748b;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 
 .agent-card-status {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
 }
-.agent-card-status.status-active  { color: #16a34a; }
-.agent-card-status.status-inactive { color: #94a3b8; }
+.agent-card-status.status-active  { color: #059669; }
+.agent-card-status.status-inactive { color: #64748b; }
 .agent-card-status.status-unknown  { color: #d97706; }
 
 .agent-card-arrow {
     color: #cbd5e1;
-    font-size: 1.1rem;
-    transition: color 0.15s, transform 0.15s;
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
     flex-shrink: 0;
 }
-.agent-card:hover .agent-card-arrow { color: #3b82f6; transform: translateX(3px); }
+.agent-card:hover .agent-card-arrow {
+    color: #6366f1;
+    transform: translateX(4px);
+}
