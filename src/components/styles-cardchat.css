@@ -1,0 +1,225 @@
+/*
+ * styles-cardchat.css
+ * Styles exclusive to CardChatLayout.
+ */
+
+/* ── Chat View ───────────────────────────────────────────────────────────── */
+.ccl-chat-view {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #ffffff;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.ccl-main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.ccl-chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.ccl-back-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+    margin-right: 4px;
+}
+.ccl-back-btn:hover { color: #fff; background: #334155; }
+
+/* Use tcl-chat-header styles from tabcard for consistency */
+.tcl-chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+.tcl-chat-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tcl-agent-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+
+.tcl-agent-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.tcl-agent-desc {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 1px;
+}
+
+/* ── Card grid launcher (copied from tabcard styles) ────────────────────── */
+.card-grid-launcher {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 48px 48px 32px;
+    background: linear-gradient(160deg, #f8fafc 0%, #f0f4ff 100%);
+    height: 100vh;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.card-grid-header {
+    margin-bottom: 32px;
+}
+
+.card-grid-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+}
+
+.card-grid-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0 0 20px;
+}
+
+.card-grid-search {
+    max-width: 360px;
+}
+.card-grid-search input {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.95rem;
+    background-color: #fff;
+    color: #1e293b;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.card-grid-search input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+}
+
+.agent-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+}
+
+.card-grid-empty {
+    color: #94a3b8;
+    font-style: italic;
+    grid-column: 1 / -1;
+}
+
+.agent-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.agent-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 16px rgba(59,130,246,0.12);
+    transform: translateY(-2px);
+}
+.agent-card:active { transform: translateY(0); }
+
+.agent-card-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+
+.agent-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.agent-card-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.agent-card-description {
+    font-size: 0.8rem;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 5px;
+}
+
+.agent-card-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+.agent-card-status.status-active  { color: #16a34a; }
+.agent-card-status.status-inactive { color: #94a3b8; }
+.agent-card-status.status-unknown  { color: #d97706; }
+
+.agent-card-arrow {
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    transition: color 0.15s, transform 0.15s;
+    flex-shrink: 0;
+}
+.agent-card:hover .agent-card-arrow { color: #3b82f6; transform: translateX(3px); }
