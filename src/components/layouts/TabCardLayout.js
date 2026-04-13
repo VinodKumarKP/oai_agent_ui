@@ -21,26 +21,7 @@ import {
     ChatInput,
     TraceLogSidebar,
 } from '../shared/SharedComponents.js';
-
-// ---------------------------------------------------------------------------
-// Avatar color palette — cycles per agent index
-// ---------------------------------------------------------------------------
-const AVATAR_COLORS = [
-    { bg: '#EEEDFE', color: '#3C3489' },
-    { bg: '#E1F5EE', color: '#085041' },
-    { bg: '#E6F1FB', color: '#0C447C' },
-    { bg: '#FAECE7', color: '#993C1D' },
-    { bg: '#FBEAF0', color: '#72243E' },
-    { bg: '#FAEEDA', color: '#633806' },
-];
-
-function avatarStyle(index) {
-    return AVATAR_COLORS[index % AVATAR_COLORS.length];
-}
-
-function agentInitials(name) {
-    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-}
+import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 // ---------------------------------------------------------------------------
 // StatusPill

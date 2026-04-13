@@ -1,101 +1,66 @@
-/**
- * CardChatLayout — professional agent registry grid that opens a chat window.
- *
- * ┌──────────────────────────────────────────────────┐
- * │  Header: title + agent count badge               │
- * │  Tabs: All | Online | Offline                    │
- * ├──────────────────────────────────────────────────┤
- * │  Toolbar: [Search] [Grid|List toggle]            │
- * ├──────────────────────────────────────────────────┤
- * │  ┌───────────┐   ┌───────────┐   ┌───────────┐   │
- * │  │ Agent A   │   │ Agent B   │   │ Agent C   │   │
- * │  └───────────┘   └───────────┘   └───────────┘   │
- * └──────────────────────────────────────────────────┘
- *
- * Clicking a card transitions to a full-window chat view.
- * Receives all props from useAgentCore() via AgentUI.js.
- */
 import React, { useState, useMemo } from 'react';
-import {
-    StatusDot,
-    ChatMessages,
-    ChatInput,
-    TraceLogSidebar,
-} from '../shared/SharedComponents.js';
+import { TraceLogSidebar } from '../shared/TraceLogSidebar.js';
+import { ChatWindow }      from '../shared/ChatWindow.js';
+import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 // ---------------------------------------------------------------------------
-// Avatar color palette — cycles through ramps per agent index
+// Helpers / Sub-components
 // ---------------------------------------------------------------------------
-const AVATAR_COLORS = [
-    { bg: '#EEEDFE', color: '#3C3489' }, // purple
-    { bg: '#E1F5EE', color: '#085041' }, // teal
-    { bg: '#E6F1FB', color: '#0C447C' }, // blue
-    { bg: '#FAECE7', color: '#993C1D' }, // coral
-    { bg: '#FBEAF0', color: '#72243E' }, // pink
-    { bg: '#FAEEDA', color: '#633806' }, // amber
-];
-
-function avatarStyle(index) {
-    return AVATAR_COLORS[index % AVATAR_COLORS.length];
-}
-
-function agentInitials(name) {
-    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-}
-
-// ---------------------------------------------------------------------------
-// StatusPill — inline Online / Busy / Offline badge
-// ---------------------------------------------------------------------------
-function StatusPill({ status }) {
-    const map = {
-        active:   { label: 'Online',  cls: 'ccl-pill-online'  },
-        inactive: { label: 'Offline', cls: 'ccl-pill-offline' },
-        busy:     { label: 'Busy',    cls: 'ccl-pill-busy'    },
-        unknown:  { label: 'Unknown', cls: 'ccl-pill-offline' },
-    };
-    const { label, cls } = map[status] || map.unknown;
+function StatusDot({ status }) {
+    let color = '#ccc';
+    if (status === 'active')   color = '#4CAF50'; // Green
+    if (status === 'inactive') color = '#F44336'; // Red
     return (
-        <span className={`ccl-status-pill ${cls}`}>
-            <span className={`ccl-dot ${cls}`} />
-            {label}
-        </span>
+        <span
+            className="ccl-status-dot"
+            style={{ backgroundColor: color }}
+            title={`Status: ${status}`}
+        />
     );
 }
 
-// ---------------------------------------------------------------------------
-// AgentCard — one card in the grid or list view
-// ---------------------------------------------------------------------------
 function AgentCard({ agent, index, onOpen, isListView }) {
     const { bg, color } = avatarStyle(index);
     const initials = agentInitials(agent.name);
 
-    return (
-        <div
-            className={`ccl-agent-card ${isListView ? 'ccl-list-card' : ''}`}
-            onClick={() => onOpen(agent.id)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && onOpen(agent.id)}
-        >
-            <div className="ccl-card-top">
-                <div className="ccl-card-avatar" style={{ background: bg, color }}>
+    if (isListView) {
+        return (
+            <div className="ccl-agent-list-item" onClick={() => onOpen(agent.id)}>
+                <div className="ccl-list-avatar" style={{ backgroundColor: bg, color }}>
                     {initials}
                 </div>
-                <div className="ccl-card-meta">
-                    <div className="ccl-card-name">{agent.name}</div>
-                    {agent.description && (
-                        <div className="ccl-card-type">{agent.description}</div>
-                    )}
+                <div className="ccl-list-info">
+                    <div className="ccl-list-name">
+                        {agent.name} <StatusDot status={agent.status} />
+                    </div>
+                    <div className="ccl-list-desc">{agent.description || 'No description available.'}</div>
                 </div>
-                <StatusPill status={agent.status} />
+                <button className="ccl-open-btn ccl-list-open">Open</button>
             </div>
-            {!isListView && agent.description && (
-                <div className="ccl-card-desc">{agent.description}</div>
-            )}
+        );
+    }
+
+    return (
+        <div className="ccl-agent-card" onClick={() => onOpen(agent.id)}>
+            <div className="ccl-card-header">
+                <div className="ccl-card-avatar" style={{ backgroundColor: bg, color }}>
+                    {initials}
+                </div>
+                <StatusDot status={agent.status} />
+            </div>
+            <div className="ccl-card-body">
+                <div className="ccl-card-name" title={agent.name}>{agent.name}</div>
+                <div className="ccl-card-desc" title={agent.description}>
+                    {agent.description || 'No description provided for this agent.'}
+                </div>
+            </div>
             <div className="ccl-card-footer">
                 <button
                     className="ccl-open-btn"
-                    onClick={(e) => { e.stopPropagation(); onOpen(agent.id); }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onOpen(agent.id);
+                    }}
                 >
                     Open ↗
                 </button>
@@ -107,7 +72,7 @@ function AgentCard({ agent, index, onOpen, isListView }) {
 // ---------------------------------------------------------------------------
 // AgentRegistry — the main launcher / registry view
 // ---------------------------------------------------------------------------
-function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen }) {
+function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen, registryError }) {
     const [activeTab, setActiveTab] = useState('all');
     const [isListView, setIsListView] = useState(false);
 
@@ -126,8 +91,8 @@ function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen }) {
     }, [agents, activeTab, searchQuery]);
 
     const tabs = [
-        { id: 'all',     label: 'All' },
-        { id: 'online',  label: 'Online' },
+        { id: 'all', label: 'All Agents' },
+        { id: 'online', label: 'Online' },
         { id: 'offline', label: 'Offline' },
     ];
 
@@ -168,141 +133,46 @@ function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen }) {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-                <div className="ccl-view-toggle">
+                <div className="ccl-view-toggles">
                     <button
-                        className={`ccl-vt-btn ${!isListView ? 'ccl-vt-active' : ''}`}
-                        title="Grid view"
+                        className={`ccl-view-btn ${!isListView ? 'ccl-view-active' : ''}`}
                         onClick={() => setIsListView(false)}
+                        title="Grid View"
                     >
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                            <rect x="0" y="0" width="6" height="6" rx="1" fill="currentColor"/>
-                            <rect x="8" y="0" width="6" height="6" rx="1" fill="currentColor"/>
-                            <rect x="0" y="8" width="6" height="6" rx="1" fill="currentColor"/>
-                            <rect x="8" y="8" width="6" height="6" rx="1" fill="currentColor"/>
-                        </svg>
+                        ⊞
                     </button>
                     <button
-                        className={`ccl-vt-btn ${isListView ? 'ccl-vt-active' : ''}`}
-                        title="List view"
+                        className={`ccl-view-btn ${isListView ? 'ccl-view-active' : ''}`}
                         onClick={() => setIsListView(true)}
+                        title="List View"
                     >
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                            <rect x="0" y="1" width="14" height="2" rx="1" fill="currentColor"/>
-                            <rect x="0" y="6" width="14" height="2" rx="1" fill="currentColor"/>
-                            <rect x="0" y="11" width="14" height="2" rx="1" fill="currentColor"/>
-                        </svg>
+                        ☰
                     </button>
                 </div>
             </div>
 
             {/* Grid / List */}
             <div className={`ccl-grid-wrap ${isListView ? 'ccl-list-wrap' : ''}`}>
-                <div className={`ccl-agent-grid ${isListView ? 'ccl-agent-list' : ''}`}>
-                    {filtered.length === 0 ? (
-                        <div className="ccl-empty-msg">No agents match your search.</div>
-                    ) : (
-                        filtered.map((agent, i) => (
-                            <AgentCard
-                                key={agent.id}
-                                agent={agent}
-                                index={i}
-                                onOpen={onOpen}
-                                isListView={isListView}
-                            />
-                        ))
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ---------------------------------------------------------------------------
-// ChatView — full-window chat for a selected agent
-// ---------------------------------------------------------------------------
-function ChatView({
-                      agent,
-                      agentIndex,
-                      messages,
-                      isLoading,
-                      message,
-                      attachedFiles,
-                      showTrace,
-                      currentTraceLogs,
-                      chatEndRef,
-                      traceEndRef,
-                      textareaRef,
-                      fileInputRef,
-                      onMessageChange,
-                      onSend,
-                      onStop,
-                      onFileSelect,
-                      onRemoveAttachment,
-                      onClear,
-                      onShowTrace,
-                      onBack,
-                  }) {
-    const { bg, color } = avatarStyle(agentIndex);
-    const initials = agentInitials(agent.name);
-
-    return (
-        <div className="ccl-chat-view">
-            <div className="ccl-chat-header">
-                <div className="ccl-chat-header-left">
-                    <button className="ccl-back-btn" onClick={onBack} title="Back to registry">
-                        ‹
-                    </button>
-                    <div className="ccl-chat-avatar" style={{ background: bg, color }}>
-                        {initials}
+                {registryError ? (
+                    <div className="ccl-error-msg" style={{ padding: '24px', color: '#d32f2f', backgroundColor: '#ffebee', borderRadius: '8px', border: '1px solid #ef9a9a', margin: '16px 0' }}>
+                        <strong>Error loading agents:</strong> {registryError}
                     </div>
-                    <div>
-                        <div className="ccl-chat-agent-name">{agent.name}</div>
-                        {agent.description && (
-                            <div className="ccl-chat-agent-desc">{agent.description}</div>
+                ) : (
+                    <div className={`ccl-agent-grid ${isListView ? 'ccl-agent-list' : ''}`}>
+                        {filtered.length === 0 ? (
+                            <div className="ccl-empty-msg">No agents match your search.</div>
+                        ) : (
+                            filtered.map((agent, i) => (
+                                <AgentCard
+                                    key={agent.id}
+                                    agent={agent}
+                                    index={i}
+                                    onOpen={onOpen}
+                                    isListView={isListView}
+                                />
+                            ))
                         )}
                     </div>
-                </div>
-                <div className="ccl-header-actions">
-                    <button
-                        className="ccl-toggle-trace-btn"
-                        onClick={() => onShowTrace(!showTrace)}
-                    >
-                        {showTrace ? 'Hide trace' : 'Show trace'}
-                    </button>
-                    <button className="ccl-clear-btn" onClick={onClear}>
-                        Clear
-                    </button>
-                </div>
-            </div>
-
-            <div className="ccl-main-content">
-                <div className="ccl-chat-area">
-                    <ChatMessages
-                        messages={messages}
-                        isLoading={isLoading}
-                        agentName={agent.name}
-                        chatEndRef={chatEndRef}
-                    />
-                    <ChatInput
-                        message={message}
-                        isLoading={isLoading}
-                        attachedFiles={attachedFiles}
-                        textareaRef={textareaRef}
-                        fileInputRef={fileInputRef}
-                        onMessageChange={onMessageChange}
-                        onSend={onSend}
-                        onStop={onStop}
-                        onFileSelect={onFileSelect}
-                        onRemoveAttachment={onRemoveAttachment}
-                    />
-                </div>
-                {showTrace && (
-                    <TraceLogSidebar
-                        logs={currentTraceLogs}
-                        selectedAgent={agent}
-                        traceEndRef={traceEndRef}
-                        onClose={() => onShowTrace(false)}
-                    />
                 )}
             </div>
         </div>
@@ -324,6 +194,7 @@ export function CardChatLayout(props) {
         currentTraceLogs,
         showTrace,
         isLoading,
+        registryError,
         chatEndRef,
         traceEndRef,
         textareaRef,
@@ -339,32 +210,76 @@ export function CardChatLayout(props) {
         setShowTrace,
     } = props;
 
-    const agentIndex = agents.findIndex(a => a.id === selectedAgentId);
+    // If an agent is selected, show the chat view
+    if (selectedAgent) {
+        const agentIndex = agents.findIndex(a => a.id === selectedAgentId);
+        const { bg, color } = avatarStyle(agentIndex >= 0 ? agentIndex : 0);
+        const initials = agentInitials(selectedAgent.name);
 
-    if (selectedAgentId && selectedAgent) {
         return (
-            <ChatView
-                agent={selectedAgent}
-                agentIndex={agentIndex >= 0 ? agentIndex : 0}
-                messages={currentMessages}
-                isLoading={isLoading}
-                message={message}
-                attachedFiles={attachedFiles}
-                showTrace={showTrace}
-                currentTraceLogs={currentTraceLogs}
-                chatEndRef={chatEndRef}
-                traceEndRef={traceEndRef}
-                textareaRef={textareaRef}
-                fileInputRef={fileInputRef}
-                onMessageChange={handleMessageChange}
-                onSend={handleSendMessage}
-                onStop={handleStopGeneration}
-                onFileSelect={handleFileSelect}
-                onRemoveAttachment={removeAttachment}
-                onClear={handleClearSession}
-                onShowTrace={setShowTrace}
-                onBack={() => handleSelectAgent(null)}
-            />
+            <div className="ccl-chat-layout">
+                {/* Embedded Toolbar / Header inside Chat */}
+                <div className="ccl-chat-header">
+                    <button className="ccl-back-btn" onClick={() => handleSelectAgent(null)}>
+                        ← Registry
+                    </button>
+                    <div className="ccl-chat-agent-info">
+                        <div className="ccl-chat-avatar" style={{ backgroundColor: bg, color }}>
+                            {initials}
+                        </div>
+                        <div>
+                            <div className="ccl-chat-name">
+                                {selectedAgent.name} <StatusDot status={selectedAgent.status} />
+                            </div>
+                            <div className="ccl-chat-desc" title={selectedAgent.description}>
+                                {selectedAgent.endpoint}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="ccl-header-actions">
+                        <button
+                            className="ccl-toggle-trace-btn"
+                            onClick={() => setShowTrace(!showTrace)}
+                        >
+                            {showTrace ? 'Hide trace' : 'Show trace'}
+                        </button>
+                        <button className="ccl-clear-btn" onClick={handleClearSession}>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div className="ccl-chat-body">
+                    <ChatWindow
+                        messages={currentMessages}
+                        agentName={selectedAgent.name}
+                        agentAvatarBg={bg}
+                        agentAvatarColor={color}
+                        chatEndRef={chatEndRef}
+                        message={message}
+                        isLoading={isLoading}
+                        attachedFiles={attachedFiles}
+                        textareaRef={textareaRef}
+                        fileInputRef={fileInputRef}
+                        onMessageChange={handleMessageChange}
+                        onSend={handleSendMessage}
+                        onStop={handleStopGeneration}
+                        onFileSelect={handleFileSelect}
+                        onRemoveAttachment={removeAttachment}
+                        onClear={handleClearSession}
+                        onShowTrace={setShowTrace}
+                        onBack={() => handleSelectAgent(null)}
+                    />
+                </div>
+                {showTrace && (
+                    <TraceLogSidebar
+                        logs={currentTraceLogs}
+                        selectedAgent={selectedAgent}
+                        traceEndRef={traceEndRef}
+                        onClose={() => setShowTrace(false)}
+                    />
+                )}
+            </div>
         );
     }
 
@@ -374,6 +289,7 @@ export function CardChatLayout(props) {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onOpen={handleSelectAgent}
+            registryError={registryError}
         />
     );
 }

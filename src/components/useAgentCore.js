@@ -104,6 +104,7 @@ export function useAgentCore({
     const [showTrace, setShowTrace]             = useState(false);
     const [isLoading, setIsLoading]             = useState(false);
     const [unreadCounts, setUnreadCounts]       = useState({});
+    const [registryError, setRegistryError]     = useState(null);
 
     const abortControllerRef = useRef(null);
     const chatEndRef         = useRef(null);
@@ -157,11 +158,14 @@ export function useAgentCore({
                             status: data.initialized ? 'active' : 'inactive',
                         }];
                     }
+                    setRegistryError(null);
                 } else {
                     console.error('Failed to fetch from agent registry:', response.status);
+                    setRegistryError(`Failed to fetch agents from the registry (HTTP ${response.status}). Please check the registry URL and your network connection.`);
                 }
             } catch (e) {
-                console.error('Error fetching agent registry:', e);
+                // console.error('Error fetching agent registry:', e);
+                setRegistryError(`An unexpected error occurred while fetching agents. Please check the console for more details.`);
             }
         }
 
@@ -266,6 +270,19 @@ export function useAgentCore({
         if ((!message.trim() && attachedFiles.length === 0) || !selectedAgentId || isLoading) return;
 
         const selectedAgent       = agents.find(a => a.id === selectedAgentId);
+        
+        if (!selectedAgent) {
+            console.error('Selected agent not found in the list of agents.');
+            setChatHistory(prev => ({
+                ...prev,
+                [selectedAgentId]: [...(prev[selectedAgentId] || []), {
+                    sender: 'System',
+                    text: `Error: The selected agent could not be found. Please refresh the page or try selecting the agent again.`,
+                }],
+            }));
+            return;
+        }
+
         const currentMessageText  = message;
         const currentAttachments  = [...attachedFiles];
 
@@ -383,7 +400,7 @@ export function useAgentCore({
                     ...prev,
                     [selectedAgentId]: [...(prev[selectedAgentId] || []), {
                         sender: 'System',
-                        text: `Error communicating with ${agents.find(a => a.id === selectedAgentId)?.name}. Details: ${errDetails}`,
+                        text: `Error communicating with ${agents.find(a => a.id === selectedAgentId)?.name || 'Agent'}. Details: ${errDetails}`,
                     }],
                 }));
             }
@@ -416,6 +433,7 @@ export function useAgentCore({
         attachedFiles,
         currentMessages, currentTraceLogs,
         showTrace, isLoading, unreadCounts,
+        registryError,
         // Refs
         chatEndRef, traceEndRef, textareaRef, fileInputRef,
         // Handlers

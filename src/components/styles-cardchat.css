@@ -132,7 +132,7 @@
 }
 
 /* ── View toggle ─────────────────────────────────────────────────────────── */
-.ccl-view-toggle {
+.ccl-view-toggles {
     display: flex;
     border: 0.5px solid #cbd5e1;
     border-radius: 8px;
@@ -140,7 +140,7 @@
     flex-shrink: 0;
 }
 
-.ccl-vt-btn {
+.ccl-view-btn {
     width: 34px;
     height: 34px;
     display: flex;
@@ -151,14 +151,15 @@
     cursor: pointer;
     color: #94a3b8;
     transition: all 0.12s;
+    font-size: 16px;
 }
 
-.ccl-vt-btn:hover:not(.ccl-vt-active) {
+.ccl-view-btn:hover:not(.ccl-view-active) {
     background: #f8fafc;
     color: #64748b;
 }
 
-.ccl-vt-active {
+.ccl-view-active {
     background: #f1f5f9;
     color: #0f172a;
 }
@@ -258,10 +259,7 @@
     flex-shrink: 0;
 }
 
-.ccl-card-meta {
-    flex: 1;
-    min-width: 0;
-}
+.ccl-card-meta { flex: 1; min-width: 0; }
 
 .ccl-card-name {
     font-size: 14px;
@@ -357,7 +355,7 @@
 }
 
 /* ── Chat View ───────────────────────────────────────────────────────────── */
-.ccl-chat-view {
+.ccl-chat-layout {
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -374,12 +372,6 @@
     background: #ffffff;
     border-bottom: 0.5px solid #e2e8f0;
     flex-shrink: 0;
-}
-
-.ccl-chat-header-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
 }
 
 .ccl-back-btn {
@@ -403,6 +395,14 @@
     border-color: #cbd5e1;
 }
 
+.ccl-chat-agent-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    margin-left: 16px;
+}
+
 .ccl-chat-avatar {
     width: 38px;
     height: 38px;
@@ -415,14 +415,17 @@
     flex-shrink: 0;
 }
 
-.ccl-chat-agent-name {
+.ccl-chat-name {
     font-size: 15px;
     font-weight: 500;
     color: #0f172a;
     margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.ccl-chat-agent-desc {
+.ccl-chat-desc {
     font-size: 12px;
     color: #64748b;
 }
@@ -460,7 +463,7 @@
 }
 
 /* ── Chat main content ───────────────────────────────────────────────────── */
-.ccl-main-content {
+.ccl-chat-body {
     display: flex;
     flex: 1;
     overflow: hidden;
@@ -468,12 +471,4 @@
     background: #ffffff;
     border: 0.5px solid #e2e8f0;
     border-radius: 12px;
-}
-
-.ccl-chat-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-width: 0;
 }
