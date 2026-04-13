@@ -28,9 +28,9 @@ import { SidebarLayout } from './layouts/SidebarLayout.js';
 import { TabCardLayout } from './layouts/TabCardLayout.js';
 import { CardChatLayout } from './layouts/CardChatLayout.js';
 
-import './styles.css';           // shared base styles (original, unchanged)
-import './styles-tabcard.css';   // TabCardLayout-only styles
-import './styles-cardchat.css';  // CardChatLayout-only styles
+import './styles/styles.css';           // shared base styles (original, unchanged)
+import './styles/styles-tabcard.css';   // TabCardLayout-only styles
+import './styles/styles-cardchat.css';  // CardChatLayout-only styles
 
 // Registry of available layouts — add new ones here
 const LAYOUTS = {
