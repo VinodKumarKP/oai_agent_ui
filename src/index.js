@@ -1,1 +1,1 @@
-export { AgentUI } from './components/AgentUI.js';
+export { AgentUI } from './components/AgentUI.jsx';
