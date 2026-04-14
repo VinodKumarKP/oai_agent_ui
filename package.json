@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "start": "parcel demo/index.html",
-    "build": "parcel build",
+    "build": "parcel build src/index.js",
     "build:demo": "parcel build demo/index.html --dist-dir demo/dist"
   },
   "repository": {
