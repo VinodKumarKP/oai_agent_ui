@@ -16,9 +16,9 @@
     ".parcelrc"
   ],
   "scripts": {
-    "start": "parcel demo/index.html",
-    "build": "parcel build src/index.js",
-    "build:demo": "parcel build demo/index.html --dist-dir demo/dist"
+    "start": "npx parcel demo/index.html",
+    "build": "npx parcel build src/index.js",
+    "build:demo": "npx parcel build demo/index.html --dist-dir demo/dist"
   },
   "repository": {
     "type": "git",
