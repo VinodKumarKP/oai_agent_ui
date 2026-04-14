@@ -15,7 +15,7 @@ import {
     ChatInput,
     TraceLogSidebar,
     EmptyState,
-} from '../shared/SharedComponents.js';
+} from '../shared/SharedComponents.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 

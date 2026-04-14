@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { TraceLogSidebar } from '../shared/TraceLogSidebar.js';
-import { ChatWindow }      from '../shared/ChatWindow.js';
+import { TraceLogSidebar } from '../shared/TraceLogSidebar.jsx';
+import { ChatWindow }      from '../shared/ChatWindow.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 // ---------------------------------------------------------------------------

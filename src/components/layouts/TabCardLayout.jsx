@@ -20,7 +20,7 @@ import {
     ChatMessages,
     ChatInput,
     TraceLogSidebar,
-} from '../shared/SharedComponents.js';
+} from '../shared/SharedComponents.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 // ---------------------------------------------------------------------------
