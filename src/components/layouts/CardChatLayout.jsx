@@ -249,36 +249,38 @@ export function CardChatLayout(props) {
                     </div>
                 </div>
 
-                <div className="ccl-chat-body">
-                    <ChatWindow
-                        messages={currentMessages}
-                        agentName={selectedAgent.name}
-                        agentAvatarBg={bg}
-                        agentAvatarColor={color}
-                        chatEndRef={chatEndRef}
-                        message={message}
-                        isLoading={isLoading}
-                        attachedFiles={attachedFiles}
-                        textareaRef={textareaRef}
-                        fileInputRef={fileInputRef}
-                        onMessageChange={handleMessageChange}
-                        onSend={handleSendMessage}
-                        onStop={handleStopGeneration}
-                        onFileSelect={handleFileSelect}
-                        onRemoveAttachment={removeAttachment}
-                        onClear={handleClearSession}
-                        onShowTrace={setShowTrace}
-                        onBack={() => handleSelectAgent(null)}
-                    />
+                <div className="ccl-chat-main">
+                    <div className="ccl-chat-body">
+                        <ChatWindow
+                            messages={currentMessages}
+                            agentName={selectedAgent.name}
+                            agentAvatarBg={bg}
+                            agentAvatarColor={color}
+                            chatEndRef={chatEndRef}
+                            message={message}
+                            isLoading={isLoading}
+                            attachedFiles={attachedFiles}
+                            textareaRef={textareaRef}
+                            fileInputRef={fileInputRef}
+                            onMessageChange={handleMessageChange}
+                            onSend={handleSendMessage}
+                            onStop={handleStopGeneration}
+                            onFileSelect={handleFileSelect}
+                            onRemoveAttachment={removeAttachment}
+                            onClear={handleClearSession}
+                            onShowTrace={setShowTrace}
+                            onBack={() => handleSelectAgent(null)}
+                        />
+                    </div>
+                    {showTrace && (
+                        <TraceLogSidebar
+                            logs={currentTraceLogs}
+                            selectedAgent={selectedAgent}
+                            traceEndRef={traceEndRef}
+                            onClose={() => setShowTrace(false)}
+                        />
+                    )}
                 </div>
-                {showTrace && (
-                    <TraceLogSidebar
-                        logs={currentTraceLogs}
-                        selectedAgent={selectedAgent}
-                        traceEndRef={traceEndRef}
-                        onClose={() => setShowTrace(false)}
-                    />
-                )}
             </div>
         );
     }
