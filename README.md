@@ -7,7 +7,7 @@ A reusable React component for interacting with A2A agents.
 You can install this package from its GitHub repository:
 
 ```bash
-npm install github:a2a-com/ui
+npm install https://github.com/Capgemini-Innersource/ptr_oai_adk_ui.git
 ```
 
 ## Basic Usage
