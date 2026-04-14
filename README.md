@@ -26,29 +26,27 @@ function App() {
 }
 ```
 
-## Running the Demo
+## Running the Demo Locally
 
-This package includes a demo that showcases the different layouts and features of the `AgentUI` component. To run it locally, follow these steps:
+This package includes a demo that showcases the different layouts and features of the `AgentUI` component. To run it locally for development, follow these steps:
 
-1.  **Navigate to the package directory** within your `node_modules`:
+1.  **Clone the repository**:
 
     ```bash
-    cd node_modules/a2a-react-ui
+    git clone https://github.com/a2a-com/ui.git
+    cd ui
     ```
 
-2.  **Install dependencies and build the demo**:
+2.  **Install dependencies**:
 
     ```bash
     npm install
-    npm run build:demo
     ```
 
-3.  **Start the demo server**:
-
-    Once the demo is built, you can start the demo server from anywhere in your project by running:
+3.  **Start the demo**:
 
     ```bash
-    npx a2a-react-ui-demo
+    npm start
     ```
 
-    This will start a server at `http://localhost:3000`.
+    This will start a development server and open the demo in your browser.
