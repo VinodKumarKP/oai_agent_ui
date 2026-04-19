@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { AgentUI } from '../src';
 
-const agentRegistryUrl = process.env.AGENT_REGISTRY_URL || "http://localhost:8081/info";
+const agentRegistryUrl = process.env.AGENT_REGISTRY_URL || "http://192.168.1.227:8081/info";
 
 const mySingleToken = 'PHNhbWxwOlJlc3BvbnNlIHhtbG5zOnNhbWxwPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6cHJvdG9jb2wiIElEPSJfZTVmNTM0M2U4YzczMjUzMTdjMjkyZGQzMTRiNGQ3NWIiIElzc3VlSW5zdGFudD0iMjAyNS0wOC0yMVQwNTozNDowNi44OTJaIiBWZXJzaW9uPSIyLjAiPiA8c2FtbDpJc3N1ZXIgeG1sbnM6c2FtbD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmFzc2VydGlvbiI+Y2FwZ2VtaW5pLmNvbTwvc2FtbDpJc3N1ZXI+IDxzYW1scDpTdGF0dXM+IDxzYW1scDpTdGF0dXNDb2RlIFZhbHVlPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6c3RhdHVzOlN1Y2Nlc3MiLz4gPC9zYW1scDpTdGF0dXM+IDxzYW1sOkFzc2VydGlvbiB4bWxuczpzYW1sPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXNzZXJ0aW9uIiBJRD0iX2E2MmMxMzY1MTVjOGI2ZDU1OTYwZjdkZDYzM2IwYTM3IiBJc3N1ZUluc3RhbnQ9IjIwMjUtMDgtMjFUMDU6MzQ6MDYuODkyWiIgVmVyc2lvbj0iMi4wIj4gPHNhbWw6SXNzdWVyPmNhcGdlbWluaS5jb208L3NhbWw6SXNzdWVyPiA8c2FtbDpTdWJqZWN0PiA8c2FtbDpOYW1lSUQgRm9ybWF0PSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoxLjE6bmFtZWlkLWZvcm1hdDplbWFpbEFkZHJlc3MiPmpvZWwuY2hyaXN0b3BoZXJAY2FwZ2VtaW5pLmNvbTwvc2FtbDpOYW1lSUQ+IDxzYW1sOlN1YmplY3RDb25maXJtYXRpb24gTWV0aG9kPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6Y206YmVhcmVyIj4gPHNhbWw6U3ViamVjdENvbmZpcm1hdGlvbkRhdGEgTm90T25PckFmdGVyPSIyMDI1LTA4LTIxVDA1OjU0OjA2Ljg5MloiLz4gPC9zYW1sOlN1YmplY3RDb25maXJtYXRpb24+IDwvc2FtbDpTdWJqZWN0PiA8c2FtbDpDb25kaXRpb25zIE5vdEJlZm9yZT0iMjAyNS0wOC0yMVQwNTozNDowNi44OTJaIiBOb3RPbk9yQWZ0ZXI9IjIwMjUtMDgtMjFUMDU6NTQ6MDYuODkyWiIvPiA8c2FtbDpBdHRyaWJ1dGVTdGF0ZW1lbnQ+IDxzYW1sOkF0dHJpYnV0ZSBOYW1lPSJlbWFpbCI+IDxzYW1sOkF0dHJpYnV0ZVZhbHVlPmpvZWwuY2hyaXN0b3BoZXJAY2FwZ2VtaW5pLmNvbTwvc2FtbDpBdHRyaWJ1dGVWYWx1ZT4gPC9zYW1sOkF0dHJpYnV0ZT4gPHNhbWw6QXR0cmlidXRlIE5hbWU9InJvbGUiPiA8c2FtbDpBdHRyaWJ1dGVWYWx1ZT5hZ2VudCBleGVjdXRvcjwvc2FtbDpBdHRyaWJ1dGVWYWx1ZT4gPC9zYW1sOkF0dHJpYnV0ZT4gPC9zYW1sOkF0dHJpYnV0ZVN0YXRlbWVudD4gPC9zYW1sOkFzc2VydGlvbj4gPGRzOlNpZ25hdHVyZSB4bWxuczpkcz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnIyI+IDxkczpTaWduYXR1cmVWYWx1ZT5ISlphUFF3eHdJSitkcmF4RUhNdWlxajJVN1lub1JrZ2FwbXR5ajJNdUdxUGNZMmo0bXJDT2lRcFI5eUMyaFR0UnlFRloydHhYT3ZkOEdkMUQwVFFSMk5tYkUwMWxkWHJVWlJYbzROalo0elUxSFdEY2Jvb1Y4aUJTaU5LaWQreUUxMll0eUUrNEdTdVhVUG5Fc0FSdEFacXhkNjhsOUpvc0E4cWNraUUvbzQ5NnIrekxCL1I2OEZhaWp3aTNzU2xKeFdkdHU2VFF3a0FmK3N2Z1djRGZZQUIxRFQvTGplVTltR2VUUzdZVVpOVUs2VzFMNFRCejhESGh4OUZEb0s2YlloSU4yYkZxSlhnSWFGNlJ3MG9PaXNPWnVMbnFPN1hFaG9kL3h1a21SandvYkQySTk4VnBjOUNFOEdBUUpZdVdQVnBwWmdNQ0d0Wnk3TFF3bmJqVEE9PTwvZHM6U2lnbmF0dXJlVmFsdWU+IDwvZHM6U2lnbmF0dXJlPiA8L3NhbWxwOlJlc3BvbnNlPg==';
 
@@ -46,8 +46,6 @@ const LAYOUTS = [
 const switcherStyles = `
 .layout-switcher {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -57,6 +55,10 @@ const switcherStyles = `
     padding: 4px;
     gap: 2px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    cursor: grab;
+}
+.layout-switcher:active {
+    cursor: grabbing;
 }
 .layout-btn {
     display: flex;
@@ -79,10 +81,53 @@ const switcherStyles = `
 `;
 
 function LayoutSwitcher({ layout, setLayout }) {
+    const switcherRef = useRef(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [position, setPosition] = useState({ x: window.innerWidth - 250, y: window.innerHeight - 70 });
+    const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            if (isDragging) {
+                setPosition({
+                    x: e.clientX - offset.x,
+                    y: e.clientY - offset.y,
+                });
+            }
+        };
+
+        const handleMouseUp = () => {
+            setIsDragging(false);
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging, offset]);
+
+    const handleMouseDown = (e) => {
+        setIsDragging(true);
+        setOffset({
+            x: e.clientX - position.x,
+            y: e.clientY - position.y,
+        });
+    };
+
     return (
         <>
             <style>{switcherStyles}</style>
-            <div className="layout-switcher" role="toolbar" aria-label="Switch layout">
+            <div
+                ref={switcherRef}
+                className="layout-switcher"
+                style={{ top: `${position.y}px`, left: `${position.x}px` }}
+                onMouseDown={handleMouseDown}
+                role="toolbar"
+                aria-label="Switch layout"
+            >
                 {LAYOUTS.map(l => (
                     <button
                         key={l.id}
