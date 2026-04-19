@@ -1,30 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
 :root {
-  /* Brand Colors */
-  --oai-primary: #35b8ff;
-  --oai-secondary: #003366;
-  --oai-bg: #000000;
-  --oai-surface: #1a1a1a;
-  --oai-surface-light: #2a2a2a;
+  /* ── Brand Colors ─────────────────────────────────────────────── */
+  --oai-primary:         #38beff;
+  --oai-primary-dim:     rgba(56, 190, 255, 0.12);
+  --oai-primary-glow:    rgba(56, 190, 255, 0.06);
+  --oai-secondary:       #0a1628;
 
-  /* Text Colors */
-  --oai-text: #f6f6f6;
-  --oai-text-main: #f6f6f6;
-  --oai-text-muted: #c5c5c5;
-  --oai-text-disabled: #6b7280;
+  /* ── Backgrounds ──────────────────────────────────────────────── */
+  --oai-bg:              #080c12;
+  --oai-surface:         #0f1520;
+  --oai-surface-light:   #16202e;
+  --oai-surface-raised:  #1a2535;
 
-  /* Core System Colors */
-  --oai-dark-grey: #272936;
+  /* ── Text ─────────────────────────────────────────────────────── */
+  --oai-text:            #e8edf3;
+  --oai-text-main:       #f0f4f8;
+  --oai-text-muted:      #7a90a8;
+  --oai-text-disabled:   #3d5166;
 
-  /* UI State Colors */
-  --oai-success: #21c354;
-  --oai-warning: #ffa500;
-  --oai-error: #ff4b4b;
-  --oai-info: #0068c9;
+  /* ── Borders ──────────────────────────────────────────────────── */
+  --oai-border:          rgba(255,255,255,0.06);
+  --oai-border-strong:   rgba(255,255,255,0.10);
 
-  /* Forms */
-  --oai-input-bg: #262730;
-  --oai-input-border: #3a3a4a;
+  /* ── State Colors ─────────────────────────────────────────────── */
+  --oai-success:         #34d399;
+  --oai-success-bg:      rgba(52, 211, 153, 0.10);
+  --oai-warning:         #fbbf24;
+  --oai-warning-bg:      rgba(251, 191, 36, 0.10);
+  --oai-error:           #f87171;
+  --oai-error-bg:        rgba(248, 113, 113, 0.10);
+  --oai-info:            #60a5fa;
+  --oai-info-bg:         rgba(96, 165, 250, 0.10);
 
-  /* Layout */
-  --oai-border: #2a2a3a;
+  /* ── Inputs ───────────────────────────────────────────────────── */
+  --oai-input-bg:        #0d1825;
+  --oai-input-border:    rgba(255,255,255,0.08);
+
+  /* ── Dark UI Accents ──────────────────────────────────────────── */
+  --oai-dark-grey:       #111827;
+  --oai-vibrant-blue:    #0ea5e9;
+  --oai-red-dark:        #ef4444;
+
+  /* ── Typography ───────────────────────────────────────────────── */
+  --font-sans:  'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:  'DM Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+
+  /* ── Shadows ──────────────────────────────────────────────────── */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4), 0 0 0 0.5px rgba(255,255,255,0.04);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(255,255,255,0.05);
+  --shadow-glow: 0 0 20px rgba(56, 190, 255, 0.08);
+
+  /* ── Radii ────────────────────────────────────────────────────── */
+  --radius-sm:  6px;
+  --radius-md:  9px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+
+  /* ── Transitions ──────────────────────────────────────────────── */
+  --ease-ui:    cubic-bezier(0.16, 1, 0.3, 1);
 }
