@@ -9,15 +9,15 @@
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
-    background-color: #ffffff;
+    background-color: var(--oai-bg);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* ── Registry header ─────────────────────────────────────────────────────── */
 .ccl-registry-header {
     padding: 20px 24px 0;
-    border-bottom: 0.5px solid #e2e8f0;
-    background: #ffffff;
+    border-bottom: 0.5px solid var(--oai-border);
+    background: var(--oai-surface);
     flex-shrink: 0;
 }
 
@@ -31,13 +31,13 @@
 .ccl-header-title {
     font-size: 17px;
     font-weight: 500;
-    color: #0f172a;
+    color: var(--oai-text-main);
     margin-bottom: 2px;
 }
 
 .ccl-header-sub {
     font-size: 13px;
-    color: #64748b;
+    color: var(--oai-text-muted);
 }
 
 .ccl-count-badge {
@@ -45,9 +45,9 @@
     font-weight: 500;
     padding: 3px 10px;
     border-radius: 20px;
-    background: #f1f5f9;
-    border: 0.5px solid #e2e8f0;
-    color: #64748b;
+    background: var(--oai-surface-light);
+    border: 0.5px solid var(--oai-border);
+    color: var(--oai-text-muted);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -62,7 +62,7 @@
     padding: 10px 16px;
     font-size: 13px;
     font-weight: 400;
-    color: #64748b;
+    color: var(--oai-text-muted);
     background: none;
     border: none;
     border-bottom: 2px solid transparent;
@@ -72,12 +72,12 @@
 }
 
 .ccl-tab-btn:hover:not(.ccl-tab-active) {
-    color: #0f172a;
+    color: var(--oai-text);
 }
 
 .ccl-tab-active {
-    color: #0f172a;
-    border-bottom-color: #0f172a;
+    color: var(--oai-primary);
+    border-bottom-color: var(--oai-primary);
     font-weight: 500;
 }
 
@@ -87,8 +87,8 @@
     align-items: center;
     gap: 10px;
     padding: 12px 24px;
-    border-bottom: 0.5px solid #e2e8f0;
-    background: #ffffff;
+    border-bottom: 0.5px solid var(--oai-border);
+    background: var(--oai-surface);
     flex-shrink: 0;
 }
 
@@ -102,7 +102,7 @@
     left: 11px;
     top: 50%;
     transform: translateY(-50%);
-    color: #94a3b8;
+    color: var(--oai-text-muted);
     font-size: 13px;
     pointer-events: none;
 }
@@ -112,10 +112,10 @@
     height: 34px;
     padding: 0 12px 0 32px;
     border-radius: 8px;
-    border: 0.5px solid #cbd5e1;
-    background: #f8fafc;
+    border: 0.5px solid var(--oai-input-border);
+    background: var(--oai-input-bg);
     font-size: 13px;
-    color: #0f172a;
+    color: var(--oai-text);
     font-family: inherit;
     outline: none;
     box-sizing: border-box;
@@ -123,18 +123,18 @@
 }
 
 .ccl-search-input:focus {
-    border-color: #94a3b8;
-    background: #ffffff;
+    border-color: var(--oai-primary);
+    background: var(--oai-surface);
 }
 
 .ccl-search-input::placeholder {
-    color: #94a3b8;
+    color: var(--oai-text-disabled);
 }
 
 /* ── View toggle ─────────────────────────────────────────────────────────── */
 .ccl-view-toggles {
     display: flex;
-    border: 0.5px solid #cbd5e1;
+    border: 0.5px solid var(--oai-input-border);
     border-radius: 8px;
     overflow: hidden;
     flex-shrink: 0;
@@ -146,22 +146,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #ffffff;
+    background: var(--oai-input-bg);
     border: none;
     cursor: pointer;
-    color: #94a3b8;
+    color: var(--oai-text-muted);
     transition: all 0.12s;
     font-size: 16px;
 }
 
 .ccl-view-btn:hover:not(.ccl-view-active) {
-    background: #f8fafc;
-    color: #64748b;
+    background: var(--oai-surface-light);
+    color: var(--oai-text);
 }
 
 .ccl-view-active {
-    background: #f1f5f9;
-    color: #0f172a;
+    background: var(--oai-primary);
+    color: var(--oai-bg);
 }
 
 /* ── Grid / List wrapper ─────────────────────────────────────────────────── */
@@ -169,12 +169,12 @@
     flex: 1;
     overflow-y: auto;
     padding: 24px;
-    background: #f8fafc;
+    background: var(--oai-bg);
 }
 
 .ccl-list-wrap {
     padding: 0;
-    background: #ffffff;
+    background: var(--oai-surface);
 }
 
 /* ── Agent grid ──────────────────────────────────────────────────────────── */
@@ -182,8 +182,8 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 1px;
-    background: #e2e8f0;
-    border: 0.5px solid #e2e8f0;
+    background: var(--oai-border);
+    border: 0.5px solid var(--oai-border);
     border-radius: 12px;
     overflow: hidden;
 }
@@ -198,7 +198,7 @@
 
 /* ── Agent card (grid mode) ──────────────────────────────────────────────── */
 .ccl-agent-card {
-    background: #ffffff;
+    background: var(--oai-surface);
     padding: 16px 18px;
     cursor: pointer;
     display: flex;
@@ -209,11 +209,11 @@
 }
 
 .ccl-agent-card:hover {
-    background: #f8fafc;
+    background: var(--oai-surface-light);
 }
 
 .ccl-agent-card:focus-visible {
-    box-shadow: inset 0 0 0 2px #6366f1;
+    box-shadow: inset 0 0 0 2px var(--oai-primary);
 }
 
 /* ── Agent card (list mode) ──────────────────────────────────────────────── */
@@ -264,7 +264,7 @@
 .ccl-card-name {
     font-size: 14px;
     font-weight: 500;
-    color: #0f172a;
+    color: var(--oai-text-main);
     margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
@@ -273,7 +273,7 @@
 
 .ccl-card-type {
     font-size: 12px;
-    color: #94a3b8;
+    color: var(--oai-text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -281,7 +281,7 @@
 
 .ccl-card-desc {
     font-size: 12px;
-    color: #64748b;
+    color: var(--oai-text-muted);
     line-height: 1.6;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -293,7 +293,7 @@
     display: flex;
     justify-content: flex-end;
     padding-top: 8px;
-    border-top: 0.5px solid #f1f5f9;
+    border-top: 0.5px solid var(--oai-border);
 }
 
 /* ── Status pill ─────────────────────────────────────────────────────────── */
@@ -309,9 +309,9 @@
     flex-shrink: 0;
 }
 
-.ccl-pill-online  { background: #EAF3DE; color: #3B6D11; }
-.ccl-pill-offline { background: #f1f5f9; color: #94a3b8; border: 0.5px solid #e2e8f0; }
-.ccl-pill-busy    { background: #FAEEDA; color: #633806; }
+.ccl-pill-online  { background: var(--oai-success-bg); color: var(--oai-success); }
+.ccl-pill-offline { background: var(--oai-error-bg); color: var(--oai-error); }
+.ccl-pill-busy    { background: var(--oai-warning-bg); color: var(--oai-warning); }
 
 .ccl-dot {
     width: 6px;
@@ -320,17 +320,17 @@
     flex-shrink: 0;
 }
 
-.ccl-dot.ccl-pill-online  { background: #639922; }
-.ccl-dot.ccl-pill-offline { background: #94a3b8; }
-.ccl-dot.ccl-pill-busy    { background: #BA7517; }
+.ccl-dot.ccl-pill-online  { background: var(--oai-success); }
+.ccl-dot.ccl-pill-offline { background: var(--oai-error); }
+.ccl-dot.ccl-pill-busy    { background: var(--oai-warning); }
 
 /* ── Open button ─────────────────────────────────────────────────────────── */
 .ccl-open-btn {
     font-size: 12px;
     font-weight: 500;
-    color: #64748b;
+    color: var(--oai-text-muted);
     background: none;
-    border: 0.5px solid #e2e8f0;
+    border: 0.5px solid var(--oai-input-border);
     padding: 5px 12px;
     border-radius: 8px;
     cursor: pointer;
@@ -339,9 +339,9 @@
 }
 
 .ccl-open-btn:hover {
-    background: #f1f5f9;
-    color: #0f172a;
-    border-color: #cbd5e1;
+    background: var(--oai-surface-light);
+    color: var(--oai-text);
+    border-color: var(--oai-primary);
 }
 
 /* ── Empty state ─────────────────────────────────────────────────────────── */
@@ -349,9 +349,9 @@
     grid-column: 1 / -1;
     text-align: center;
     padding: 60px 20px;
-    color: #94a3b8;
+    color: var(--oai-text-muted);
     font-size: 14px;
-    background: #ffffff;
+    background: var(--oai-surface);
 }
 
 /* ── Chat View ───────────────────────────────────────────────────────────── */
@@ -360,7 +360,7 @@
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
-    background: #f8fafc;
+    background: var(--oai-bg);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
@@ -369,15 +369,15 @@
     align-items: center;
     justify-content: space-between;
     padding: 14px 24px;
-    background: #ffffff;
-    border-bottom: 0.5px solid #e2e8f0;
+    background: var(--oai-surface);
+    border-bottom: 0.5px solid var(--oai-border);
     flex-shrink: 0;
 }
 
 .ccl-back-btn {
-    background: #f8fafc;
-    border: 0.5px solid #e2e8f0;
-    color: #64748b;
+    background: var(--oai-input-bg);
+    border: 0.5px solid var(--oai-input-border);
+    color: var(--oai-text-muted);
     cursor: pointer;
     font-size: 1.2rem;
     padding: 6px 12px;
@@ -390,9 +390,9 @@
 }
 
 .ccl-back-btn:hover {
-    background: #f1f5f9;
-    color: #0f172a;
-    border-color: #cbd5e1;
+    background: var(--oai-surface-light);
+    color: var(--oai-text);
+    border-color: var(--oai-primary);
 }
 
 .ccl-chat-agent-info {
@@ -418,7 +418,7 @@
 .ccl-chat-name {
     font-size: 15px;
     font-weight: 500;
-    color: #0f172a;
+    color: var(--oai-text-main);
     margin-bottom: 2px;
     display: flex;
     align-items: center;
@@ -427,7 +427,7 @@
 
 .ccl-chat-desc {
     font-size: 12px;
-    color: #64748b;
+    color: var(--oai-text-muted);
 }
 
 .ccl-header-actions {
@@ -445,21 +445,21 @@
     cursor: pointer;
     font-family: inherit;
     transition: all 0.15s;
-    border: 0.5px solid #e2e8f0;
-    background: #f8fafc;
-    color: #64748b;
+    border: 0.5px solid var(--oai-input-border);
+    background: var(--oai-input-bg);
+    color: var(--oai-text-muted);
 }
 
 .ccl-toggle-trace-btn:hover {
-    background: #f1f5f9;
-    color: #0f172a;
-    border-color: #cbd5e1;
+    background: var(--oai-surface-light);
+    color: var(--oai-text);
+    border-color: var(--oai-primary);
 }
 
 .ccl-clear-btn:hover {
-    background: #fee2e2;
-    color: #ef4444;
-    border-color: #fca5a5;
+    background: var(--oai-error-bg);
+    color: var(--oai-error);
+    border-color: var(--oai-error);
 }
 
 /* ── Chat main content ───────────────────────────────────────────────────── */
@@ -468,8 +468,8 @@
     flex: 1;
     overflow: hidden;
     margin: 16px;
-    background: #ffffff;
-    border: 0.5px solid #e2e8f0;
+    background: var(--oai-surface);
+    border: 0.5px solid var(--oai-border);
     border-radius: 12px;
 }
 .ccl-chat-main {

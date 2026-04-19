@@ -1,0 +1,30 @@
+:root {
+  /* Brand Colors */
+  --oai-primary: #35b8ff;
+  --oai-secondary: #003366;
+  --oai-bg: #000000;
+  --oai-surface: #1a1a1a;
+  --oai-surface-light: #2a2a2a;
+
+  /* Text Colors */
+  --oai-text: #f6f6f6;
+  --oai-text-main: #f6f6f6;
+  --oai-text-muted: #c5c5c5;
+  --oai-text-disabled: #6b7280;
+
+  /* Core System Colors */
+  --oai-dark-grey: #272936;
+
+  /* UI State Colors */
+  --oai-success: #21c354;
+  --oai-warning: #ffa500;
+  --oai-error: #ff4b4b;
+  --oai-info: #0068c9;
+
+  /* Forms */
+  --oai-input-bg: #262730;
+  --oai-input-border: #3a3a4a;
+
+  /* Layout */
+  --oai-border: #2a2a3a;
+}
