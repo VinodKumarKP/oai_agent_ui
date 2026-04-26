@@ -20,6 +20,8 @@ import {
     ChatInput,
     TraceLogSidebar,
 } from '../shared/SharedComponents.jsx';
+import { AgentEvaluationMetrics } from './AgentEvaluationMetrics.jsx';
+import { AgentLogs } from './AgentLogs.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 // ---------------------------------------------------------------------------
@@ -147,70 +149,6 @@ function SubTabBar({ currentView, setCurrentView }) {
             >
                 Older Logs
             </button>
-        </div>
-    );
-}
-
-// ---------------------------------------------------------------------------
-// AgentMetrics — placeholder for agent metrics
-// ---------------------------------------------------------------------------
-function AgentMetrics({ selectedAgent }) {
-    // Placeholder data
-    const metrics = {
-        totalMessages: 150,
-        averageResponseTime: '2.5s',
-        uptime: '99.9%',
-        lastActive: '2023-10-01 12:00:00',
-    };
-
-    return (
-        <div className="tcl-metrics">
-            <h3>Metrics for {selectedAgent.name}</h3>
-            <div className="tcl-metrics-grid">
-                <div className="tcl-metric-item">
-                    <span className="tcl-metric-label">Total Messages:</span>
-                    <span className="tcl-metric-value">{metrics.totalMessages}</span>
-                </div>
-                <div className="tcl-metric-item">
-                    <span className="tcl-metric-label">Avg Response Time:</span>
-                    <span className="tcl-metric-value">{metrics.averageResponseTime}</span>
-                </div>
-                <div className="tcl-metric-item">
-                    <span className="tcl-metric-label">Uptime:</span>
-                    <span className="tcl-metric-value">{metrics.uptime}</span>
-                </div>
-                <div className="tcl-metric-item">
-                    <span className="tcl-metric-label">Last Active:</span>
-                    <span className="tcl-metric-value">{metrics.lastActive}</span>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ---------------------------------------------------------------------------
-// AgentLogs — placeholder for older logs
-// ---------------------------------------------------------------------------
-function AgentLogs({ selectedAgent }) {
-    // Placeholder logs
-    const logs = [
-        { id: 1, timestamp: '2023-10-01 10:00:00', message: 'Conversation started' },
-        { id: 2, timestamp: '2023-10-01 10:05:00', message: 'User asked about weather' },
-        { id: 3, timestamp: '2023-10-01 10:10:00', message: 'Agent responded with forecast' },
-        // Add more as needed
-    ];
-
-    return (
-        <div className="tcl-logs">
-            <h3>Older Logs for {selectedAgent.name}</h3>
-            <div className="tcl-logs-list">
-                {logs.map((log) => (
-                    <div key={log.id} className="tcl-log-item">
-                        <span className="tcl-log-timestamp">{log.timestamp}</span>
-                        <span className="tcl-log-message">{log.message}</span>
-                    </div>
-                ))}
-            </div>
         </div>
     );
 }
@@ -346,6 +284,7 @@ export function TabCardLayout(props) {
         handleStopGeneration, handleSendMessage,
         setSearchQuery, setShowTrace,
         evaluations, expandedEvaluations, toggleEvaluation,
+        agentEvals,
     } = props;
 
     const [panelCollapsed, setPanelCollapsed] = useState(false);
@@ -448,7 +387,9 @@ export function TabCardLayout(props) {
                                     )}
 
                                     {currentView === 'metrics' && (
-                                        <AgentMetrics selectedAgent={selectedAgent} />
+                                        <div className="tcl-metrics">
+                                            <AgentEvaluationMetrics evaluations={agentEvals[selectedAgentId]} />
+                                        </div>
                                     )}
 
                                     {currentView === 'logs' && (

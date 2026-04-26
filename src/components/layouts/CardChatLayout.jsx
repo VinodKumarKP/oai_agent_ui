@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { TraceLogSidebar } from '../shared/TraceLogSidebar.jsx';
 import { ChatWindow }      from '../shared/ChatWindow.jsx';
+import { AgentEvaluationMetrics } from './AgentEvaluationMetrics.jsx';
+import { AgentLogs } from './AgentLogs.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 // ---------------------------------------------------------------------------
@@ -93,70 +95,6 @@ function SubTabBar({ currentView, setCurrentView }) {
             >
                 Older Logs
             </button>
-        </div>
-    );
-}
-
-// ---------------------------------------------------------------------------
-// AgentMetrics — placeholder for agent metrics
-// ---------------------------------------------------------------------------
-function AgentMetrics({ selectedAgent }) {
-    // Placeholder data
-    const metrics = {
-        totalMessages: 150,
-        averageResponseTime: '2.5s',
-        uptime: '99.9%',
-        lastActive: '2023-10-01 12:00:00',
-    };
-
-    return (
-        <div className="ccl-metrics">
-            <h3>Metrics for {selectedAgent.name}</h3>
-            <div className="ccl-metrics-grid">
-                <div className="ccl-metric-item">
-                    <span className="ccl-metric-label">Total Messages:</span>
-                    <span className="ccl-metric-value">{metrics.totalMessages}</span>
-                </div>
-                <div className="ccl-metric-item">
-                    <span className="ccl-metric-label">Avg Response Time:</span>
-                    <span className="ccl-metric-value">{metrics.averageResponseTime}</span>
-                </div>
-                <div className="ccl-metric-item">
-                    <span className="ccl-metric-label">Uptime:</span>
-                    <span className="ccl-metric-value">{metrics.uptime}</span>
-                </div>
-                <div className="ccl-metric-item">
-                    <span className="ccl-metric-label">Last Active:</span>
-                    <span className="ccl-metric-value">{metrics.lastActive}</span>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ---------------------------------------------------------------------------
-// AgentLogs — placeholder for older logs
-// ---------------------------------------------------------------------------
-function AgentLogs({ selectedAgent }) {
-    // Placeholder logs
-    const logs = [
-        { id: 1, timestamp: '2023-10-01 10:00:00', message: 'Conversation started' },
-        { id: 2, timestamp: '2023-10-01 10:05:00', message: 'User asked about weather' },
-        { id: 3, timestamp: '2023-10-01 10:10:00', message: 'Agent responded with forecast' },
-        // Add more as needed
-    ];
-
-    return (
-        <div className="ccl-logs">
-            <h3>Older Logs for {selectedAgent.name}</h3>
-            <div className="ccl-logs-list">
-                {logs.map((log) => (
-                    <div key={log.id} className="ccl-log-item">
-                        <span className="ccl-log-timestamp">{log.timestamp}</span>
-                        <span className="ccl-log-message">{log.message}</span>
-                    </div>
-                ))}
-            </div>
         </div>
     );
 }
@@ -301,6 +239,7 @@ export function CardChatLayout(props) {
         setSearchQuery,
         setShowTrace,
         evaluations, expandedEvaluations, toggleEvaluation,
+        agentEvals,
     } = props;
 
     const [currentView, setCurrentView] = useState('chat');
@@ -377,11 +316,15 @@ export function CardChatLayout(props) {
                         )}
 
                         {currentView === 'metrics' && (
-                            <AgentMetrics selectedAgent={selectedAgent} />
+                            <div className="ccl-metrics">
+                                <AgentEvaluationMetrics evaluations={agentEvals[selectedAgentId]} />
+                            </div>
                         )}
 
                         {currentView === 'logs' && (
-                            <AgentLogs selectedAgent={selectedAgent} />
+                             <div className="ccl-logs">
+                                <AgentLogs selectedAgent={selectedAgent} />
+                            </div>
                         )}
                     </div>
                     {showTrace && currentView === 'chat' && (
