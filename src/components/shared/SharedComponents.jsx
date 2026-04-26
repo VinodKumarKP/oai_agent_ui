@@ -18,7 +18,7 @@ export function StatusDot({ status, size = 8 }) {
 // ---------------------------------------------------------------------------
 // ChatMessages — scrollable message list, shared by both layouts
 // ---------------------------------------------------------------------------
-export function ChatMessages({ messages, isLoading, agentName, chatEndRef }) {
+export function ChatMessages({ messages, isLoading, agentName, chatEndRef, evaluations, expandedEvaluations, onToggleEvaluation }) {
     return (
         <div className="chat-messages">
             {messages.map((msg, index) => {
@@ -46,6 +46,20 @@ export function ChatMessages({ messages, isLoading, agentName, chatEndRef }) {
                                         <span className="attachment-icon">📎</span> {name}
                                     </div>
                                 ))}
+                            </div>
+                        )}
+                        {!isYou && !isSystem && msg.taskId && evaluations && evaluations[msg.taskId] && (
+                            <div className="evaluation-toggle">
+                                <button
+                                    className="evaluation-toggle-btn"
+                                    onClick={() => onToggleEvaluation(msg.taskId)}
+                                    title="Toggle evaluation metrics"
+                                >
+                                    {expandedEvaluations.has(msg.taskId) ? '📊 Hide Metrics' : '📊 Show Metrics'}
+                                </button>
+                                {expandedEvaluations.has(msg.taskId) && (
+                                    <EvaluationDisplay evaluation={evaluations[msg.taskId]} />
+                                )}
                             </div>
                         )}
                     </div>
@@ -201,6 +215,111 @@ export function EmptyState({ agents, onSelectAgent }) {
                     ))}
                 </div>
             )}
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// EvaluationDisplay — shows evaluation metrics for agent responses
+// ---------------------------------------------------------------------------
+export function EvaluationDisplay({ evaluation }) {
+    const getScoreColor = (score, maxScore = 10) => {
+        const percentage = (score / maxScore) * 100;
+        if (percentage >= 80) return '#10b981'; // green
+        if (percentage >= 60) return '#f59e0b'; // yellow
+        return '#ef4444'; // red
+    };
+
+    const formatScore = (score) => {
+        if (typeof score === 'number') {
+            return score % 1 === 0 ? score.toString() : score.toFixed(1);
+        }
+        return score;
+    };
+
+    const renderMetric = (label, value, maxScore = 10) => {
+        if (value === null || value === undefined) return null;
+        return (
+            <div className="evaluation-metric">
+                <span className="evaluation-label">{label}:</span>
+                <span
+                    className="evaluation-value"
+                    style={{ color: getScoreColor(value, maxScore) }}
+                >
+                    {formatScore(value)}{maxScore === 10 ? '/10' : ''}
+                </span>
+            </div>
+        );
+    };
+
+    return (
+        <div className="evaluation-display">
+            <div className="evaluation-header">
+                <span className="evaluation-icon">📊</span>
+                <span className="evaluation-title">Response Quality</span>
+            </div>
+            <div className="evaluation-metrics">
+                {renderMetric('BLEU Score', evaluation.bleu_score)}
+                {renderMetric('ROUGE Score', evaluation.rouge_score)}
+                {renderMetric('Recall', evaluation.recall_score)}
+                {renderMetric('Clarity', evaluation.clarity_score)}
+                {renderMetric('Empathy', evaluation.empathy_score)}
+                {renderMetric('Quality', evaluation.quality_score)}
+                {renderMetric('Accuracy', evaluation.accuracy_score)}
+                {renderMetric('Context Recall', evaluation.context_recall)}
+                {renderMetric('Precision', evaluation.precision_score)}
+                {renderMetric('Relevance', evaluation.relevance_score)}
+                {renderMetric('Sentiment', evaluation.sentiment_score)}
+                {renderMetric('Formality', evaluation.formality_score)}
+                {renderMetric('Readability', evaluation.readability_score)}
+                {renderMetric('Completeness', evaluation.completeness_score)}
+                {renderMetric('Coherence', evaluation.coherence_score)}
+                {renderMetric('Context Adherence', evaluation.context_adherence)}
+                {renderMetric('Context Precision', evaluation.context_precision)}
+                {renderMetric('Context Relevance', evaluation.context_relevance)}
+                {renderMetric('Intent Confidence', evaluation.intent_confidence)}
+                {renderMetric('Satisfaction', evaluation.satisfaction_score)}
+                {renderMetric('Perplexity', evaluation.perplexity_score, 100)}
+                {renderMetric('Hallucination', evaluation.hallucination_score)}
+                {renderMetric('Toxicity', evaluation.toxicity_score)}
+                {evaluation.overall_assessment && (
+                    <div className="evaluation-assessment">
+                        <strong>Assessment:</strong> {evaluation.overall_assessment}
+                    </div>
+                )}
+                {evaluation.detected_intent && (
+                    <div className="evaluation-intent">
+                        <strong>Intent:</strong> {evaluation.detected_intent}
+                    </div>
+                )}
+                {evaluation.complexity_level && (
+                    <div className="evaluation-complexity">
+                        <strong>Complexity:</strong> {evaluation.complexity_level}
+                    </div>
+                )}
+                <div className="evaluation-flags">
+                    {evaluation.is_low_quality !== undefined && (
+                        <span className={`evaluation-flag ${evaluation.is_low_quality ? 'low-quality' : 'good-quality'}`}>
+                            {evaluation.is_low_quality ? '⚠️ Low Quality' : '✅ Good Quality'}
+                        </span>
+                    )}
+                    {evaluation.has_code_example !== undefined && (
+                        <span className="evaluation-flag">
+                            {evaluation.has_code_example ? '💻 Has Code' : '📝 No Code'}
+                        </span>
+                    )}
+                    {evaluation.has_structured_format !== undefined && (
+                        <span className="evaluation-flag">
+                            {evaluation.has_structured_format ? '📋 Structured' : '📄 Unstructured'}
+                        </span>
+                    )}
+                    {evaluation.hallucination_detected !== undefined && (
+                        <span className={`evaluation-flag ${evaluation.hallucination_detected ? 'hallucination' : 'no-hallucination'}`}>
+                            {evaluation.hallucination_detected ? '🤖 Hallucination' : '🎯 No Hallucination'}
+                        </span>
+                    )}
+                </div>
+            </div>
         </div>
     );
 }

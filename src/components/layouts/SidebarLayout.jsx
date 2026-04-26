@@ -148,6 +148,7 @@ export function SidebarLayout(props) {
         handleFileSelect, removeAttachment,
         handleStopGeneration, handleSendMessage,
         setSearchQuery, setShowTrace,
+        evaluations, expandedEvaluations, toggleEvaluation,
     } = props;
 
     const [currentView, setCurrentView] = useState('chat');
@@ -245,6 +246,9 @@ export function SidebarLayout(props) {
                                     isLoading={isLoading}
                                     agentName={selectedAgent.name}
                                     chatEndRef={chatEndRef}
+                                    evaluations={evaluations}
+                                    expandedEvaluations={expandedEvaluations}
+                                    onToggleEvaluation={toggleEvaluation}
                                 />
 
                                 <ChatInput

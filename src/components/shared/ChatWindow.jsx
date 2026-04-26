@@ -20,6 +20,9 @@ export function ChatWindow({
     onClear,
     onShowTrace,
     onBack,
+    evaluations,
+    expandedEvaluations,
+    onToggleEvaluation,
 }) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
@@ -28,6 +31,9 @@ export function ChatWindow({
                 isLoading={isLoading}
                 agentName={agentName}
                 chatEndRef={chatEndRef}
+                evaluations={evaluations}
+                expandedEvaluations={expandedEvaluations}
+                onToggleEvaluation={onToggleEvaluation}
             />
             <ChatInput
                 message={message}

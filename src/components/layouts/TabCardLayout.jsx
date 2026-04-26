@@ -345,6 +345,7 @@ export function TabCardLayout(props) {
         handleFileSelect, removeAttachment,
         handleStopGeneration, handleSendMessage,
         setSearchQuery, setShowTrace,
+        evaluations, expandedEvaluations, toggleEvaluation,
     } = props;
 
     const [panelCollapsed, setPanelCollapsed] = useState(false);
@@ -426,6 +427,9 @@ export function TabCardLayout(props) {
                                                 isLoading={isLoading}
                                                 agentName={selectedAgent.name}
                                                 chatEndRef={chatEndRef}
+                                                evaluations={evaluations}
+                                                expandedEvaluations={expandedEvaluations}
+                                                onToggleEvaluation={toggleEvaluation}
                                             />
 
                                             <ChatInput

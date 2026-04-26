@@ -105,6 +105,8 @@ export function useAgentCore({
     const [isLoading, setIsLoading]             = useState(false);
     const [unreadCounts, setUnreadCounts]       = useState({});
     const [registryError, setRegistryError]     = useState(null);
+    const [evaluations, setEvaluations]         = useState({});
+    const [expandedEvaluations, setExpandedEvaluations] = useState(new Set());
 
     const abortControllerRef = useRef(null);
     const chatEndRef         = useRef(null);
@@ -328,6 +330,8 @@ export function useAgentCore({
                 },
             });
 
+            let currentTaskId = null;
+
             for await (const event of stream) {
                 if (signal.aborted) throw new Error('User aborted the request.');
 
@@ -339,6 +343,11 @@ export function useAgentCore({
                     hour12: false, hour: '2-digit', minute: '2-digit',
                     second: '2-digit', fractionalSecondDigits: 3,
                 });
+
+                // Capture task_id from task events
+                if (event.kind === 'task') {
+                    currentTaskId = event.id;
+                }
 
                 // Trace logging
                 setTraceLogs(prev => {
@@ -381,7 +390,11 @@ export function useAgentCore({
                 }
 
                 if (responseText) {
-                    const responseMessage = { sender: selectedAgent.name, text: responseText };
+                    const responseMessage = {
+                        sender: selectedAgent.name,
+                        text: responseText,
+                        taskId: currentTaskId
+                    };
                     setChatHistory(prev => {
                         const currentHistory = prev[selectedAgentId] || [];
                         const lastMessage    = currentHistory[currentHistory.length - 1];
@@ -392,8 +405,13 @@ export function useAgentCore({
                     });
                 }
             }
+
+            // Fetch evaluation after stream completes
+            if (currentTaskId) {
+                fetchEvaluation(currentTaskId, baseUrl);
+            }
         } catch (e) {
-            console.error('Error during streaming. Details:', e);
+            // Error is already handled by adding a system message to chat history
             if (e.message !== 'User aborted the request.') {
                 const errDetails = e instanceof Error ? e.message : String(e);
                 setChatHistory(prev => ({
@@ -409,6 +427,51 @@ export function useAgentCore({
             abortControllerRef.current = null;
         }
     };
+
+    // ── Fetch evaluation ─────────────────────────────────────────────────────
+    const fetchEvaluation = useCallback(async (taskId, agentEndpoint, retryCount = 0) => {
+        if (!taskId || !agentEndpoint) return;
+
+        const maxRetries = 3;
+        const retryDelay = 15000; // 15 seconds
+
+        try {
+            const evaluationUrl = `${agentEndpoint.replace(/\/$/, '')}/evaluations/${taskId}`;
+            const response = await fetch(evaluationUrl, {
+                headers: { Accept: 'application/json', Authorization: `Bearer ${authToken}` },
+            });
+
+            if (response.ok) {
+                const evaluationData = await response.json();
+                setEvaluations(prev => ({ ...prev, [taskId]: evaluationData }));
+            } else if (response.status === 404 && retryCount < maxRetries) {
+                // Evaluation not ready yet, retry after delay
+                setTimeout(() => fetchEvaluation(taskId, agentEndpoint, retryCount + 1), retryDelay);
+            } else {
+                console.warn(`Failed to fetch evaluation for task ${taskId}: ${response.status}`);
+            }
+        } catch (error) {
+            if (retryCount < maxRetries) {
+                // Network error, retry after delay
+                setTimeout(() => fetchEvaluation(taskId, agentEndpoint, retryCount + 1), retryDelay);
+            } else {
+                console.warn(`Error fetching evaluation for task ${taskId} after ${maxRetries} retries:`, error);
+            }
+        }
+    }, [authToken]);
+
+    // ── Toggle evaluation display ─────────────────────────────────────────────
+    const toggleEvaluation = useCallback((taskId) => {
+        setExpandedEvaluations(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(taskId)) {
+                newSet.delete(taskId);
+            } else {
+                newSet.add(taskId);
+            }
+            return newSet;
+        });
+    }, []);
 
     // ── Derived values ───────────────────────────────────────────────────────
     const filteredAgents = useMemo(() => {
@@ -433,7 +496,7 @@ export function useAgentCore({
         attachedFiles,
         currentMessages, currentTraceLogs,
         showTrace, isLoading, unreadCounts,
-        registryError,
+        registryError, evaluations, expandedEvaluations,
         // Refs
         chatEndRef, traceEndRef, textareaRef, fileInputRef,
         // Handlers
@@ -444,5 +507,6 @@ export function useAgentCore({
         handleFileSelect, removeAttachment,
         handleStopGeneration, handleSendMessage,
         setSearchQuery, setShowTrace,
+        fetchEvaluation, toggleEvaluation,
     };
 }

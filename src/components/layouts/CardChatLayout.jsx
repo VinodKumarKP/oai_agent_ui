@@ -300,6 +300,7 @@ export function CardChatLayout(props) {
         handleSendMessage,
         setSearchQuery,
         setShowTrace,
+        evaluations, expandedEvaluations, toggleEvaluation,
     } = props;
 
     const [currentView, setCurrentView] = useState('chat');
@@ -369,6 +370,9 @@ export function CardChatLayout(props) {
                                 onClear={handleClearSession}
                                 onShowTrace={setShowTrace}
                                 onBack={() => handleSelectAgent(null)}
+                                evaluations={evaluations}
+                                expandedEvaluations={expandedEvaluations}
+                                onToggleEvaluation={toggleEvaluation}
                             />
                         )}
 
