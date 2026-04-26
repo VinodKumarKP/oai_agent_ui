@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 
 export function AgentEvaluationMetrics({ evaluations }) {
-    if (!evaluations || evaluations.length === 0) {
+    if (!evaluations || !Array.isArray(evaluations) || evaluations.length === 0) {
         return <div>No evaluation data available.</div>;
     }
 
