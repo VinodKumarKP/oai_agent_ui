@@ -346,9 +346,9 @@ export function CardChatLayout(props) {
                 </div>
 
                 <div className="ccl-chat-main">
-                    <SubTabBar currentView={currentView} setCurrentView={setCurrentView} />
-
                     <div className="ccl-chat-body">
+                        <SubTabBar currentView={currentView} setCurrentView={setCurrentView} />
+
                         {currentView === 'chat' && (
                             <ChatWindow
                                 messages={currentMessages}
