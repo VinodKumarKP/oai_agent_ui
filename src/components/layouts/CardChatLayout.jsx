@@ -70,6 +70,98 @@ function AgentCard({ agent, index, onOpen, isListView }) {
 }
 
 // ---------------------------------------------------------------------------
+// SubTabBar
+// ---------------------------------------------------------------------------
+function SubTabBar({ currentView, setCurrentView }) {
+    return (
+        <div className="ccl-sub-tab-bar">
+            <button
+                className={`ccl-sub-tab ${currentView === 'chat' ? 'ccl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('chat')}
+            >
+                Chat
+            </button>
+            <button
+                className={`ccl-sub-tab ${currentView === 'metrics' ? 'ccl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('metrics')}
+            >
+                Metrics
+            </button>
+            <button
+                className={`ccl-sub-tab ${currentView === 'logs' ? 'ccl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('logs')}
+            >
+                Older Logs
+            </button>
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// AgentMetrics — placeholder for agent metrics
+// ---------------------------------------------------------------------------
+function AgentMetrics({ selectedAgent }) {
+    // Placeholder data
+    const metrics = {
+        totalMessages: 150,
+        averageResponseTime: '2.5s',
+        uptime: '99.9%',
+        lastActive: '2023-10-01 12:00:00',
+    };
+
+    return (
+        <div className="ccl-metrics">
+            <h3>Metrics for {selectedAgent.name}</h3>
+            <div className="ccl-metrics-grid">
+                <div className="ccl-metric-item">
+                    <span className="ccl-metric-label">Total Messages:</span>
+                    <span className="ccl-metric-value">{metrics.totalMessages}</span>
+                </div>
+                <div className="ccl-metric-item">
+                    <span className="ccl-metric-label">Avg Response Time:</span>
+                    <span className="ccl-metric-value">{metrics.averageResponseTime}</span>
+                </div>
+                <div className="ccl-metric-item">
+                    <span className="ccl-metric-label">Uptime:</span>
+                    <span className="ccl-metric-value">{metrics.uptime}</span>
+                </div>
+                <div className="ccl-metric-item">
+                    <span className="ccl-metric-label">Last Active:</span>
+                    <span className="ccl-metric-value">{metrics.lastActive}</span>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// AgentLogs — placeholder for older logs
+// ---------------------------------------------------------------------------
+function AgentLogs({ selectedAgent }) {
+    // Placeholder logs
+    const logs = [
+        { id: 1, timestamp: '2023-10-01 10:00:00', message: 'Conversation started' },
+        { id: 2, timestamp: '2023-10-01 10:05:00', message: 'User asked about weather' },
+        { id: 3, timestamp: '2023-10-01 10:10:00', message: 'Agent responded with forecast' },
+        // Add more as needed
+    ];
+
+    return (
+        <div className="ccl-logs">
+            <h3>Older Logs for {selectedAgent.name}</h3>
+            <div className="ccl-logs-list">
+                {logs.map((log) => (
+                    <div key={log.id} className="ccl-log-item">
+                        <span className="ccl-log-timestamp">{log.timestamp}</span>
+                        <span className="ccl-log-message">{log.message}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
 // AgentRegistry — the main launcher / registry view
 // ---------------------------------------------------------------------------
 function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen, registryError }) {
@@ -210,6 +302,8 @@ export function CardChatLayout(props) {
         setShowTrace,
     } = props;
 
+    const [currentView, setCurrentView] = useState('chat');
+
     // If an agent is selected, show the chat view
     if (selectedAgent) {
         const agentIndex = agents.findIndex(a => a.id === selectedAgentId);
@@ -236,43 +330,57 @@ export function CardChatLayout(props) {
                             </div>
                         </div>
                     </div>
-                    <div className="ccl-header-actions">
-                        <button
-                            className="ccl-toggle-trace-btn"
-                            onClick={() => setShowTrace(!showTrace)}
-                        >
-                            {showTrace ? 'Hide trace' : 'Show trace'}
-                        </button>
-                        <button className="ccl-clear-btn" onClick={handleClearSession}>
-                            Clear
-                        </button>
-                    </div>
+                    {currentView === 'chat' && (
+                        <div className="ccl-header-actions">
+                            <button
+                                className="ccl-toggle-trace-btn"
+                                onClick={() => setShowTrace(!showTrace)}
+                            >
+                                {showTrace ? 'Hide trace' : 'Show trace'}
+                            </button>
+                            <button className="ccl-clear-btn" onClick={handleClearSession}>
+                                Clear
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="ccl-chat-main">
+                    <SubTabBar currentView={currentView} setCurrentView={setCurrentView} />
+
                     <div className="ccl-chat-body">
-                        <ChatWindow
-                            messages={currentMessages}
-                            agentName={selectedAgent.name}
-                            agentAvatarBg={bg}
-                            agentAvatarColor={color}
-                            chatEndRef={chatEndRef}
-                            message={message}
-                            isLoading={isLoading}
-                            attachedFiles={attachedFiles}
-                            textareaRef={textareaRef}
-                            fileInputRef={fileInputRef}
-                            onMessageChange={handleMessageChange}
-                            onSend={handleSendMessage}
-                            onStop={handleStopGeneration}
-                            onFileSelect={handleFileSelect}
-                            onRemoveAttachment={removeAttachment}
-                            onClear={handleClearSession}
-                            onShowTrace={setShowTrace}
-                            onBack={() => handleSelectAgent(null)}
-                        />
+                        {currentView === 'chat' && (
+                            <ChatWindow
+                                messages={currentMessages}
+                                agentName={selectedAgent.name}
+                                agentAvatarBg={bg}
+                                agentAvatarColor={color}
+                                chatEndRef={chatEndRef}
+                                message={message}
+                                isLoading={isLoading}
+                                attachedFiles={attachedFiles}
+                                textareaRef={textareaRef}
+                                fileInputRef={fileInputRef}
+                                onMessageChange={handleMessageChange}
+                                onSend={handleSendMessage}
+                                onStop={handleStopGeneration}
+                                onFileSelect={handleFileSelect}
+                                onRemoveAttachment={removeAttachment}
+                                onClear={handleClearSession}
+                                onShowTrace={setShowTrace}
+                                onBack={() => handleSelectAgent(null)}
+                            />
+                        )}
+
+                        {currentView === 'metrics' && (
+                            <AgentMetrics selectedAgent={selectedAgent} />
+                        )}
+
+                        {currentView === 'logs' && (
+                            <AgentLogs selectedAgent={selectedAgent} />
+                        )}
                     </div>
-                    {showTrace && (
+                    {showTrace && currentView === 'chat' && (
                         <TraceLogSidebar
                             logs={currentTraceLogs}
                             selectedAgent={selectedAgent}

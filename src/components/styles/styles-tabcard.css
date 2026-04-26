@@ -562,3 +562,124 @@
     color: var(--oai-primary);
     border-color: var(--oai-primary);
 }
+
+/* ── Sub-tab bar ─────────────────────────────────────────────────────────── */
+.tcl-sub-tab-bar {
+    display: flex;
+    align-items: center;
+    background: var(--oai-surface);
+    border-bottom: 1px solid var(--oai-border);
+    height: 40px;
+    flex-shrink: 0;
+    padding: 0 16px;
+    gap: 0;
+}
+
+.tcl-sub-tab {
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--oai-text-muted);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: all 0.15s var(--ease-ui);
+    letter-spacing: 0.01em;
+}
+.tcl-sub-tab:hover { color: var(--oai-text); }
+.tcl-sub-tab-active {
+    color: var(--oai-primary);
+    border-bottom-color: var(--oai-primary);
+    font-weight: 600;
+}
+
+/* ── Metrics ─────────────────────────────────────────────────────────────── */
+.tcl-metrics {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--oai-bg);
+}
+
+.tcl-metrics h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--oai-text-main);
+    margin-bottom: 16px;
+}
+
+.tcl-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.tcl-metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--oai-surface);
+    border: 1px solid var(--oai-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.tcl-metric-label {
+    font-size: 12px;
+    color: var(--oai-text-muted);
+    font-weight: 500;
+}
+
+.tcl-metric-value {
+    font-size: 14px;
+    color: var(--oai-text-main);
+    font-weight: 600;
+}
+
+/* ── Logs ─────────────────────────────────────────────────────────────────── */
+.tcl-logs {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--oai-bg);
+}
+
+.tcl-logs h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--oai-text-main);
+    margin-bottom: 16px;
+}
+
+.tcl-logs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tcl-log-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: var(--oai-surface);
+    border: 1px solid var(--oai-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.tcl-log-timestamp {
+    font-size: 11px;
+    color: var(--oai-text-muted);
+    font-weight: 500;
+    min-width: 140px;
+}
+
+.tcl-log-message {
+    font-size: 12px;
+    color: var(--oai-text-main);
+    flex: 1;
+}

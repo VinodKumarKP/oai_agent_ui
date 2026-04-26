@@ -8,7 +8,7 @@
  *
  * Receives all props from useAgentCore() via AgentUI.js.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import {
     StatusDot,
     ChatMessages,
@@ -39,6 +39,98 @@ function StatusPill({ status }) {
 }
 
 // ---------------------------------------------------------------------------
+// SubTabBar
+// ---------------------------------------------------------------------------
+function SubTabBar({ currentView, setCurrentView }) {
+    return (
+        <div className="sl-sub-tab-bar">
+            <button
+                className={`sl-sub-tab ${currentView === 'chat' ? 'sl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('chat')}
+            >
+                Chat
+            </button>
+            <button
+                className={`sl-sub-tab ${currentView === 'metrics' ? 'sl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('metrics')}
+            >
+                Metrics
+            </button>
+            <button
+                className={`sl-sub-tab ${currentView === 'logs' ? 'sl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('logs')}
+            >
+                Older Logs
+            </button>
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// AgentMetrics — placeholder for agent metrics
+// ---------------------------------------------------------------------------
+function AgentMetrics({ selectedAgent }) {
+    // Placeholder data
+    const metrics = {
+        totalMessages: 150,
+        averageResponseTime: '2.5s',
+        uptime: '99.9%',
+        lastActive: '2023-10-01 12:00:00',
+    };
+
+    return (
+        <div className="sl-metrics">
+            <h3>Metrics for {selectedAgent.name}</h3>
+            <div className="sl-metrics-grid">
+                <div className="sl-metric-item">
+                    <span className="sl-metric-label">Total Messages:</span>
+                    <span className="sl-metric-value">{metrics.totalMessages}</span>
+                </div>
+                <div className="sl-metric-item">
+                    <span className="sl-metric-label">Avg Response Time:</span>
+                    <span className="sl-metric-value">{metrics.averageResponseTime}</span>
+                </div>
+                <div className="sl-metric-item">
+                    <span className="sl-metric-label">Uptime:</span>
+                    <span className="sl-metric-value">{metrics.uptime}</span>
+                </div>
+                <div className="sl-metric-item">
+                    <span className="sl-metric-label">Last Active:</span>
+                    <span className="sl-metric-value">{metrics.lastActive}</span>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// AgentLogs — placeholder for older logs
+// ---------------------------------------------------------------------------
+function AgentLogs({ selectedAgent }) {
+    // Placeholder logs
+    const logs = [
+        { id: 1, timestamp: '2023-10-01 10:00:00', message: 'Conversation started' },
+        { id: 2, timestamp: '2023-10-01 10:05:00', message: 'User asked about weather' },
+        { id: 3, timestamp: '2023-10-01 10:10:00', message: 'Agent responded with forecast' },
+        // Add more as needed
+    ];
+
+    return (
+        <div className="sl-logs">
+            <h3>Older Logs for {selectedAgent.name}</h3>
+            <div className="sl-logs-list">
+                {logs.map((log) => (
+                    <div key={log.id} className="sl-log-item">
+                        <span className="sl-log-timestamp">{log.timestamp}</span>
+                        <span className="sl-log-message">{log.message}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
 // SidebarLayout — main export
 // ---------------------------------------------------------------------------
 export function SidebarLayout(props) {
@@ -58,6 +150,7 @@ export function SidebarLayout(props) {
         setSearchQuery, setShowTrace,
     } = props;
 
+    const [currentView, setCurrentView] = useState('chat');
     const selectedIndex = agents.findIndex(a => a.id === selectedAgentId);
     const { bg, color } = selectedAgent ? avatarStyle(selectedIndex >= 0 ? selectedIndex : 0) : {};
     const initials = selectedAgent ? agentInitials(selectedAgent.name) : '';
@@ -89,7 +182,7 @@ export function SidebarLayout(props) {
                     {filteredAgents.length === 0 ? (
                         <div className="sl-no-agents">No agents found.</div>
                     ) : (
-                        filteredAgents.map((agent, i) => (
+                        filteredAgents.map((agent) => (
                             <li
                                 key={agent.id}
                                 className={`sl-agent-item ${selectedAgentId === agent.id ? 'sl-selected' : ''}`}
@@ -128,38 +221,54 @@ export function SidebarLayout(props) {
                                     </div>
                                 </div>
                             </div>
-                            <div className="sl-header-actions">
-                                <button
-                                    className="sl-trace-btn"
-                                    onClick={() => setShowTrace(!showTrace)}
-                                >
-                                    {showTrace ? 'Hide trace' : 'Show trace'}
-                                </button>
-                                <button className="sl-clear-btn" onClick={handleClearSession}>
-                                    Clear
-                                </button>
-                            </div>
+                            {currentView === 'chat' && (
+                                <div className="sl-header-actions">
+                                    <button
+                                        className="sl-trace-btn"
+                                        onClick={() => setShowTrace(!showTrace)}
+                                    >
+                                        {showTrace ? 'Hide trace' : 'Show trace'}
+                                    </button>
+                                    <button className="sl-clear-btn" onClick={handleClearSession}>
+                                        Clear
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
-                        <ChatMessages
-                            messages={currentMessages}
-                            isLoading={isLoading}
-                            agentName={selectedAgent.name}
-                            chatEndRef={chatEndRef}
-                        />
+                        <SubTabBar currentView={currentView} setCurrentView={setCurrentView} />
 
-                        <ChatInput
-                            message={message}
-                            isLoading={isLoading}
-                            attachedFiles={attachedFiles}
-                            textareaRef={textareaRef}
-                            fileInputRef={fileInputRef}
-                            onMessageChange={handleMessageChange}
-                            onSend={handleSendMessage}
-                            onStop={handleStopGeneration}
-                            onFileSelect={handleFileSelect}
-                            onRemoveAttachment={removeAttachment}
-                        />
+                        {currentView === 'chat' && (
+                            <>
+                                <ChatMessages
+                                    messages={currentMessages}
+                                    isLoading={isLoading}
+                                    agentName={selectedAgent.name}
+                                    chatEndRef={chatEndRef}
+                                />
+
+                                <ChatInput
+                                    message={message}
+                                    isLoading={isLoading}
+                                    attachedFiles={attachedFiles}
+                                    textareaRef={textareaRef}
+                                    fileInputRef={fileInputRef}
+                                    onMessageChange={handleMessageChange}
+                                    onSend={handleSendMessage}
+                                    onStop={handleStopGeneration}
+                                    onFileSelect={handleFileSelect}
+                                    onRemoveAttachment={removeAttachment}
+                                />
+                            </>
+                        )}
+
+                        {currentView === 'metrics' && (
+                            <AgentMetrics selectedAgent={selectedAgent} />
+                        )}
+
+                        {currentView === 'logs' && (
+                            <AgentLogs selectedAgent={selectedAgent} />
+                        )}
                     </>
                 ) : (
                     <EmptyState agents={agents} onSelectAgent={handleSelectAgent} />
@@ -167,7 +276,7 @@ export function SidebarLayout(props) {
             </div>
 
             {/* ── Right Trace Sidebar ── */}
-            {showTrace && (
+            {showTrace && currentView === 'chat' && (
                 <TraceLogSidebar
                     logs={currentTraceLogs}
                     selectedAgent={selectedAgent}

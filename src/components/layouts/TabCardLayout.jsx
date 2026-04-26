@@ -16,7 +16,6 @@
  */
 import React, { useState } from 'react';
 import {
-    StatusDot,
     ChatMessages,
     ChatInput,
     TraceLogSidebar,
@@ -120,6 +119,98 @@ function TabBar({ openAgents, selectedAgentId, allAgents, unreadCounts, onSelect
                     </button>
                 );
             })}
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// SubTabBar
+// ---------------------------------------------------------------------------
+function SubTabBar({ currentView, setCurrentView }) {
+    return (
+        <div className="tcl-sub-tab-bar">
+            <button
+                className={`tcl-sub-tab ${currentView === 'chat' ? 'tcl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('chat')}
+            >
+                Chat
+            </button>
+            <button
+                className={`tcl-sub-tab ${currentView === 'metrics' ? 'tcl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('metrics')}
+            >
+                Metrics
+            </button>
+            <button
+                className={`tcl-sub-tab ${currentView === 'logs' ? 'tcl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('logs')}
+            >
+                Older Logs
+            </button>
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// AgentMetrics — placeholder for agent metrics
+// ---------------------------------------------------------------------------
+function AgentMetrics({ selectedAgent }) {
+    // Placeholder data
+    const metrics = {
+        totalMessages: 150,
+        averageResponseTime: '2.5s',
+        uptime: '99.9%',
+        lastActive: '2023-10-01 12:00:00',
+    };
+
+    return (
+        <div className="tcl-metrics">
+            <h3>Metrics for {selectedAgent.name}</h3>
+            <div className="tcl-metrics-grid">
+                <div className="tcl-metric-item">
+                    <span className="tcl-metric-label">Total Messages:</span>
+                    <span className="tcl-metric-value">{metrics.totalMessages}</span>
+                </div>
+                <div className="tcl-metric-item">
+                    <span className="tcl-metric-label">Avg Response Time:</span>
+                    <span className="tcl-metric-value">{metrics.averageResponseTime}</span>
+                </div>
+                <div className="tcl-metric-item">
+                    <span className="tcl-metric-label">Uptime:</span>
+                    <span className="tcl-metric-value">{metrics.uptime}</span>
+                </div>
+                <div className="tcl-metric-item">
+                    <span className="tcl-metric-label">Last Active:</span>
+                    <span className="tcl-metric-value">{metrics.lastActive}</span>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// AgentLogs — placeholder for older logs
+// ---------------------------------------------------------------------------
+function AgentLogs({ selectedAgent }) {
+    // Placeholder logs
+    const logs = [
+        { id: 1, timestamp: '2023-10-01 10:00:00', message: 'Conversation started' },
+        { id: 2, timestamp: '2023-10-01 10:05:00', message: 'User asked about weather' },
+        { id: 3, timestamp: '2023-10-01 10:10:00', message: 'Agent responded with forecast' },
+        // Add more as needed
+    ];
+
+    return (
+        <div className="tcl-logs">
+            <h3>Older Logs for {selectedAgent.name}</h3>
+            <div className="tcl-logs-list">
+                {logs.map((log) => (
+                    <div key={log.id} className="tcl-log-item">
+                        <span className="tcl-log-timestamp">{log.timestamp}</span>
+                        <span className="tcl-log-message">{log.message}</span>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
@@ -257,6 +348,7 @@ export function TabCardLayout(props) {
     } = props;
 
     const [panelCollapsed, setPanelCollapsed] = useState(false);
+    const [currentView, setCurrentView] = useState('chat');
     const hasOpenTabs = openAgents.length > 0;
 
     const selectedIndex = agents.findIndex(a => a.id === selectedAgentId);
@@ -310,38 +402,54 @@ export function TabCardLayout(props) {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="tcl-header-actions">
-                                            <button
-                                                className="tcl-trace-btn"
-                                                onClick={() => setShowTrace(!showTrace)}
-                                            >
-                                                {showTrace ? 'Hide trace' : 'Show trace'}
-                                            </button>
-                                            <button className="tcl-clear-btn" onClick={handleClearSession}>
-                                                Clear
-                                            </button>
-                                        </div>
+                                        {currentView === 'chat' && (
+                                            <div className="tcl-header-actions">
+                                                <button
+                                                    className="tcl-trace-btn"
+                                                    onClick={() => setShowTrace(!showTrace)}
+                                                >
+                                                    {showTrace ? 'Hide trace' : 'Show trace'}
+                                                </button>
+                                                <button className="tcl-clear-btn" onClick={handleClearSession}>
+                                                    Clear
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
 
-                                    <ChatMessages
-                                        messages={currentMessages}
-                                        isLoading={isLoading}
-                                        agentName={selectedAgent.name}
-                                        chatEndRef={chatEndRef}
-                                    />
+                                    <SubTabBar currentView={currentView} setCurrentView={setCurrentView} />
 
-                                    <ChatInput
-                                        message={message}
-                                        isLoading={isLoading}
-                                        attachedFiles={attachedFiles}
-                                        textareaRef={textareaRef}
-                                        fileInputRef={fileInputRef}
-                                        onMessageChange={handleMessageChange}
-                                        onSend={handleSendMessage}
-                                        onStop={handleStopGeneration}
-                                        onFileSelect={handleFileSelect}
-                                        onRemoveAttachment={removeAttachment}
-                                    />
+                                    {currentView === 'chat' && (
+                                        <>
+                                            <ChatMessages
+                                                messages={currentMessages}
+                                                isLoading={isLoading}
+                                                agentName={selectedAgent.name}
+                                                chatEndRef={chatEndRef}
+                                            />
+
+                                            <ChatInput
+                                                message={message}
+                                                isLoading={isLoading}
+                                                attachedFiles={attachedFiles}
+                                                textareaRef={textareaRef}
+                                                fileInputRef={fileInputRef}
+                                                onMessageChange={handleMessageChange}
+                                                onSend={handleSendMessage}
+                                                onStop={handleStopGeneration}
+                                                onFileSelect={handleFileSelect}
+                                                onRemoveAttachment={removeAttachment}
+                                            />
+                                        </>
+                                    )}
+
+                                    {currentView === 'metrics' && (
+                                        <AgentMetrics selectedAgent={selectedAgent} />
+                                    )}
+
+                                    {currentView === 'logs' && (
+                                        <AgentLogs selectedAgent={selectedAgent} />
+                                    )}
                                 </>
                             ) : (
                                 <div className="tcl-empty-state">
@@ -361,7 +469,7 @@ export function TabCardLayout(props) {
             </div>
 
             {/* ── Trace sidebar (right) ── */}
-            {showTrace && (
+            {showTrace && currentView === 'chat' && (
                 <TraceLogSidebar
                     logs={currentTraceLogs}
                     selectedAgent={selectedAgent}

@@ -636,6 +636,127 @@ html,
   box-shadow: var(--shadow-glow);
 }
 
+/* ── Sub-tab bar ─────────────────────────────────────────────────────────── */
+.sl-sub-tab-bar {
+    display: flex;
+    align-items: center;
+    background: var(--oai-surface);
+    border-bottom: 1px solid var(--oai-border);
+    height: 40px;
+    flex-shrink: 0;
+    padding: 0 20px;
+    gap: 0;
+}
+
+.sl-sub-tab {
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--oai-text-muted);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: all 0.15s var(--ease-ui);
+    letter-spacing: 0.01em;
+}
+.sl-sub-tab:hover { color: var(--oai-text); }
+.sl-sub-tab-active {
+    color: var(--oai-primary);
+    border-bottom-color: var(--oai-primary);
+    font-weight: 600;
+}
+
+/* ── Metrics ─────────────────────────────────────────────────────────────── */
+.sl-metrics {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--oai-bg);
+}
+
+.sl-metrics h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--oai-text-main);
+    margin-bottom: 16px;
+}
+
+.sl-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.sl-metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--oai-surface);
+    border: 1px solid var(--oai-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.sl-metric-label {
+    font-size: 12px;
+    color: var(--oai-text-muted);
+    font-weight: 500;
+}
+
+.sl-metric-value {
+    font-size: 14px;
+    color: var(--oai-text-main);
+    font-weight: 600;
+}
+
+/* ── Logs ─────────────────────────────────────────────────────────────────── */
+.sl-logs {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--oai-bg);
+}
+
+.sl-logs h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--oai-text-main);
+    margin-bottom: 16px;
+}
+
+.sl-logs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sl-log-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: var(--oai-surface);
+    border: 1px solid var(--oai-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.sl-log-timestamp {
+    font-size: 11px;
+    color: var(--oai-text-muted);
+    font-weight: 500;
+    min-width: 140px;
+}
+
+.sl-log-message {
+    font-size: 12px;
+    color: var(--oai-text-main);
+    flex: 1;
+}
+
 /* ── Status dot (shared primitive) ──────────────────────────────────────── */
 .status-dot {
   width: 6px;
