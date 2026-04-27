@@ -99,7 +99,7 @@ const TABS = ['Overview', 'Performance', 'Quality', 'ML Scores', 'Recent'];
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function AgentEvaluationMetrics({ evaluations: initialEvaluations }) {
+export function AgentEvaluationMetrics({ evaluations: initialEvaluations, agentEndpoint, authToken = 'dummy-token' }) {
     const [activeTab, setActiveTab] = useState('Overview');
     const [agentFilter, setAgentFilter] = useState('all');
     const [refreshing, setRefreshing] = useState(false);
@@ -108,11 +108,21 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations }) {
     const [lastRefreshed, setLastRefreshed] = useState(null);
 
     const handleRefresh = async () => {
-        if (refreshing) return;
+        if (refreshing || !agentEndpoint) return;
         setRefreshing(true);
         setError(null);
         try {
-            const res = await fetch('/evaluations/agent');
+            const baseUrl = agentEndpoint.replace(/\/$/, '');
+            const endpointPath = 'evaluations/agent';
+            const url = `${baseUrl}/${endpointPath}`;
+
+            const res = await fetch(url, {
+                cache: 'no-cache',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json',
+                }
+            });
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
             const json = await res.json();
             setData(Array.isArray(json) ? json : []);
@@ -131,7 +141,7 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations }) {
                 <span>{error ? `Failed to load: ${error}` : 'No evaluation data available.'}</span>
                 <button
                     onClick={handleRefresh}
-                    disabled={refreshing}
+                    disabled={refreshing || !agentEndpoint}
                     style={{
                         marginTop: 12,
                         padding: '7px 16px',
@@ -142,7 +152,7 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations }) {
                         fontSize: 12,
                         fontWeight: 500,
                         fontFamily: 'var(--font-sans)',
-                        cursor: refreshing ? 'not-allowed' : 'pointer',
+                        cursor: (refreshing || !agentEndpoint) ? 'not-allowed' : 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         gap: 6,
@@ -309,7 +319,7 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations }) {
 
                     <button
                         onClick={handleRefresh}
-                        disabled={refreshing}
+                        disabled={refreshing || !agentEndpoint}
                         title="Refresh metrics"
                         style={{
                             flexShrink: 0,
@@ -324,12 +334,12 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations }) {
                             fontSize: 12,
                             fontWeight: 500,
                             fontFamily: 'var(--font-sans)',
-                            cursor: refreshing ? 'not-allowed' : 'pointer',
+                            cursor: (refreshing || !agentEndpoint) ? 'not-allowed' : 'pointer',
                             transition: 'all 0.18s ease',
                             letterSpacing: '0.01em',
                         }}
-                        onMouseEnter={e => { if (!refreshing) { e.currentTarget.style.borderColor = 'var(--oai-primary)'; e.currentTarget.style.color = 'var(--oai-primary)'; }}}
-                        onMouseLeave={e => { if (!refreshing) { e.currentTarget.style.borderColor = 'var(--oai-input-border)'; e.currentTarget.style.color = 'var(--oai-text-muted)'; }}}
+                        onMouseEnter={e => { if (!refreshing && agentEndpoint) { e.currentTarget.style.borderColor = 'var(--oai-primary)'; e.currentTarget.style.color = 'var(--oai-primary)'; }}}
+                        onMouseLeave={e => { if (!refreshing && agentEndpoint) { e.currentTarget.style.borderColor = 'var(--oai-input-border)'; e.currentTarget.style.color = 'var(--oai-text-muted)'; }}}
                     >
                         <svg
                             width="13" height="13" viewBox="0 0 24 24" fill="none"

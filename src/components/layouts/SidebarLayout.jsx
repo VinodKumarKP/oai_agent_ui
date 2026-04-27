@@ -88,6 +88,7 @@ export function SidebarLayout(props) {
         setSearchQuery, setShowTrace,
         evaluations, expandedEvaluations, toggleEvaluation,
         agentEvals,
+        authToken
     } = props;
 
     const [currentView, setCurrentView] = useState('chat');
@@ -207,7 +208,11 @@ export function SidebarLayout(props) {
 
                         {currentView === 'metrics' && (
                             <div className="sl-metrics">
-                                <AgentEvaluationMetrics evaluations={agentEvals[selectedAgentId]} />
+                                <AgentEvaluationMetrics
+                                    evaluations={agentEvals[selectedAgentId]}
+                                    agentEndpoint={selectedAgent.endpoint}
+                                    authToken={authToken}
+                                />
                             </div>
                         )}
 

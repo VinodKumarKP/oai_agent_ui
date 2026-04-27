@@ -285,6 +285,7 @@ export function TabCardLayout(props) {
         setSearchQuery, setShowTrace,
         evaluations, expandedEvaluations, toggleEvaluation,
         agentEvals,
+        authToken
     } = props;
 
     const [panelCollapsed, setPanelCollapsed] = useState(false);
@@ -388,7 +389,11 @@ export function TabCardLayout(props) {
 
                                     {currentView === 'metrics' && (
                                         <div className="tcl-metrics">
-                                            <AgentEvaluationMetrics evaluations={agentEvals[selectedAgentId]} />
+                                            <AgentEvaluationMetrics
+                                                evaluations={agentEvals[selectedAgentId]}
+                                                agentEndpoint={selectedAgent.endpoint}
+                                                authToken={authToken}
+                                            />
                                         </div>
                                     )}
 

@@ -240,6 +240,7 @@ export function CardChatLayout(props) {
         setShowTrace,
         evaluations, expandedEvaluations, toggleEvaluation,
         agentEvals,
+        authToken
     } = props;
 
     const [currentView, setCurrentView] = useState('chat');
@@ -317,7 +318,11 @@ export function CardChatLayout(props) {
 
                         {currentView === 'metrics' && (
                             <div className="ccl-metrics">
-                                <AgentEvaluationMetrics evaluations={agentEvals[selectedAgentId]} />
+                                <AgentEvaluationMetrics
+                                    evaluations={agentEvals[selectedAgentId]}
+                                    agentEndpoint={selectedAgent.endpoint}
+                                    authToken={authToken}
+                                    />
                             </div>
                         )}
 

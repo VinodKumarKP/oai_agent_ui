@@ -540,5 +540,6 @@ export function useAgentCore({
         setSearchQuery, setShowTrace,
         fetchEvaluation, toggleEvaluation,
         fetchAgentEvaluations,
+        authToken
     };
 }
