@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
@@ -99,18 +99,18 @@ const TABS = ['Overview', 'Performance', 'Quality', 'ML Scores', 'Recent'];
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function AgentEvaluationMetrics({ evaluations: initialEvaluations, agentStats, agentEndpoint, authToken = 'dummy-token' }) {
+export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token' }) {
     const [activeTab, setActiveTab] = useState('Overview');
     const [agentFilter, setAgentFilter] = useState('all');
-    const [refreshing, setRefreshing] = useState(false);
-    const [data, setData] = useState(initialEvaluations ?? []);
-    const [stats, setStats] = useState(agentStats ?? {});
+    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState([]);
+    const [stats, setStats] = useState({});
     const [error, setError] = useState(null);
     const [lastRefreshed, setLastRefreshed] = useState(null);
 
-    const handleRefresh = async () => {
-        if (refreshing || !agentEndpoint) return;
-        setRefreshing(true);
+    const fetchData = useCallback(async () => {
+        if (!agentEndpoint) return;
+        setLoading(true);
         setError(null);
         try {
             const baseUrl = agentEndpoint.replace(/\/a2a\/?$/, '');
@@ -143,45 +143,13 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations, agentS
         } catch (err) {
             setError(err.message);
         } finally {
-            setRefreshing(false);
+            setLoading(false);
         }
-    };
+    }, [agentEndpoint, authToken]);
 
-    if ((!data || !Array.isArray(data) || data.length === 0) && !stats) {
-        return (
-            <div className="metrics-empty">
-                <span style={{ fontSize: 32 }}>📊</span>
-                <span>{error ? `Failed to load: ${error}` : 'No evaluation data available.'}</span>
-                <button
-                    onClick={handleRefresh}
-                    disabled={refreshing || !agentEndpoint}
-                    style={{
-                        marginTop: 12,
-                        padding: '7px 16px',
-                        borderRadius: 6,
-                        border: '1px solid var(--oai-input-border)',
-                        background: 'var(--oai-input-bg)',
-                        color: 'var(--oai-text-muted)',
-                        fontSize: 12,
-                        fontWeight: 500,
-                        fontFamily: 'var(--font-sans)',
-                        cursor: (refreshing || !agentEndpoint) ? 'not-allowed' : 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                    }}
-                >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
-                        style={{ animation: refreshing ? 'metricsRefreshSpin 0.7s linear infinite' : 'none' }}>
-                        <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" />
-                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-                    </svg>
-                    {refreshing ? 'Loading…' : 'Load Data'}
-                    <style>{`@keyframes metricsRefreshSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-                </button>
-            </div>
-        );
-    }
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     // Unique agents
     const agents = useMemo(() => ['all', ...new Set(data.map(e => e.agent_name).filter(Boolean))], [data]);
@@ -289,6 +257,35 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations, agentS
         padding: '16px',
     };
 
+    if (loading) {
+        return (
+            <div className="metrics-empty">
+                <span style={{ fontSize: 32 }}>📊</span>
+                <span>Loading metrics...</span>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="metrics-empty">
+                <span style={{ fontSize: 32 }}>📊</span>
+                <span>{`Failed to load: ${error}`}</span>
+                <button onClick={fetchData} style={{ marginTop: 12 }}>Retry</button>
+            </div>
+        );
+    }
+
+    if (data.length === 0 && Object.keys(stats).length === 0) {
+        return (
+            <div className="metrics-empty">
+                <span style={{ fontSize: 32 }}>📊</span>
+                <span>No evaluation data available.</span>
+                <button onClick={fetchData} style={{ marginTop: 12 }}>Refresh</button>
+            </div>
+        );
+    }
+
     return (
         <div style={{ fontFamily: 'var(--font-sans)', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
@@ -331,8 +328,8 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations, agentS
                     )}
 
                     <button
-                        onClick={handleRefresh}
-                        disabled={refreshing || !agentEndpoint}
+                        onClick={fetchData}
+                        disabled={loading || !agentEndpoint}
                         title="Refresh metrics"
                         style={{
                             flexShrink: 0,
@@ -342,28 +339,28 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations, agentS
                             padding: '5px 12px',
                             borderRadius: 6,
                             border: '1px solid var(--oai-input-border)',
-                            background: refreshing ? 'var(--oai-primary-dim, rgba(56,190,255,0.1))' : 'var(--oai-input-bg)',
-                            color: refreshing ? 'var(--oai-primary)' : 'var(--oai-text-muted)',
+                            background: loading ? 'var(--oai-primary-dim, rgba(56,190,255,0.1))' : 'var(--oai-input-bg)',
+                            color: loading ? 'var(--oai-primary)' : 'var(--oai-text-muted)',
                             fontSize: 12,
                             fontWeight: 500,
                             fontFamily: 'var(--font-sans)',
-                            cursor: (refreshing || !agentEndpoint) ? 'not-allowed' : 'pointer',
+                            cursor: (loading || !agentEndpoint) ? 'not-allowed' : 'pointer',
                             transition: 'all 0.18s ease',
                             letterSpacing: '0.01em',
                         }}
-                        onMouseEnter={e => { if (!refreshing && agentEndpoint) { e.currentTarget.style.borderColor = 'var(--oai-primary)'; e.currentTarget.style.color = 'var(--oai-primary)'; }}}
-                        onMouseLeave={e => { if (!refreshing && agentEndpoint) { e.currentTarget.style.borderColor = 'var(--oai-input-border)'; e.currentTarget.style.color = 'var(--oai-text-muted)'; }}}
+                        onMouseEnter={e => { if (!loading && agentEndpoint) { e.currentTarget.style.borderColor = 'var(--oai-primary)'; e.currentTarget.style.color = 'var(--oai-primary)'; }}}
+                        onMouseLeave={e => { if (!loading && agentEndpoint) { e.currentTarget.style.borderColor = 'var(--oai-input-border)'; e.currentTarget.style.color = 'var(--oai-text-muted)'; }}}
                     >
                         <svg
                             width="13" height="13" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
-                            style={{ flexShrink: 0, animation: refreshing ? 'metricsRefreshSpin 0.7s linear infinite' : 'none' }}
+                            style={{ flexShrink: 0, animation: loading ? 'metricsRefreshSpin 0.7s linear infinite' : 'none' }}
                         >
                             <polyline points="23 4 23 10 17 10" />
                             <polyline points="1 20 1 14 7 14" />
                             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
                         </svg>
-                        {refreshing ? 'Refreshing…' : 'Refresh'}
+                        {loading ? 'Refreshing…' : 'Refresh'}
                         <style>{`@keyframes metricsRefreshSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
                     </button>
                 </div>

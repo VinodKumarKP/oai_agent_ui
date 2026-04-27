@@ -106,8 +106,6 @@ export function useAgentCore({
     const [unreadCounts, setUnreadCounts]       = useState({});
     const [registryError, setRegistryError]     = useState(null);
     const [evaluations, setEvaluations]         = useState({});
-    const [agentEvals, setAgentEvals] = useState({});
-    const [agentStats, setAgentStats] = useState({});
     const [expandedEvaluations, setExpandedEvaluations] = useState(new Set());
 
     const abortControllerRef = useRef(null);
@@ -180,60 +178,6 @@ export function useAgentCore({
     }, [agentRegistryUrl, authToken]);
 
     useEffect(() => { fetchAgents(); }, [fetchAgents]);
-
-    const fetchAgentEvaluations = useCallback(async () => {
-        if (!selectedAgentId) return;
-
-        const agent = agents.find(a => a.id === selectedAgentId);
-        if (!agent) return;
-
-        try {
-            const evaluationUrl = `${agent.endpoint.replace(/\/$/, '')}/evaluations/agent`;
-            const response = await fetch(evaluationUrl, {
-                headers: { Accept: 'application/json', Authorization: `Bearer ${authToken}` },
-            });
-
-            if (response.ok) {
-                const evaluationData = await response.json();
-                setAgentEvals(prev => ({ ...prev, [selectedAgentId]: evaluationData }));
-            } else {
-                console.warn(`Failed to fetch evaluations for agent ${selectedAgentId}: ${response.status}`);
-            }
-        } catch (error) {
-            console.warn(`Error fetching evaluations for agent ${selectedAgentId}:`, error);
-        }
-    }, [agents, selectedAgentId, authToken]);
-
-    const fetchAgentStats = useCallback(async () => {
-        if (!selectedAgentId) return;
-
-        const agent = agents.find(a => a.id === selectedAgentId);
-        if (!agent) return;
-
-        try {
-            const statsUrl = `${agent.endpoint.replace(/\/a2a\/?$/, '')}/logs/stats`;
-            const response = await fetch(statsUrl, {
-                headers: { Accept: 'application/json', Authorization: `Bearer ${authToken}` },
-            });
-
-            if (response.ok) {
-                const statsData = await response.json();
-                setAgentStats(prev => ({ ...prev, [selectedAgentId]: statsData.statistics }));
-            } else {
-                console.warn(`Failed to fetch stats for agent ${selectedAgentId}: ${response.status}`);
-            }
-        } catch (error) {
-            console.warn(`Error fetching stats for agent ${selectedAgentId}:`, error);
-        }
-    }, [agents, selectedAgentId, authToken]);
-
-
-    useEffect(() => {
-        if (selectedAgentId) {
-            fetchAgentEvaluations();
-            fetchAgentStats();
-        }
-    }, [selectedAgentId, fetchAgentEvaluations, fetchAgentStats]);
 
     // ── Auto-scroll ──────────────────────────────────────────────────────────
     useEffect(() => {
@@ -553,7 +497,6 @@ export function useAgentCore({
         currentMessages, currentTraceLogs,
         showTrace, isLoading, unreadCounts,
         registryError, evaluations, expandedEvaluations,
-        agentEvals, agentStats,
         // Refs
         chatEndRef, traceEndRef, textareaRef, fileInputRef,
         // Handlers
@@ -565,8 +508,6 @@ export function useAgentCore({
         handleStopGeneration, handleSendMessage,
         setSearchQuery, setShowTrace,
         fetchEvaluation, toggleEvaluation,
-        fetchAgentEvaluations,
-        fetchAgentStats,
         authToken,
     };
 }

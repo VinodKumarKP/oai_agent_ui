@@ -209,7 +209,6 @@ export function SidebarLayout(props) {
                         {currentView === 'metrics' && (
                             <div className="sl-metrics">
                                 <AgentEvaluationMetrics
-                                    evaluations={agentEvals[selectedAgentId]}
                                     agentEndpoint={selectedAgent.endpoint}
                                     authToken={authToken}
                                 />
