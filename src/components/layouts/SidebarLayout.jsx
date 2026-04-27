@@ -229,7 +229,7 @@ export function SidebarLayout(props) {
                         )}
 
                         {currentView === 'logs' && (
-                            <div className="ccl-logs">
+                            <div className="logs">
                                 <AgentLogs selectedAgent={selectedAgent} authToken={authToken} />
                             </div>
                         )}
