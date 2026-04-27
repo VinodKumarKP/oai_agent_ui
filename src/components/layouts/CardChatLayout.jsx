@@ -93,7 +93,7 @@ function SubTabBar({ currentView, setCurrentView }) {
                 className={`ccl-sub-tab ${currentView === 'logs' ? 'ccl-sub-tab-active' : ''}`}
                 onClick={() => setCurrentView('logs')}
             >
-                Older Logs
+                Logs
             </button>
         </div>
     );
@@ -326,7 +326,7 @@ export function CardChatLayout(props) {
 
                         {currentView === 'logs' && (
                              <div className="ccl-logs">
-                                <AgentLogs selectedAgent={selectedAgent} />
+                                <AgentLogs selectedAgent={selectedAgent} authToken={authToken} />
                             </div>
                         )}
                     </div>

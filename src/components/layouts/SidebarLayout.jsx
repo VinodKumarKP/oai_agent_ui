@@ -62,7 +62,7 @@ function SubTabBar({ currentView, setCurrentView }) {
                 className={`sl-sub-tab ${currentView === 'logs' ? 'sl-sub-tab-active' : ''}`}
                 onClick={() => setCurrentView('logs')}
             >
-                Older Logs
+                Logs
             </button>
         </div>
     );
@@ -216,7 +216,9 @@ export function SidebarLayout(props) {
                         )}
 
                         {currentView === 'logs' && (
-                            <AgentLogs selectedAgent={selectedAgent} />
+                            <div className="ccl-logs">
+                                <AgentLogs selectedAgent={selectedAgent} authToken={authToken} />
+                            </div>
                         )}
                     </>
                 ) : (

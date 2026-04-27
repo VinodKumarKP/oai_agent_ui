@@ -147,7 +147,7 @@ function SubTabBar({ currentView, setCurrentView }) {
                 className={`tcl-sub-tab ${currentView === 'logs' ? 'tcl-sub-tab-active' : ''}`}
                 onClick={() => setCurrentView('logs')}
             >
-                Older Logs
+                Logs
             </button>
         </div>
     );
@@ -397,7 +397,9 @@ export function TabCardLayout(props) {
                                     )}
 
                                     {currentView === 'logs' && (
-                                        <AgentLogs selectedAgent={selectedAgent} />
+                                        <div className="ccl-logs">
+                                            <AgentLogs selectedAgent={selectedAgent} authToken={authToken} />
+                                        </div>
                                     )}
                                 </>
                             ) : (
