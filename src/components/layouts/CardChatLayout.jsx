@@ -3,6 +3,7 @@ import { TraceLogSidebar } from '../shared/TraceLogSidebar.jsx';
 import { ChatWindow }      from '../shared/ChatWindow.jsx';
 import { AgentEvaluationMetrics } from './AgentEvaluationMetrics.jsx';
 import { AgentLogs } from './AgentLogs.jsx';
+import { TokenManager } from './TokenManager.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 // ---------------------------------------------------------------------------
@@ -94,6 +95,12 @@ function SubTabBar({ currentView, setCurrentView }) {
                 onClick={() => setCurrentView('logs')}
             >
                 Logs
+            </button>
+            <button
+                className={`ccl-sub-tab ${currentView === 'tokens' ? 'ccl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('tokens')}
+            >
+                Tokens
             </button>
         </div>
     );
@@ -328,6 +335,13 @@ export function CardChatLayout(props) {
                              <div className="logs">
                                 <AgentLogs selectedAgent={selectedAgent} authToken={authToken} />
                             </div>
+                        )}
+
+                        {currentView === 'tokens' && (
+                            <TokenManager
+                                agentEndpoint={selectedAgent.endpoint}
+                                authToken={authToken}
+                            />
                         )}
                     </div>
                     {showTrace && currentView === 'chat' && (

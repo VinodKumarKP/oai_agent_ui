@@ -22,6 +22,7 @@ import {
 } from '../shared/SharedComponents.jsx';
 import { AgentEvaluationMetrics } from './AgentEvaluationMetrics.jsx';
 import { AgentLogs } from './AgentLogs.jsx';
+import { TokenManager } from './TokenManager.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 // ---------------------------------------------------------------------------
@@ -148,6 +149,12 @@ function SubTabBar({ currentView, setCurrentView }) {
                 onClick={() => setCurrentView('logs')}
             >
                 Logs
+            </button>
+            <button
+                className={`tcl-sub-tab ${currentView === 'tokens' ? 'tcl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('tokens')}
+            >
+                Tokens
             </button>
         </div>
     );
@@ -400,6 +407,13 @@ export function TabCardLayout(props) {
                                         <div className="logs">
                                             <AgentLogs selectedAgent={selectedAgent} authToken={authToken} />
                                         </div>
+                                    )}
+
+                                    {currentView === 'tokens' && (
+                                        <TokenManager
+                                            agentEndpoint={selectedAgent.endpoint}
+                                            authToken={authToken}
+                                        />
                                     )}
                                 </>
                             ) : (
