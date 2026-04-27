@@ -316,7 +316,7 @@ export function CardChatLayout(props) {
                         )}
 
                         {currentView === 'metrics' && (
-                            <div className="ccl-metrics">
+                            <div className="metrics">
                                 <AgentEvaluationMetrics
                                     agentEndpoint={selectedAgent.endpoint}
                                     authToken={authToken}
@@ -325,7 +325,7 @@ export function CardChatLayout(props) {
                         )}
 
                         {currentView === 'logs' && (
-                             <div className="ccl-logs">
+                             <div className="logs">
                                 <AgentLogs selectedAgent={selectedAgent} authToken={authToken} />
                             </div>
                         )}

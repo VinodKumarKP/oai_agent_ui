@@ -388,7 +388,7 @@ export function TabCardLayout(props) {
                                     )}
 
                                     {currentView === 'metrics' && (
-                                        <div className="tcl-metrics">
+                                        <div className="metrics">
                                             <AgentEvaluationMetrics
                                                 agentEndpoint={selectedAgent.endpoint}
                                                 authToken={authToken}
@@ -397,7 +397,7 @@ export function TabCardLayout(props) {
                                     )}
 
                                     {currentView === 'logs' && (
-                                        <div className="ccl-logs">
+                                        <div className="logs">
                                             <AgentLogs selectedAgent={selectedAgent} authToken={authToken} />
                                         </div>
                                     )}

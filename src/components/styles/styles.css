@@ -1675,3 +1675,92 @@ html,
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ── Metrics ─────────────────────────────────────────────────────────────── */
+.metrics {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--oai-bg);
+}
+
+.metrics h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--oai-text-main);
+    margin-bottom: 16px;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--oai-surface);
+    border: 1px solid var(--oai-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.metric-label {
+    font-size: 12px;
+    color: var(--oai-text-muted);
+    font-weight: 500;
+}
+
+.metric-value {
+    font-size: 14px;
+    color: var(--oai-text-main);
+    font-weight: 600;
+}
+
+/* ── Logs ─────────────────────────────────────────────────────────────────── */
+.logs {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--oai-bg);
+}
+
+.logs h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--oai-text-main);
+    margin-bottom: 16px;
+}
+
+.logs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.log-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: var(--oai-surface);
+    border: 1px solid var(--oai-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.log-timestamp {
+    font-size: 11px;
+    color: var(--oai-text-muted);
+    font-weight: 500;
+    min-width: 140px;
+}
+
+.log-message {
+    font-size: 12px;
+    color: var(--oai-text-main);
+    flex: 1;
+}

@@ -35,10 +35,12 @@ const fmtK = (n) => {
 
 function StatCard({ label, value, sub, accent }) {
     return (
-        <div className="metric-card" style={{ borderLeft: `3px solid ${accent || 'var(--oai-primary)'}` }}>
-            <span className="metric-card-label">{label}</span>
-            <span className="metric-card-value" style={{ color: accent || 'var(--oai-primary)', fontSize: 22 }}>{value}</span>
-            {sub && <span style={{ fontSize: 11, color: 'var(--oai-text-disabled)', marginTop: 4, display: 'block' }}>{sub}</span>}
+        <div className="metric-item" style={{ borderLeft: `3px solid ${accent || 'var(--oai-primary)'}` }}>
+            <div>
+                <span className="metric-label">{label}</span>
+                {sub && <span style={{ fontSize: 11, color: 'var(--oai-text-disabled)', marginTop: 4, display: 'block' }}>{sub}</span>}
+            </div>
+            <span className="metric-value" style={{ color: accent || 'var(--oai-primary)', fontSize: 22 }}>{value}</span>
         </div>
     );
 }
@@ -413,7 +415,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
             {activeTab === 'Overview' && (
                 <>
                     {/* KPI Cards */}
-                    <div className="metrics-summary" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
+                    <div className="metrics-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
                         <StatCard label="Total Interactions" value={stats.total_interactions ?? '–'} sub="across all sessions" />
                         <StatCard label="Unique Sessions" value={stats.unique_sessions ?? '–'} />
                         <StatCard label="Avg Response Time" value={`${(stats.avg_response_time_ms / 1000).toFixed(2)}s` ?? '–'} />
