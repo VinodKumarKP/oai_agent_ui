@@ -1764,3 +1764,10 @@ html,
     color: var(--oai-text-main);
     flex: 1;
 }
+
+.chart-card {
+    background: var(--oai-surface);
+    border: 1px solid var(--oai-border);
+    border-radius: 8px;
+    padding: 16px;
+}

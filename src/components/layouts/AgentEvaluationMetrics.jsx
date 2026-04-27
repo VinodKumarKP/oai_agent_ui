@@ -256,14 +256,6 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
     // Recent evals table
     const recent = [...sorted].reverse().slice(0, 10);
 
-    // ── Styles ────────────────────────────────────────────────────────────
-    const chartCard = {
-        background: 'var(--oai-surface)',
-        border: '1px solid var(--oai-border)',
-        borderRadius: 8,
-        padding: '16px',
-    };
-
     if (loading) {
         return (
             <div className="metrics-empty">
@@ -442,7 +434,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                     {/* Quality over time + Hallucination pie */}
                     <SectionTitle badge={`${total} evals`}>Trend Overview</SectionTitle>
                     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
-                        <div style={chartCard}>
+                        <div className="chart-card">
                             <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Quality Score Over Time</h3>
                             <ResponsiveContainer width="100%" height={240}>
                                 <AreaChart data={timelineData} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
@@ -464,7 +456,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                            <div style={chartCard}>
+                            <div className="chart-card">
                                 <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Hallucination</h3>
                                 <ResponsiveContainer width="100%" height={140}>
                                     <PieChart>
@@ -476,7 +468,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                                     </PieChart>
                                 </ResponsiveContainer>
                             </div>
-                            <div style={chartCard}>
+                            <div className="chart-card">
                                 <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Complexity Mix</h3>
                                 <ResponsiveContainer width="100%" height={120}>
                                     <PieChart>
@@ -495,7 +487,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                     {agentComparison.length > 1 && (
                         <>
                             <SectionTitle>Agent Comparison</SectionTitle>
-                            <div style={chartCard}>
+                            <div className="chart-card">
                                 <ResponsiveContainer width="100%" height={220}>
                                     <BarChart data={agentComparison} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
                                         <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
@@ -519,7 +511,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                 <>
                     <SectionTitle>Performance Profile (Radar)</SectionTitle>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                        <div style={chartCard}>
+                        <div className="chart-card">
                             <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Avg Score by Dimension</h3>
                             <ResponsiveContainer width="100%" height={300}>
                                 <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="75%">
@@ -532,7 +524,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                             </ResponsiveContainer>
                         </div>
 
-                        <div style={chartCard}>
+                        <div className="chart-card">
                             <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Score Breakdown</h3>
                             {[
                                 ['Clarity', evalAvg(evals, 'clarity_score')],
@@ -551,7 +543,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
 
                     {/* Multi-metric timeline */}
                     <SectionTitle>Multi-Metric Trend</SectionTitle>
-                    <div style={chartCard}>
+                    <div className="chart-card">
                         <ResponsiveContainer width="100%" height={260}>
                             <LineChart data={timelineData} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
@@ -574,7 +566,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                 <>
                     <SectionTitle>Quality Score Distribution</SectionTitle>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                        <div style={chartCard}>
+                        <div className="chart-card">
                             <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Histogram (0–10)</h3>
                             <ResponsiveContainer width="100%" height={240}>
                                 <BarChart data={distBuckets} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
@@ -591,7 +583,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                             </ResponsiveContainer>
                         </div>
 
-                        <div style={chartCard}>
+                        <div className="chart-card">
                             <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Quality Health</h3>
                             {[
                                 { label: 'High Quality (≥8)', count: evals.filter(e => e.quality_score >= 8).length, color: '#10b981' },
@@ -614,7 +606,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
 
                     {/* Perplexity over time */}
                     <SectionTitle>Perplexity Score (lower = better)</SectionTitle>
-                    <div style={chartCard}>
+                    <div className="chart-card">
                         <ResponsiveContainer width="100%" height={200}>
                             <AreaChart data={sorted.map((e, i) => ({ name: `#${i + 1}`, perplexity: e.evaluation_data?.perplexity_score ?? 0 }))} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
                                 <defs>
@@ -639,7 +631,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                 <>
                     <SectionTitle badge="NLP metrics">ML Performance Metrics</SectionTitle>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                        <div style={chartCard}>
+                        <div className="chart-card">
                             <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Avg NLP Scores (normalised /10)</h3>
                             <ResponsiveContainer width="100%" height={260}>
                                 <BarChart data={mlData} layout="vertical" margin={{ top: 4, right: 20, left: 30, bottom: 0 }}>
@@ -654,7 +646,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                             </ResponsiveContainer>
                         </div>
 
-                        <div style={chartCard}>
+                        <div className="chart-card">
                             <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Context Monitoring</h3>
                             {[
                                 ['Context Recall', evalAvg(evals, 'context_recall')],
@@ -678,7 +670,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                     {/* Hallucination score trend */}
                     <SectionTitle>Hallucination Score Trend</SectionTitle>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                        <div style={chartCard}>
+                        <div className="chart-card">
                             <ResponsiveContainer width="100%" height={200}>
                                 <LineChart data={sorted.map((e, i) => ({ name: `#${i + 1}`, score: e.evaluation_data?.hallucination_score ?? 0 }))} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
@@ -690,7 +682,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>
-                        <div style={chartCard}>
+                        <div className="chart-card">
                             <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Total Tokens Consumed</h3>
                             <ResponsiveContainer width="100%" height={200}>
                                 <BarChart data={[{ name: 'Tokens', value: stats.total_tokens_sum }]} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
@@ -716,8 +708,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                             const ts = new Date(e.timestamp);
                             const hasSub = i === 0;
                             return (
-                                <div key={e.id} style={{
-                                    ...chartCard,
+                                <div key={e.id} className="chart-card" style={{
                                     borderLeft: `3px solid ${scoreColor(e.quality_score)}`,
                                     display: 'grid',
                                     gridTemplateColumns: '1fr auto',
