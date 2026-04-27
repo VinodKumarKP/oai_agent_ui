@@ -99,37 +99,74 @@ const TABS = ['Overview', 'Performance', 'Quality', 'ML Scores', 'Recent'];
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function AgentEvaluationMetrics({ evaluations, onRefresh }) {
+export function AgentEvaluationMetrics({ evaluations: initialEvaluations }) {
     const [activeTab, setActiveTab] = useState('Overview');
     const [agentFilter, setAgentFilter] = useState('all');
     const [refreshing, setRefreshing] = useState(false);
+    const [data, setData] = useState(initialEvaluations ?? []);
+    const [error, setError] = useState(null);
+    const [lastRefreshed, setLastRefreshed] = useState(null);
 
     const handleRefresh = async () => {
-        if (!onRefresh || refreshing) return;
+        if (refreshing) return;
         setRefreshing(true);
+        setError(null);
         try {
-            await onRefresh();
+            const res = await fetch('/evaluations/agent');
+            if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+            const json = await res.json();
+            setData(Array.isArray(json) ? json : []);
+            setLastRefreshed(new Date());
+        } catch (err) {
+            setError(err.message);
         } finally {
             setRefreshing(false);
         }
     };
 
-    if (!evaluations || !Array.isArray(evaluations) || evaluations.length === 0) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
         return (
             <div className="metrics-empty">
                 <span style={{ fontSize: 32 }}>📊</span>
-                <span>No evaluation data available.</span>
+                <span>{error ? `Failed to load: ${error}` : 'No evaluation data available.'}</span>
+                <button
+                    onClick={handleRefresh}
+                    disabled={refreshing}
+                    style={{
+                        marginTop: 12,
+                        padding: '7px 16px',
+                        borderRadius: 6,
+                        border: '1px solid var(--oai-input-border)',
+                        background: 'var(--oai-input-bg)',
+                        color: 'var(--oai-text-muted)',
+                        fontSize: 12,
+                        fontWeight: 500,
+                        fontFamily: 'var(--font-sans)',
+                        cursor: refreshing ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                    }}
+                >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+                        style={{ animation: refreshing ? 'metricsRefreshSpin 0.7s linear infinite' : 'none' }}>
+                        <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" />
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                    </svg>
+                    {refreshing ? 'Loading…' : 'Load Data'}
+                    <style>{`@keyframes metricsRefreshSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+                </button>
             </div>
         );
     }
 
     // Unique agents
-    const agents = useMemo(() => ['all', ...new Set(evaluations.map(e => e.agent_name).filter(Boolean))], [evaluations]);
+    const agents = useMemo(() => ['all', ...new Set(data.map(e => e.agent_name).filter(Boolean))], [data]);
 
     // Filtered evals
     const evals = useMemo(
-        () => agentFilter === 'all' ? evaluations : evaluations.filter(e => e.agent_name === agentFilter),
-        [evaluations, agentFilter]
+        () => agentFilter === 'all' ? data : data.filter(e => e.agent_name === agentFilter),
+        [data, agentFilter]
     );
 
     const sorted = useMemo(() => [...evals].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)), [evals]);
@@ -204,9 +241,9 @@ export function AgentEvaluationMetrics({ evaluations, onRefresh }) {
 
     // Agent comparison (if multiple agents)
     const agentComparison = useMemo(() => {
-        const agentNames = [...new Set(evaluations.map(e => e.agent_name).filter(Boolean))];
+        const agentNames = [...new Set(data.map(e => e.agent_name).filter(Boolean))];
         return agentNames.map(name => {
-            const ag = evaluations.filter(e => e.agent_name === name);
+            const ag = data.filter(e => e.agent_name === name);
             return {
                 name,
                 quality: parseFloat(avg(ag, 'quality_score').toFixed(2)),
@@ -216,7 +253,7 @@ export function AgentEvaluationMetrics({ evaluations, onRefresh }) {
                 count: ag.length,
             };
         });
-    }, [evaluations]);
+    }, [data]);
 
     // Recent evals table
     const recent = [...sorted].reverse().slice(0, 10);
@@ -244,7 +281,10 @@ export function AgentEvaluationMetrics({ evaluations, onRefresh }) {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, gap: 12 }}>
                     <div style={{ minWidth: 0 }}>
                         <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--oai-text-main)', whiteSpace: 'nowrap' }}>Agent Evaluation Dashboard</h2>
-                        <span style={{ fontSize: 11, color: 'var(--oai-text-disabled)' }}>{total} evaluations · {agents.length - 1} agent{agents.length > 2 ? 's' : ''}</span>
+                        <span style={{ fontSize: 11, color: 'var(--oai-text-disabled)' }}>
+                            {total} evaluations · {agents.length - 1} agent{agents.length > 2 ? 's' : ''}
+                            {lastRefreshed && ` · updated ${lastRefreshed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                        </span>
                     </div>
 
                     {agents.length > 2 && (
@@ -267,44 +307,42 @@ export function AgentEvaluationMetrics({ evaluations, onRefresh }) {
                         </select>
                     )}
 
-                    {onRefresh && (
-                        <button
-                            onClick={handleRefresh}
-                            disabled={refreshing}
-                            title="Refresh metrics"
-                            style={{
-                                flexShrink: 0,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 6,
-                                padding: '5px 12px',
-                                borderRadius: 6,
-                                border: '1px solid var(--oai-input-border)',
-                                background: refreshing ? 'var(--oai-primary-dim, rgba(56,190,255,0.1))' : 'var(--oai-input-bg)',
-                                color: refreshing ? 'var(--oai-primary)' : 'var(--oai-text-muted)',
-                                fontSize: 12,
-                                fontWeight: 500,
-                                fontFamily: 'var(--font-sans)',
-                                cursor: refreshing ? 'not-allowed' : 'pointer',
-                                transition: 'all 0.18s ease',
-                                letterSpacing: '0.01em',
-                            }}
-                            onMouseEnter={e => { if (!refreshing) { e.currentTarget.style.borderColor = 'var(--oai-primary)'; e.currentTarget.style.color = 'var(--oai-primary)'; }}}
-                            onMouseLeave={e => { if (!refreshing) { e.currentTarget.style.borderColor = 'var(--oai-input-border)'; e.currentTarget.style.color = 'var(--oai-text-muted)'; }}}
+                    <button
+                        onClick={handleRefresh}
+                        disabled={refreshing}
+                        title="Refresh metrics"
+                        style={{
+                            flexShrink: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            padding: '5px 12px',
+                            borderRadius: 6,
+                            border: '1px solid var(--oai-input-border)',
+                            background: refreshing ? 'var(--oai-primary-dim, rgba(56,190,255,0.1))' : 'var(--oai-input-bg)',
+                            color: refreshing ? 'var(--oai-primary)' : 'var(--oai-text-muted)',
+                            fontSize: 12,
+                            fontWeight: 500,
+                            fontFamily: 'var(--font-sans)',
+                            cursor: refreshing ? 'not-allowed' : 'pointer',
+                            transition: 'all 0.18s ease',
+                            letterSpacing: '0.01em',
+                        }}
+                        onMouseEnter={e => { if (!refreshing) { e.currentTarget.style.borderColor = 'var(--oai-primary)'; e.currentTarget.style.color = 'var(--oai-primary)'; }}}
+                        onMouseLeave={e => { if (!refreshing) { e.currentTarget.style.borderColor = 'var(--oai-input-border)'; e.currentTarget.style.color = 'var(--oai-text-muted)'; }}}
+                    >
+                        <svg
+                            width="13" height="13" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+                            style={{ flexShrink: 0, animation: refreshing ? 'metricsRefreshSpin 0.7s linear infinite' : 'none' }}
                         >
-                            <svg
-                                width="13" height="13" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
-                                style={{ flexShrink: 0, animation: refreshing ? 'metricsRefreshSpin 0.7s linear infinite' : 'none' }}
-                            >
-                                <polyline points="23 4 23 10 17 10" />
-                                <polyline points="1 20 1 14 7 14" />
-                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-                            </svg>
-                            {refreshing ? 'Refreshing…' : 'Refresh'}
-                            <style>{`@keyframes metricsRefreshSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-                        </button>
-                    )}
+                            <polyline points="23 4 23 10 17 10" />
+                            <polyline points="1 20 1 14 7 14" />
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                        </svg>
+                        {refreshing ? 'Refreshing…' : 'Refresh'}
+                        <style>{`@keyframes metricsRefreshSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+                    </button>
                 </div>
 
                 {/* Tab bar — scrollable, never wraps, never shrinks */}
@@ -346,377 +384,377 @@ export function AgentEvaluationMetrics({ evaluations, onRefresh }) {
             {/* ── Scrollable content ── */}
             <div className="metrics-panel" style={{ flex: 1, overflowY: 'auto', padding: '20px', fontFamily: 'var(--font-sans)' }}>
 
-                {/* ═══════════════════════ OVERVIEW TAB ═══════════════════════ */}
-                {activeTab === 'Overview' && (
-                    <>
-                        {/* KPI Cards */}
-                        <div className="metrics-summary" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
-                            <StatCard label="Total Evaluations" value={total} sub="across all sessions" />
-                            <StatCard
-                                label="Avg Quality Score"
-                                value={`${avgQuality.toFixed(1)}/10`}
-                                accent={scoreColor(avgQuality)}
-                                sub={avgQuality >= 8 ? 'Excellent' : avgQuality >= 6 ? 'Good' : 'Needs Work'}
-                            />
-                            <StatCard
-                                label="Hallucination Rate"
-                                value={halluRate}
-                                accent={halluCount === 0 ? '#10b981' : halluCount / total > 0.1 ? '#ef4444' : '#f59e0b'}
-                                sub={`${halluCount} detected`}
-                            />
-                            <StatCard
-                                label="Avg Satisfaction"
-                                value={`${avgSatisfaction.toFixed(1)}/10`}
-                                accent={scoreColor(avgSatisfaction)}
-                            />
-                            <StatCard
-                                label="Low Quality Responses"
-                                value={lowQuality}
-                                accent={lowQuality === 0 ? '#10b981' : '#ef4444'}
-                                sub={fmtPct(lowQuality, total) + ' of total'}
-                            />
-                            <StatCard
-                                label="Avg Toxicity"
-                                value={fmt2(avgToxicity)}
-                                accent={avgToxicity < 0.5 ? '#10b981' : '#ef4444'}
-                                sub="Lower is better"
-                            />
-                        </div>
+            {/* ═══════════════════════ OVERVIEW TAB ═══════════════════════ */}
+            {activeTab === 'Overview' && (
+                <>
+                    {/* KPI Cards */}
+                    <div className="metrics-summary" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
+                        <StatCard label="Total Evaluations" value={total} sub="across all sessions" />
+                        <StatCard
+                            label="Avg Quality Score"
+                            value={`${avgQuality.toFixed(1)}/10`}
+                            accent={scoreColor(avgQuality)}
+                            sub={avgQuality >= 8 ? 'Excellent' : avgQuality >= 6 ? 'Good' : 'Needs Work'}
+                        />
+                        <StatCard
+                            label="Hallucination Rate"
+                            value={halluRate}
+                            accent={halluCount === 0 ? '#10b981' : halluCount / total > 0.1 ? '#ef4444' : '#f59e0b'}
+                            sub={`${halluCount} detected`}
+                        />
+                        <StatCard
+                            label="Avg Satisfaction"
+                            value={`${avgSatisfaction.toFixed(1)}/10`}
+                            accent={scoreColor(avgSatisfaction)}
+                        />
+                        <StatCard
+                            label="Low Quality Responses"
+                            value={lowQuality}
+                            accent={lowQuality === 0 ? '#10b981' : '#ef4444'}
+                            sub={fmtPct(lowQuality, total) + ' of total'}
+                        />
+                        <StatCard
+                            label="Avg Toxicity"
+                            value={fmt2(avgToxicity)}
+                            accent={avgToxicity < 0.5 ? '#10b981' : '#ef4444'}
+                            sub="Lower is better"
+                        />
+                    </div>
 
-                        {/* Quality over time + Hallucination pie */}
-                        <SectionTitle badge={`${total} evals`}>Trend Overview</SectionTitle>
-                        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
-                            <div style={chartCard}>
-                                <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Quality Score Over Time</h3>
-                                <ResponsiveContainer width="100%" height={240}>
-                                    <AreaChart data={timelineData} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
-                                        <defs>
-                                            <linearGradient id="qualGrad" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#38beff" stopOpacity={0.3} />
-                                                <stop offset="95%" stopColor="#38beff" stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
-                                        <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
-                                        <YAxis domain={[0, 10]} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
-                                        <Tooltip content={<DarkTooltip />} />
-                                        <ReferenceLine y={avgQuality} stroke="#38beff" strokeDasharray="4 2" strokeOpacity={0.5} label={{ value: 'avg', position: 'insideTopRight', fontSize: 10, fill: '#38beff' }} />
-                                        <Area type="monotone" dataKey="quality" name="Quality" stroke="#38beff" fill="url(#qualGrad)" strokeWidth={2} dot={false} activeDot={{ r: 5 }} />
-                                        <Area type="monotone" dataKey="satisfaction" name="Satisfaction" stroke="#8b5cf6" fill="none" strokeWidth={1.5} strokeDasharray="4 2" dot={false} />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            </div>
-
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                                <div style={chartCard}>
-                                    <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Hallucination</h3>
-                                    <ResponsiveContainer width="100%" height={140}>
-                                        <PieChart>
-                                            <Pie data={pieData} cx="50%" cy="50%" innerRadius={40} outerRadius={60} dataKey="value" paddingAngle={3}>
-                                                {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
-                                            </Pie>
-                                            <Tooltip content={<DarkTooltip />} />
-                                            <Legend iconSize={8} wrapperStyle={{ fontSize: 11 }} />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                </div>
-                                <div style={chartCard}>
-                                    <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Complexity Mix</h3>
-                                    <ResponsiveContainer width="100%" height={120}>
-                                        <PieChart>
-                                            <Pie data={complexityData} cx="50%" cy="50%" outerRadius={50} dataKey="value">
-                                                {complexityData.map((_, i) => <Cell key={i} fill={COMPLEXITY_COLORS[i % COMPLEXITY_COLORS.length]} />)}
-                                            </Pie>
-                                            <Tooltip content={<DarkTooltip />} />
-                                            <Legend iconSize={8} wrapperStyle={{ fontSize: 11 }} />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Agent Comparison (only when multiple agents visible) */}
-                        {agentComparison.length > 1 && (
-                            <>
-                                <SectionTitle>Agent Comparison</SectionTitle>
-                                <div style={chartCard}>
-                                    <ResponsiveContainer width="100%" height={220}>
-                                        <BarChart data={agentComparison} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
-                                            <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--oai-text-muted)' }} />
-                                            <YAxis domain={[0, 10]} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
-                                            <Tooltip content={<DarkTooltip />} />
-                                            <Legend wrapperStyle={{ fontSize: 11 }} />
-                                            <Bar dataKey="quality" name="Quality" fill="#38beff" radius={[3, 3, 0, 0]} />
-                                            <Bar dataKey="accuracy" name="Accuracy" fill="#8b5cf6" radius={[3, 3, 0, 0]} />
-                                            <Bar dataKey="satisfaction" name="Satisfaction" fill="#10b981" radius={[3, 3, 0, 0]} />
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </>
-                        )}
-                    </>
-                )}
-
-                {/* ═══════════════════════ PERFORMANCE TAB ════════════════════ */}
-                {activeTab === 'Performance' && (
-                    <>
-                        <SectionTitle>Performance Profile (Radar)</SectionTitle>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                            <div style={chartCard}>
-                                <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Avg Score by Dimension</h3>
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="75%">
-                                        <PolarGrid stroke="var(--oai-border)" />
-                                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: 'var(--oai-text-muted)' }} />
-                                        <PolarRadiusAxis angle={30} domain={[0, 10]} tick={{ fontSize: 9, fill: 'var(--oai-text-disabled)' }} />
-                                        <Radar name="Avg Score" dataKey="value" stroke="#38beff" fill="#38beff" fillOpacity={0.25} strokeWidth={2} />
-                                        <Tooltip content={<DarkTooltip />} />
-                                    </RadarChart>
-                                </ResponsiveContainer>
-                            </div>
-
-                            <div style={chartCard}>
-                                <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Score Breakdown</h3>
-                                {[
-                                    ['Clarity', evalAvg(evals, 'clarity_score')],
-                                    ['Accuracy', evalAvg(evals, 'accuracy_score')],
-                                    ['Relevance', evalAvg(evals, 'relevance_score')],
-                                    ['Empathy', evalAvg(evals, 'empathy_score')],
-                                    ['Coherence', evalAvg(evals, 'coherence_score')],
-                                    ['Completeness', evalAvg(evals, 'completeness_score')],
-                                    ['Formality', evalAvg(evals, 'formality_score')],
-                                    ['Readability', evalAvg(evals, 'readability_score')],
-                                    ['Satisfaction', evalAvg(evals, 'satisfaction_score')],
-                                    ['Sentiment', evalAvg(evals, 'sentiment_score')],
-                                ].map(([label, value]) => <ScoreBar key={label} label={label} value={value} />)}
-                            </div>
-                        </div>
-
-                        {/* Multi-metric timeline */}
-                        <SectionTitle>Multi-Metric Trend</SectionTitle>
+                    {/* Quality over time + Hallucination pie */}
+                    <SectionTitle badge={`${total} evals`}>Trend Overview</SectionTitle>
+                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
                         <div style={chartCard}>
-                            <ResponsiveContainer width="100%" height={260}>
-                                <LineChart data={timelineData} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
-                                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
-                                    <YAxis domain={[0, 10]} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
-                                    <Tooltip content={<DarkTooltip />} />
-                                    <Legend wrapperStyle={{ fontSize: 11 }} />
-                                    <Line type="monotone" dataKey="quality" name="Quality" stroke="#38beff" strokeWidth={2} dot={false} />
-                                    <Line type="monotone" dataKey="satisfaction" name="Satisfaction" stroke="#8b5cf6" strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
-                                    <Line type="monotone" dataKey="accuracy" name="Accuracy" stroke="#10b981" strokeWidth={1.5} dot={false} strokeDasharray="2 2" />
-                                    <Line type="monotone" dataKey="coherence" name="Coherence" stroke="#f59e0b" strokeWidth={1.5} dot={false} strokeDasharray="6 2" />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </>
-                )}
-
-                {/* ═══════════════════════ QUALITY TAB ════════════════════════ */}
-                {activeTab === 'Quality' && (
-                    <>
-                        <SectionTitle>Quality Score Distribution</SectionTitle>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                            <div style={chartCard}>
-                                <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Histogram (0–10)</h3>
-                                <ResponsiveContainer width="100%" height={240}>
-                                    <BarChart data={distBuckets} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
-                                        <XAxis dataKey="score" tick={{ fontSize: 11, fill: 'var(--oai-text-muted)' }} />
-                                        <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
-                                        <Tooltip content={<DarkTooltip />} />
-                                        <Bar dataKey="count" name="Count" radius={[3, 3, 0, 0]}>
-                                            {distBuckets.map((entry, i) => (
-                                                <Cell key={i} fill={scoreColor(entry.score)} />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-
-                            <div style={chartCard}>
-                                <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Quality Health</h3>
-                                {[
-                                    { label: 'High Quality (≥8)', count: evals.filter(e => e.quality_score >= 8).length, color: '#10b981' },
-                                    { label: 'Medium Quality (5–7)', count: evals.filter(e => e.quality_score >= 5 && e.quality_score < 8).length, color: '#f59e0b' },
-                                    { label: 'Low Quality (<5)', count: evals.filter(e => e.quality_score < 5).length, color: '#ef4444' },
-                                    { label: 'Hallucinations', count: halluCount, color: '#f59e0b' },
-                                    { label: 'Has Structured Format', count: evals.filter(e => e.evaluation_data?.has_structured_format).length, color: '#8b5cf6' },
-                                    { label: 'Has Code Example', count: evals.filter(e => e.evaluation_data?.has_code_example).length, color: '#38beff' },
-                                ].map(({ label, count, color }) => (
-                                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--oai-border)' }}>
-                                        <span style={{ fontSize: 12, color: 'var(--oai-text-muted)' }}>{label}</span>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                            <span style={{ fontSize: 12, color: 'var(--oai-text-disabled)' }}>{fmtPct(count, total)}</span>
-                                            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 14, color, minWidth: 28, textAlign: 'right' }}>{count}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Perplexity over time */}
-                        <SectionTitle>Perplexity Score (lower = better)</SectionTitle>
-                        <div style={chartCard}>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <AreaChart data={sorted.map((e, i) => ({ name: `#${i + 1}`, perplexity: e.evaluation_data?.perplexity_score ?? 0 }))} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
+                            <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Quality Score Over Time</h3>
+                            <ResponsiveContainer width="100%" height={240}>
+                                <AreaChart data={timelineData} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
                                     <defs>
-                                        <linearGradient id="perpGrad" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                                        <linearGradient id="qualGrad" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#38beff" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#38beff" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
                                     <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
-                                    <YAxis tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                    <YAxis domain={[0, 10]} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
                                     <Tooltip content={<DarkTooltip />} />
-                                    <Area type="monotone" dataKey="perplexity" name="Perplexity" stroke="#f59e0b" fill="url(#perpGrad)" strokeWidth={2} dot={false} />
+                                    <ReferenceLine y={avgQuality} stroke="#38beff" strokeDasharray="4 2" strokeOpacity={0.5} label={{ value: 'avg', position: 'insideTopRight', fontSize: 10, fill: '#38beff' }} />
+                                    <Area type="monotone" dataKey="quality" name="Quality" stroke="#38beff" fill="url(#qualGrad)" strokeWidth={2} dot={false} activeDot={{ r: 5 }} />
+                                    <Area type="monotone" dataKey="satisfaction" name="Satisfaction" stroke="#8b5cf6" fill="none" strokeWidth={1.5} strokeDasharray="4 2" dot={false} />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
-                    </>
-                )}
 
-                {/* ═══════════════════════ ML SCORES TAB ══════════════════════ */}
-                {activeTab === 'ML Scores' && (
-                    <>
-                        <SectionTitle badge="NLP metrics">ML Performance Metrics</SectionTitle>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                             <div style={chartCard}>
-                                <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Avg NLP Scores (normalised /10)</h3>
-                                <ResponsiveContainer width="100%" height={260}>
-                                    <BarChart data={mlData} layout="vertical" margin={{ top: 4, right: 20, left: 30, bottom: 0 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
-                                        <XAxis type="number" domain={[0, 10]} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
-                                        <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'var(--oai-text-muted)' }} width={70} />
+                                <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Hallucination</h3>
+                                <ResponsiveContainer width="100%" height={140}>
+                                    <PieChart>
+                                        <Pie data={pieData} cx="50%" cy="50%" innerRadius={40} outerRadius={60} dataKey="value" paddingAngle={3}>
+                                            {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
+                                        </Pie>
                                         <Tooltip content={<DarkTooltip />} />
-                                        <Bar dataKey="value" name="Score" radius={[0, 3, 3, 0]}>
-                                            {mlData.map((entry, i) => <Cell key={i} fill={scoreColor(entry.value)} />)}
-                                        </Bar>
+                                        <Legend iconSize={8} wrapperStyle={{ fontSize: 11 }} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div style={chartCard}>
+                                <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Complexity Mix</h3>
+                                <ResponsiveContainer width="100%" height={120}>
+                                    <PieChart>
+                                        <Pie data={complexityData} cx="50%" cy="50%" outerRadius={50} dataKey="value">
+                                            {complexityData.map((_, i) => <Cell key={i} fill={COMPLEXITY_COLORS[i % COMPLEXITY_COLORS.length]} />)}
+                                        </Pie>
+                                        <Tooltip content={<DarkTooltip />} />
+                                        <Legend iconSize={8} wrapperStyle={{ fontSize: 11 }} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Agent Comparison (only when multiple agents visible) */}
+                    {agentComparison.length > 1 && (
+                        <>
+                            <SectionTitle>Agent Comparison</SectionTitle>
+                            <div style={chartCard}>
+                                <ResponsiveContainer width="100%" height={220}>
+                                    <BarChart data={agentComparison} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
+                                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--oai-text-muted)' }} />
+                                        <YAxis domain={[0, 10]} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                        <Tooltip content={<DarkTooltip />} />
+                                        <Legend wrapperStyle={{ fontSize: 11 }} />
+                                        <Bar dataKey="quality" name="Quality" fill="#38beff" radius={[3, 3, 0, 0]} />
+                                        <Bar dataKey="accuracy" name="Accuracy" fill="#8b5cf6" radius={[3, 3, 0, 0]} />
+                                        <Bar dataKey="satisfaction" name="Satisfaction" fill="#10b981" radius={[3, 3, 0, 0]} />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
+                        </>
+                    )}
+                </>
+            )}
 
-                            <div style={chartCard}>
-                                <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Context Monitoring</h3>
-                                {[
-                                    ['Context Recall', evalAvg(evals, 'context_recall')],
-                                    ['Context Precision', evalAvg(evals, 'context_precision')],
-                                    ['Context Adherence', evalAvg(evals, 'context_adherence')],
-                                    ['Context Relevance', evalAvg(evals, 'context_relevance')],
-                                    ['Intent Confidence', evalAvg(evals, 'intent_confidence')],
-                                ].map(([label, value]) => <ScoreBar key={label} label={label} value={value} />)}
-
-                                <div style={{ marginTop: 20 }}>
-                                    <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Text Quality</h3>
-                                    {[
-                                        ['BLEU Score', avgBLEU * 10],
-                                        ['ROUGE Score', avgROUGE * 10],
-                                        ['Avg Perplexity', avgPerplexity, 20],
-                                    ].map(([label, value, max]) => <ScoreBar key={label} label={label} value={value} max={max ?? 10} />)}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Hallucination score trend */}
-                        <SectionTitle>Hallucination Score Trend</SectionTitle>
+            {/* ═══════════════════════ PERFORMANCE TAB ════════════════════ */}
+            {activeTab === 'Performance' && (
+                <>
+                    <SectionTitle>Performance Profile (Radar)</SectionTitle>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                         <div style={chartCard}>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <LineChart data={sorted.map((e, i) => ({ name: `#${i + 1}`, score: e.evaluation_data?.hallucination_score ?? 0 }))} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
-                                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
-                                    <YAxis domain={[0, 1]} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                            <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Avg Score by Dimension</h3>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="75%">
+                                    <PolarGrid stroke="var(--oai-border)" />
+                                    <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: 'var(--oai-text-muted)' }} />
+                                    <PolarRadiusAxis angle={30} domain={[0, 10]} tick={{ fontSize: 9, fill: 'var(--oai-text-disabled)' }} />
+                                    <Radar name="Avg Score" dataKey="value" stroke="#38beff" fill="#38beff" fillOpacity={0.25} strokeWidth={2} />
                                     <Tooltip content={<DarkTooltip />} />
-                                    <ReferenceLine y={0.5} stroke="#ef4444" strokeDasharray="4 2" strokeOpacity={0.5} />
-                                    <Line type="monotone" dataKey="score" name="Hallucination Score" stroke="#ef4444" strokeWidth={2} dot={false} activeDot={{ r: 5 }} />
-                                </LineChart>
+                                </RadarChart>
                             </ResponsiveContainer>
                         </div>
-                    </>
-                )}
 
-                {/* ═══════════════════════ RECENT TAB ══════════════════════════ */}
-                {activeTab === 'Recent' && (
-                    <>
-                        <SectionTitle badge="last 10">Recent Evaluations</SectionTitle>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            {recent.map((e, i) => {
-                                const ed = e.evaluation_data || {};
-                                const ts = new Date(e.timestamp);
-                                const hasSub = i === 0;
-                                return (
-                                    <div key={e.id} style={{
-                                        ...chartCard,
-                                        borderLeft: `3px solid ${scoreColor(e.quality_score)}`,
-                                        display: 'grid',
-                                        gridTemplateColumns: '1fr auto',
-                                        gap: 12,
-                                        alignItems: 'start',
-                                    }}>
-                                        <div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                                                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--oai-text-disabled)' }}>#{e.id}</span>
-                                                <span style={{ fontSize: 11, color: 'var(--oai-text-muted)' }}>{e.agent_name}</span>
-                                                <span style={{ fontSize: 10, color: 'var(--oai-text-disabled)', marginLeft: 'auto' }}>
+                        <div style={chartCard}>
+                            <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Score Breakdown</h3>
+                            {[
+                                ['Clarity', evalAvg(evals, 'clarity_score')],
+                                ['Accuracy', evalAvg(evals, 'accuracy_score')],
+                                ['Relevance', evalAvg(evals, 'relevance_score')],
+                                ['Empathy', evalAvg(evals, 'empathy_score')],
+                                ['Coherence', evalAvg(evals, 'coherence_score')],
+                                ['Completeness', evalAvg(evals, 'completeness_score')],
+                                ['Formality', evalAvg(evals, 'formality_score')],
+                                ['Readability', evalAvg(evals, 'readability_score')],
+                                ['Satisfaction', evalAvg(evals, 'satisfaction_score')],
+                                ['Sentiment', evalAvg(evals, 'sentiment_score')],
+                            ].map(([label, value]) => <ScoreBar key={label} label={label} value={value} />)}
+                        </div>
+                    </div>
+
+                    {/* Multi-metric timeline */}
+                    <SectionTitle>Multi-Metric Trend</SectionTitle>
+                    <div style={chartCard}>
+                        <ResponsiveContainer width="100%" height={260}>
+                            <LineChart data={timelineData} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
+                                <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                <YAxis domain={[0, 10]} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                <Tooltip content={<DarkTooltip />} />
+                                <Legend wrapperStyle={{ fontSize: 11 }} />
+                                <Line type="monotone" dataKey="quality" name="Quality" stroke="#38beff" strokeWidth={2} dot={false} />
+                                <Line type="monotone" dataKey="satisfaction" name="Satisfaction" stroke="#8b5cf6" strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
+                                <Line type="monotone" dataKey="accuracy" name="Accuracy" stroke="#10b981" strokeWidth={1.5} dot={false} strokeDasharray="2 2" />
+                                <Line type="monotone" dataKey="coherence" name="Coherence" stroke="#f59e0b" strokeWidth={1.5} dot={false} strokeDasharray="6 2" />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </>
+            )}
+
+            {/* ═══════════════════════ QUALITY TAB ════════════════════════ */}
+            {activeTab === 'Quality' && (
+                <>
+                    <SectionTitle>Quality Score Distribution</SectionTitle>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                        <div style={chartCard}>
+                            <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Histogram (0–10)</h3>
+                            <ResponsiveContainer width="100%" height={240}>
+                                <BarChart data={distBuckets} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
+                                    <XAxis dataKey="score" tick={{ fontSize: 11, fill: 'var(--oai-text-muted)' }} />
+                                    <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                    <Tooltip content={<DarkTooltip />} />
+                                    <Bar dataKey="count" name="Count" radius={[3, 3, 0, 0]}>
+                                        {distBuckets.map((entry, i) => (
+                                            <Cell key={i} fill={scoreColor(entry.score)} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        <div style={chartCard}>
+                            <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Quality Health</h3>
+                            {[
+                                { label: 'High Quality (≥8)', count: evals.filter(e => e.quality_score >= 8).length, color: '#10b981' },
+                                { label: 'Medium Quality (5–7)', count: evals.filter(e => e.quality_score >= 5 && e.quality_score < 8).length, color: '#f59e0b' },
+                                { label: 'Low Quality (<5)', count: evals.filter(e => e.quality_score < 5).length, color: '#ef4444' },
+                                { label: 'Hallucinations', count: halluCount, color: '#f59e0b' },
+                                { label: 'Has Structured Format', count: evals.filter(e => e.evaluation_data?.has_structured_format).length, color: '#8b5cf6' },
+                                { label: 'Has Code Example', count: evals.filter(e => e.evaluation_data?.has_code_example).length, color: '#38beff' },
+                            ].map(({ label, count, color }) => (
+                                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--oai-border)' }}>
+                                    <span style={{ fontSize: 12, color: 'var(--oai-text-muted)' }}>{label}</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <span style={{ fontSize: 12, color: 'var(--oai-text-disabled)' }}>{fmtPct(count, total)}</span>
+                                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 14, color, minWidth: 28, textAlign: 'right' }}>{count}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Perplexity over time */}
+                    <SectionTitle>Perplexity Score (lower = better)</SectionTitle>
+                    <div style={chartCard}>
+                        <ResponsiveContainer width="100%" height={200}>
+                            <AreaChart data={sorted.map((e, i) => ({ name: `#${i + 1}`, perplexity: e.evaluation_data?.perplexity_score ?? 0 }))} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="perpGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
+                                <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                <YAxis tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                <Tooltip content={<DarkTooltip />} />
+                                <Area type="monotone" dataKey="perplexity" name="Perplexity" stroke="#f59e0b" fill="url(#perpGrad)" strokeWidth={2} dot={false} />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </>
+            )}
+
+            {/* ═══════════════════════ ML SCORES TAB ══════════════════════ */}
+            {activeTab === 'ML Scores' && (
+                <>
+                    <SectionTitle badge="NLP metrics">ML Performance Metrics</SectionTitle>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                        <div style={chartCard}>
+                            <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Avg NLP Scores (normalised /10)</h3>
+                            <ResponsiveContainer width="100%" height={260}>
+                                <BarChart data={mlData} layout="vertical" margin={{ top: 4, right: 20, left: 30, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
+                                    <XAxis type="number" domain={[0, 10]} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                    <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'var(--oai-text-muted)' }} width={70} />
+                                    <Tooltip content={<DarkTooltip />} />
+                                    <Bar dataKey="value" name="Score" radius={[0, 3, 3, 0]}>
+                                        {mlData.map((entry, i) => <Cell key={i} fill={scoreColor(entry.value)} />)}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        <div style={chartCard}>
+                            <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Context Monitoring</h3>
+                            {[
+                                ['Context Recall', evalAvg(evals, 'context_recall')],
+                                ['Context Precision', evalAvg(evals, 'context_precision')],
+                                ['Context Adherence', evalAvg(evals, 'context_adherence')],
+                                ['Context Relevance', evalAvg(evals, 'context_relevance')],
+                                ['Intent Confidence', evalAvg(evals, 'intent_confidence')],
+                            ].map(([label, value]) => <ScoreBar key={label} label={label} value={value} />)}
+
+                            <div style={{ marginTop: 20 }}>
+                                <h3 style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Text Quality</h3>
+                                {[
+                                    ['BLEU Score', avgBLEU * 10],
+                                    ['ROUGE Score', avgROUGE * 10],
+                                    ['Avg Perplexity', avgPerplexity, 20],
+                                ].map(([label, value, max]) => <ScoreBar key={label} label={label} value={value} max={max ?? 10} />)}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Hallucination score trend */}
+                    <SectionTitle>Hallucination Score Trend</SectionTitle>
+                    <div style={chartCard}>
+                        <ResponsiveContainer width="100%" height={200}>
+                            <LineChart data={sorted.map((e, i) => ({ name: `#${i + 1}`, score: e.evaluation_data?.hallucination_score ?? 0 }))} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
+                                <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                <YAxis domain={[0, 1]} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                <Tooltip content={<DarkTooltip />} />
+                                <ReferenceLine y={0.5} stroke="#ef4444" strokeDasharray="4 2" strokeOpacity={0.5} />
+                                <Line type="monotone" dataKey="score" name="Hallucination Score" stroke="#ef4444" strokeWidth={2} dot={false} activeDot={{ r: 5 }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </>
+            )}
+
+            {/* ═══════════════════════ RECENT TAB ══════════════════════════ */}
+            {activeTab === 'Recent' && (
+                <>
+                    <SectionTitle badge="last 10">Recent Evaluations</SectionTitle>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {recent.map((e, i) => {
+                            const ed = e.evaluation_data || {};
+                            const ts = new Date(e.timestamp);
+                            const hasSub = i === 0;
+                            return (
+                                <div key={e.id} style={{
+                                    ...chartCard,
+                                    borderLeft: `3px solid ${scoreColor(e.quality_score)}`,
+                                    display: 'grid',
+                                    gridTemplateColumns: '1fr auto',
+                                    gap: 12,
+                                    alignItems: 'start',
+                                }}>
+                                    <div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--oai-text-disabled)' }}>#{e.id}</span>
+                                            <span style={{ fontSize: 11, color: 'var(--oai-text-muted)' }}>{e.agent_name}</span>
+                                            <span style={{ fontSize: 10, color: 'var(--oai-text-disabled)', marginLeft: 'auto' }}>
                                                 {ts.toLocaleDateString()} {ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </span>
-                                            </div>
+                                        </div>
 
-                                            {ed.overall_assessment && (
-                                                <p style={{ margin: '0 0 8px', fontSize: 12, color: 'var(--oai-text)', lineHeight: 1.5 }}>
-                                                    {ed.overall_assessment}
-                                                </p>
+                                        {ed.overall_assessment && (
+                                            <p style={{ margin: '0 0 8px', fontSize: 12, color: 'var(--oai-text)', lineHeight: 1.5 }}>
+                                                {ed.overall_assessment}
+                                            </p>
+                                        )}
+
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                                            {e.hallucination_detected && (
+                                                <span className="evaluation-flag hallucination">⚠ Hallucination</span>
                                             )}
-
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                                                {e.hallucination_detected && (
-                                                    <span className="evaluation-flag hallucination">⚠ Hallucination</span>
-                                                )}
-                                                {ed.is_low_quality && (
-                                                    <span className="evaluation-flag low-quality">Low Quality</span>
-                                                )}
-                                                {!ed.is_low_quality && !e.hallucination_detected && (
-                                                    <span className="evaluation-flag good-quality">✓ Clean</span>
-                                                )}
-                                                {ed.has_structured_format && (
-                                                    <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 500, background: 'rgba(139,92,246,0.1)', color: '#8b5cf6' }}>Structured</span>
-                                                )}
-                                                {ed.complexity_level && (
-                                                    <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 500, background: 'rgba(255,255,255,0.05)', color: 'var(--oai-text-muted)' }}>{ed.complexity_level}</span>
-                                                )}
-                                                {ed.detected_intent && (
-                                                    <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 400, background: 'rgba(255,255,255,0.03)', color: 'var(--oai-text-disabled)', fontStyle: 'italic', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {ed.is_low_quality && (
+                                                <span className="evaluation-flag low-quality">Low Quality</span>
+                                            )}
+                                            {!ed.is_low_quality && !e.hallucination_detected && (
+                                                <span className="evaluation-flag good-quality">✓ Clean</span>
+                                            )}
+                                            {ed.has_structured_format && (
+                                                <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 500, background: 'rgba(139,92,246,0.1)', color: '#8b5cf6' }}>Structured</span>
+                                            )}
+                                            {ed.complexity_level && (
+                                                <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 500, background: 'rgba(255,255,255,0.05)', color: 'var(--oai-text-muted)' }}>{ed.complexity_level}</span>
+                                            )}
+                                            {ed.detected_intent && (
+                                                <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 400, background: 'rgba(255,255,255,0.03)', color: 'var(--oai-text-disabled)', fontStyle: 'italic', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                     {ed.detected_intent}
                                                 </span>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, minWidth: 80 }}>
-                                            <div style={{ fontSize: 28, fontFamily: 'var(--font-mono)', fontWeight: 800, color: scoreColor(e.quality_score), lineHeight: 1 }}>
-                                                {e.quality_score}
-                                            </div>
-                                            <div style={{ fontSize: 10, color: 'var(--oai-text-disabled)', textAlign: 'right' }}>quality</div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 4 }}>
-                                                {[
-                                                    ['Acc', ed.accuracy_score],
-                                                    ['Coh', ed.coherence_score],
-                                                    ['Rel', ed.relevance_score],
-                                                ].map(([lbl, val]) => (
-                                                    <div key={lbl} style={{ display: 'flex', gap: 6, alignItems: 'center', justifyContent: 'flex-end' }}>
-                                                        <span style={{ fontSize: 10, color: 'var(--oai-text-disabled)' }}>{lbl}</span>
-                                                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: scoreColor(val ?? 0) }}>{val ?? '–'}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                            )}
                                         </div>
                                     </div>
-                                );
-                            })}
-                        </div>
-                    </>
-                )}
+
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, minWidth: 80 }}>
+                                        <div style={{ fontSize: 28, fontFamily: 'var(--font-mono)', fontWeight: 800, color: scoreColor(e.quality_score), lineHeight: 1 }}>
+                                            {e.quality_score}
+                                        </div>
+                                        <div style={{ fontSize: 10, color: 'var(--oai-text-disabled)', textAlign: 'right' }}>quality</div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 4 }}>
+                                            {[
+                                                ['Acc', ed.accuracy_score],
+                                                ['Coh', ed.coherence_score],
+                                                ['Rel', ed.relevance_score],
+                                            ].map(([lbl, val]) => (
+                                                <div key={lbl} style={{ display: 'flex', gap: 6, alignItems: 'center', justifyContent: 'flex-end' }}>
+                                                    <span style={{ fontSize: 10, color: 'var(--oai-text-disabled)' }}>{lbl}</span>
+                                                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: scoreColor(val ?? 0) }}>{val ?? '–'}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </>
+            )}
             </div> {/* end scrollable content */}
         </div>
     );
