@@ -25,6 +25,11 @@ const scoreColor = (v, max = 10) => {
 
 const fmt2 = (n) => (typeof n === 'number' ? n.toFixed(2) : '–');
 const fmtPct = (n, tot) => tot ? `${((n / tot) * 100).toFixed(1)}%` : '0%';
+const fmtK = (n) => {
+    if (typeof n !== 'number') return '–';
+    if (n < 1000) return n.toString();
+    return `${(n / 1000).toFixed(1)}k`;
+}
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -412,6 +417,7 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
                         <StatCard label="Total Interactions" value={stats.total_interactions ?? '–'} sub="across all sessions" />
                         <StatCard label="Unique Sessions" value={stats.unique_sessions ?? '–'} />
                         <StatCard label="Avg Response Time" value={`${(stats.avg_response_time_ms / 1000).toFixed(2)}s` ?? '–'} />
+                        <StatCard label="Total Tokens" value={fmtK(stats.total_tokens_sum)} sub="consumed" />
                         <StatCard
                             label="Avg Quality Score"
                             value={`${avgQuality.toFixed(1)}/10`}
@@ -669,17 +675,31 @@ export function AgentEvaluationMetrics({ agentEndpoint, authToken = 'dummy-token
 
                     {/* Hallucination score trend */}
                     <SectionTitle>Hallucination Score Trend</SectionTitle>
-                    <div style={chartCard}>
-                        <ResponsiveContainer width="100%" height={200}>
-                            <LineChart data={sorted.map((e, i) => ({ name: `#${i + 1}`, score: e.evaluation_data?.hallucination_score ?? 0 }))} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
-                                <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
-                                <YAxis domain={[0, 1]} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
-                                <Tooltip content={<DarkTooltip />} />
-                                <ReferenceLine y={0.5} stroke="#ef4444" strokeDasharray="4 2" strokeOpacity={0.5} />
-                                <Line type="monotone" dataKey="score" name="Hallucination Score" stroke="#ef4444" strokeWidth={2} dot={false} activeDot={{ r: 5 }} />
-                            </LineChart>
-                        </ResponsiveContainer>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                        <div style={chartCard}>
+                            <ResponsiveContainer width="100%" height={200}>
+                                <LineChart data={sorted.map((e, i) => ({ name: `#${i + 1}`, score: e.evaluation_data?.hallucination_score ?? 0 }))} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
+                                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                    <YAxis domain={[0, 1]} tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                    <Tooltip content={<DarkTooltip />} />
+                                    <ReferenceLine y={0.5} stroke="#ef4444" strokeDasharray="4 2" strokeOpacity={0.5} />
+                                    <Line type="monotone" dataKey="score" name="Hallucination Score" stroke="#ef4444" strokeWidth={2} dot={false} activeDot={{ r: 5 }} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div style={chartCard}>
+                            <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: 'var(--oai-text)' }}>Total Tokens Consumed</h3>
+                            <ResponsiveContainer width="100%" height={200}>
+                                <BarChart data={[{ name: 'Tokens', value: stats.total_tokens_sum }]} margin={{ top: 4, right: 12, left: -10, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--oai-border)" />
+                                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--oai-text-muted)' }} />
+                                    <YAxis tick={{ fontSize: 10, fill: 'var(--oai-text-disabled)' }} />
+                                    <Tooltip content={<DarkTooltip />} />
+                                    <Bar dataKey="value" name="Tokens" fill="#8b5cf6" radius={[3, 3, 0, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
                 </>
             )}
