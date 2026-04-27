@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { TraceLogSidebar } from '../shared/TraceLogSidebar.jsx';
 import { ChatWindow }      from '../shared/ChatWindow.jsx';
-import { AgentEvaluationMetrics } from './AgentEvaluationMetrics.jsx';
-import { AgentLogs } from './AgentLogs.jsx';
-import { TokenManager } from './TokenManager.jsx';
+import { AgentEvaluationMetrics } from '../shared/AgentEvaluationMetrics.jsx';
+import { AgentLogs } from '../shared/AgentLogs.jsx';
+import { TokenManager } from '../shared/TokenManager.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 // ---------------------------------------------------------------------------
