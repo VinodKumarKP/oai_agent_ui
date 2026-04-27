@@ -99,11 +99,12 @@ const TABS = ['Overview', 'Performance', 'Quality', 'ML Scores', 'Recent'];
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function AgentEvaluationMetrics({ evaluations: initialEvaluations, agentEndpoint, authToken = 'dummy-token' }) {
+export function AgentEvaluationMetrics({ evaluations: initialEvaluations, agentStats, agentEndpoint, authToken = 'dummy-token' }) {
     const [activeTab, setActiveTab] = useState('Overview');
     const [agentFilter, setAgentFilter] = useState('all');
     const [refreshing, setRefreshing] = useState(false);
     const [data, setData] = useState(initialEvaluations ?? []);
+    const [stats, setStats] = useState(agentStats ?? {});
     const [error, setError] = useState(null);
     const [lastRefreshed, setLastRefreshed] = useState(null);
 
@@ -112,20 +113,32 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations, agentE
         setRefreshing(true);
         setError(null);
         try {
-            const baseUrl = agentEndpoint.replace(/\/$/, '');
-            const endpointPath = 'evaluations/agent';
-            const url = `${baseUrl}/${endpointPath}`;
+            const baseUrl = agentEndpoint.replace(/\/a2a\/?$/, '');
+            const evalsUrl = `${baseUrl}/evaluations/agent`;
+            const statsUrl = `${baseUrl}/logs/stats`;
 
-            const res = await fetch(url, {
-                cache: 'no-cache',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`,
-                    'Accept': 'application/json',
-                }
-            });
-            if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-            const json = await res.json();
-            setData(Array.isArray(json) ? json : []);
+            const [evalsRes, statsRes] = await Promise.all([
+                fetch(evalsUrl, {
+                    cache: 'no-cache',
+                    headers: { 'Authorization': `Bearer ${authToken}`, 'Accept': 'application/json' }
+                }),
+                fetch(statsUrl, {
+                    cache: 'no-cache',
+                    headers: { 'Authorization': `Bearer ${authToken}`, 'Accept': 'application/json' }
+                })
+            ]);
+
+            if (!evalsRes.ok) throw new Error(`Evaluations: ${evalsRes.status} ${evalsRes.statusText}`);
+            const evalsJson = await evalsRes.json();
+            setData(Array.isArray(evalsJson) ? evalsJson : []);
+
+            if (statsRes.ok) {
+                const statsJson = await statsRes.json();
+                setStats(statsJson.statistics);
+            } else {
+                console.warn(`Could not load agent stats: ${statsRes.status}`);
+            }
+
             setLastRefreshed(new Date());
         } catch (err) {
             setError(err.message);
@@ -134,7 +147,7 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations, agentE
         }
     };
 
-    if (!data || !Array.isArray(data) || data.length === 0) {
+    if ((!data || !Array.isArray(data) || data.length === 0) && !stats) {
         return (
             <div className="metrics-empty">
                 <span style={{ fontSize: 32 }}>📊</span>
@@ -399,7 +412,9 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations, agentE
                 <>
                     {/* KPI Cards */}
                     <div className="metrics-summary" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
-                        <StatCard label="Total Evaluations" value={total} sub="across all sessions" />
+                        <StatCard label="Total Interactions" value={stats.total_interactions ?? '–'} sub="across all sessions" />
+                        <StatCard label="Unique Sessions" value={stats.unique_sessions ?? '–'} />
+                        <StatCard label="Avg Response Time" value={`${(stats.avg_response_time_ms / 1000).toFixed(2)}s` ?? '–'} />
                         <StatCard
                             label="Avg Quality Score"
                             value={`${avgQuality.toFixed(1)}/10`}
@@ -416,18 +431,6 @@ export function AgentEvaluationMetrics({ evaluations: initialEvaluations, agentE
                             label="Avg Satisfaction"
                             value={`${avgSatisfaction.toFixed(1)}/10`}
                             accent={scoreColor(avgSatisfaction)}
-                        />
-                        <StatCard
-                            label="Low Quality Responses"
-                            value={lowQuality}
-                            accent={lowQuality === 0 ? '#10b981' : '#ef4444'}
-                            sub={fmtPct(lowQuality, total) + ' of total'}
-                        />
-                        <StatCard
-                            label="Avg Toxicity"
-                            value={fmt2(avgToxicity)}
-                            accent={avgToxicity < 0.5 ? '#10b981' : '#ef4444'}
-                            sub="Lower is better"
                         />
                     </div>
 

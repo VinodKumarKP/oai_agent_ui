@@ -107,6 +107,7 @@ export function useAgentCore({
     const [registryError, setRegistryError]     = useState(null);
     const [evaluations, setEvaluations]         = useState({});
     const [agentEvals, setAgentEvals] = useState({});
+    const [agentStats, setAgentStats] = useState({});
     const [expandedEvaluations, setExpandedEvaluations] = useState(new Set());
 
     const abortControllerRef = useRef(null);
@@ -203,11 +204,36 @@ export function useAgentCore({
         }
     }, [agents, selectedAgentId, authToken]);
 
+    const fetchAgentStats = useCallback(async () => {
+        if (!selectedAgentId) return;
+
+        const agent = agents.find(a => a.id === selectedAgentId);
+        if (!agent) return;
+
+        try {
+            const statsUrl = `${agent.endpoint.replace(/\/a2a\/?$/, '')}/logs/stats`;
+            const response = await fetch(statsUrl, {
+                headers: { Accept: 'application/json', Authorization: `Bearer ${authToken}` },
+            });
+
+            if (response.ok) {
+                const statsData = await response.json();
+                setAgentStats(prev => ({ ...prev, [selectedAgentId]: statsData.statistics }));
+            } else {
+                console.warn(`Failed to fetch stats for agent ${selectedAgentId}: ${response.status}`);
+            }
+        } catch (error) {
+            console.warn(`Error fetching stats for agent ${selectedAgentId}:`, error);
+        }
+    }, [agents, selectedAgentId, authToken]);
+
+
     useEffect(() => {
         if (selectedAgentId) {
             fetchAgentEvaluations();
+            fetchAgentStats();
         }
-    }, [selectedAgentId, fetchAgentEvaluations]);
+    }, [selectedAgentId, fetchAgentEvaluations, fetchAgentStats]);
 
     // ── Auto-scroll ──────────────────────────────────────────────────────────
     useEffect(() => {
@@ -527,7 +553,7 @@ export function useAgentCore({
         currentMessages, currentTraceLogs,
         showTrace, isLoading, unreadCounts,
         registryError, evaluations, expandedEvaluations,
-        agentEvals,
+        agentEvals, agentStats,
         // Refs
         chatEndRef, traceEndRef, textareaRef, fileInputRef,
         // Handlers
@@ -540,6 +566,7 @@ export function useAgentCore({
         setSearchQuery, setShowTrace,
         fetchEvaluation, toggleEvaluation,
         fetchAgentEvaluations,
-        authToken
+        fetchAgentStats,
+        authToken,
     };
 }
