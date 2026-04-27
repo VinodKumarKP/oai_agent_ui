@@ -23,6 +23,7 @@ import {
 import { AgentEvaluationMetrics } from '../shared/AgentEvaluationMetrics.jsx';
 import { AgentLogs } from '../shared/AgentLogs.jsx';
 import { TokenManager } from '../shared/TokenManager.jsx';
+import { SettingsPage } from '../settings/SettingsPage.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 // ---------------------------------------------------------------------------
@@ -167,7 +168,7 @@ function BrowsePanel({
                          filteredAgents, selectedAgentId, allAgents,
                          searchQuery, setSearchQuery,
                          onOpen, fetchAgents,
-                         isCollapsed, onToggle,
+                         isCollapsed, onToggle, onShowSettings,
                      }) {
     return (
         <div className={`tcl-browse ${isCollapsed ? 'tcl-browse-collapsed' : ''}`}>
@@ -225,6 +226,9 @@ function BrowsePanel({
 
                     <button className="tcl-browse-refresh" onClick={fetchAgents}>
                         ↻ Refresh
+                    </button>
+                    <button className="tcl-browse-refresh" onClick={onShowSettings}>
+                        Settings
                     </button>
                 </>
             )}
@@ -297,11 +301,16 @@ export function TabCardLayout(props) {
 
     const [panelCollapsed, setPanelCollapsed] = useState(false);
     const [currentView, setCurrentView] = useState('chat');
+    const [showSettings, setShowSettings] = useState(false);
     const hasOpenTabs = openAgents.length > 0;
 
     const selectedIndex = agents.findIndex(a => a.id === selectedAgentId);
     const { bg, color } = selectedAgent ? avatarStyle(selectedIndex >= 0 ? selectedIndex : 0) : {};
     const initials = selectedAgent ? agentInitials(selectedAgent.name) : '';
+
+    if (showSettings) {
+        return <SettingsPage onBack={() => setShowSettings(false)} />;
+    }
 
     return (
         <div className="tcl-container">
@@ -317,6 +326,7 @@ export function TabCardLayout(props) {
                 fetchAgents={fetchAgents}
                 isCollapsed={panelCollapsed}
                 onToggle={() => setPanelCollapsed(p => !p)}
+                onShowSettings={() => setShowSettings(true)}
             />
 
             {/* ── Main area ── */}

@@ -4,6 +4,7 @@ import { ChatWindow }      from '../shared/ChatWindow.jsx';
 import { AgentEvaluationMetrics } from '../shared/AgentEvaluationMetrics.jsx';
 import { AgentLogs } from '../shared/AgentLogs.jsx';
 import { TokenManager } from '../shared/TokenManager.jsx';
+import { SettingsPage } from '../settings/SettingsPage.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 // ---------------------------------------------------------------------------
@@ -109,7 +110,7 @@ function SubTabBar({ currentView, setCurrentView }) {
 // ---------------------------------------------------------------------------
 // AgentRegistry — the main launcher / registry view
 // ---------------------------------------------------------------------------
-function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen, registryError }) {
+function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen, registryError, onShowSettings }) {
     const [activeTab, setActiveTab] = useState('all');
     const [isListView, setIsListView] = useState(false);
 
@@ -142,9 +143,9 @@ function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen, registryEr
                         <div className="ccl-header-title">Agent registry</div>
                         <div className="ccl-header-sub">Browse, search, and launch your agents</div>
                     </div>
-                    <span className="ccl-count-badge">
-                        {filtered.length} agent{filtered.length !== 1 ? 's' : ''}
-                    </span>
+                    <button className="ccl-back-btn" onClick={onShowSettings}>
+                        Settings
+                    </button>
                 </div>
                 <div className="ccl-tabs">
                     {tabs.map(t => (
@@ -250,6 +251,7 @@ export function CardChatLayout(props) {
     } = props;
 
     const [currentView, setCurrentView] = useState('chat');
+    const [showSettings, setShowSettings] = useState(false);
 
     // If an agent is selected, show the chat view
     if (selectedAgent) {
@@ -357,6 +359,10 @@ export function CardChatLayout(props) {
         );
     }
 
+    if (showSettings) {
+        return <SettingsPage onBack={() => setShowSettings(false)} />;
+    }
+
     return (
         <AgentRegistry
             agents={agents}
@@ -364,6 +370,7 @@ export function CardChatLayout(props) {
             setSearchQuery={setSearchQuery}
             onOpen={handleSelectAgent}
             registryError={registryError}
+            onShowSettings={() => setShowSettings(true)}
         />
     );
 }

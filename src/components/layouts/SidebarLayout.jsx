@@ -19,6 +19,7 @@ import {
 import { AgentEvaluationMetrics } from '../shared/AgentEvaluationMetrics.jsx';
 import { AgentLogs } from '../shared/AgentLogs.jsx';
 import { TokenManager } from '../shared/TokenManager.jsx';
+import { SettingsPage } from '../settings/SettingsPage.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 
@@ -99,9 +100,14 @@ export function SidebarLayout(props) {
     } = props;
 
     const [currentView, setCurrentView] = useState('chat');
+    const [showSettings, setShowSettings] = useState(false);
     const selectedIndex = agents.findIndex(a => a.id === selectedAgentId);
     const { bg, color } = selectedAgent ? avatarStyle(selectedIndex >= 0 ? selectedIndex : 0) : {};
     const initials = selectedAgent ? agentInitials(selectedAgent.name) : '';
+
+    if (showSettings) {
+        return <SettingsPage onBack={() => setShowSettings(false)} />;
+    }
 
     return (
         <div className="sl-container">
@@ -111,8 +117,8 @@ export function SidebarLayout(props) {
                 <div className="sl-sidebar-top">
                     <div className="sl-sidebar-brand">
                         <span className="sl-brand-name">Agents</span>
-                        <button className="sl-refresh-btn" onClick={fetchAgents} title="Refresh agent list">
-                            Refresh
+                        <button className="sl-refresh-btn" onClick={() => setShowSettings(true)} title="Settings">
+                            Settings
                         </button>
                     </div>
                     <div className="sl-search-wrap">
