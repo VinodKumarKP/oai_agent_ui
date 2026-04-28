@@ -113,6 +113,8 @@ function SubTabBar({ currentView, setCurrentView }) {
 function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen, registryError, onShowSettings }) {
     const [activeTab, setActiveTab] = useState('all');
     const [isListView, setIsListView] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const agentsPerPage = 12; // Display 12 agents per page
 
     const filtered = useMemo(() => {
         let list = agents;
@@ -125,8 +127,21 @@ function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen, registryEr
                 a.description?.toLowerCase().includes(q)
             );
         }
+        setCurrentPage(1); // Reset to first page on filter/tab change
         return list;
     }, [agents, activeTab, searchQuery]);
+
+    // Pagination logic
+    const totalPages = Math.ceil(filtered.length / agentsPerPage);
+    const paginatedAgents = useMemo(() => {
+        const startIndex = (currentPage - 1) * agentsPerPage;
+        const endIndex = startIndex + agentsPerPage;
+        return filtered.slice(startIndex, endIndex);
+    }, [filtered, currentPage, agentsPerPage]);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
 
     const tabs = [
         { id: 'all', label: 'All Agents' },
@@ -196,21 +211,50 @@ function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen, registryEr
                         <strong>Error loading agents:</strong> {registryError}
                     </div>
                 ) : (
-                    <div className={`ccl-agent-grid ${isListView ? 'ccl-agent-list' : ''}`}>
-                        {filtered.length === 0 ? (
-                            <div className="ccl-empty-msg">No agents match your search.</div>
-                        ) : (
-                            filtered.map((agent, i) => (
-                                <AgentCard
-                                    key={agent.id}
-                                    agent={agent}
-                                    index={i}
-                                    onOpen={onOpen}
-                                    isListView={isListView}
-                                />
-                            ))
+                    <>
+                        <div className={`ccl-agent-grid ${isListView ? 'ccl-agent-list' : ''}`}>
+                            {paginatedAgents.length === 0 ? (
+                                <div className="ccl-empty-msg">No agents match your search.</div>
+                            ) : (
+                                paginatedAgents.map((agent, i) => (
+                                    <AgentCard
+                                        key={agent.id}
+                                        agent={agent}
+                                        index={i}
+                                        onOpen={onOpen}
+                                        isListView={isListView}
+                                    />
+                                ))
+                            )}
+                        </div>
+                        {totalPages > 1 && (
+                            <div className="ccl-pagination">
+                                <button
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="ccl-pagination-btn"
+                                >
+                                    Previous
+                                </button>
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                    <button
+                                        key={page}
+                                        onClick={() => handlePageChange(page)}
+                                        className={`ccl-pagination-btn ${currentPage === page ? 'ccl-pagination-active' : ''}`}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="ccl-pagination-btn"
+                                >
+                                    Next
+                                </button>
+                            </div>
                         )}
-                    </div>
+                    </>
                 )}
             </div>
         </div>
