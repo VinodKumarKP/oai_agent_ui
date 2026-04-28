@@ -11,9 +11,9 @@ import { agentInitials, avatarStyle } from '../shared/utils.js';
 // Helpers / Sub-components
 // ---------------------------------------------------------------------------
 function StatusDot({ status }) {
-    let color = '#ccc';
-    if (status === 'active')   color = '#4CAF50'; // Green
-    if (status === 'inactive') color = '#F44336'; // Red
+    let color = 'var(--oai-text-disabled)';
+    if (status === 'active')   color = '#4CAF50';
+    if (status === 'inactive') color = '#F44336';
     return (
         <span
             className="ccl-status-dot"
@@ -61,10 +61,7 @@ function AgentCard({ agent, index, onOpen, isListView }) {
             <div className="ccl-card-footer">
                 <button
                     className="ccl-open-btn"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onOpen(agent.id);
-                    }}
+                    onClick={(e) => { e.stopPropagation(); onOpen(agent.id); }}
                 >
                     Open ↗
                 </button>
@@ -158,7 +155,7 @@ function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen, registryEr
                         <div className="ccl-header-title">Agent registry</div>
                         <div className="ccl-header-sub">Browse, search, and launch your agents</div>
                     </div>
-                    <button className="ccl-back-btn" onClick={onShowSettings}>
+                    <button className="ccl-settings-btn" onClick={onShowSettings}>
                         Settings
                     </button>
                 </div>
@@ -373,12 +370,12 @@ export function CardChatLayout(props) {
                                 <AgentEvaluationMetrics
                                     agentEndpoint={selectedAgent.endpoint}
                                     authToken={authToken}
-                                    />
+                                />
                             </div>
                         )}
 
                         {currentView === 'logs' && (
-                             <div className="logs">
+                            <div className="logs">
                                 <AgentLogs selectedAgent={selectedAgent} authToken={authToken} />
                             </div>
                         )}

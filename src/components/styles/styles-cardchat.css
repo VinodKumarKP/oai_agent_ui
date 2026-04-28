@@ -1,9 +1,29 @@
 /*
- * styles-cardchat.css
- * Styles for CardChatLayout — professional agent registry + chat view.
+ * styles-cardchat.css  — Elevated Edition
+ * Agent registry + chat view with refined depth, typography & interactions.
  */
 
-/* ── Registry shell ──────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   KEYFRAMES
+───────────────────────────────────────────────────────────────────────────── */
+@keyframes ccl-fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ccl-slide-in {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes ccl-pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.5); }
+    50%       { box-shadow: 0 0 0 4px rgba(52, 211, 153, 0); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   REGISTRY SHELL
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-registry {
     display: flex;
     flex-direction: column;
@@ -13,33 +33,38 @@
     font-family: var(--font-sans);
 }
 
-/* ── Registry header ─────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   REGISTRY HEADER
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-registry-header {
-    padding: 18px 22px 0;
+    padding: 20px 24px 0;
     border-bottom: 1px solid var(--oai-border);
     background: var(--oai-surface);
     flex-shrink: 0;
-    box-shadow: var(--shadow-sm);
+    /* Subtle gradient to add lift */
+    background: linear-gradient(180deg, var(--oai-surface-raised) 0%, var(--oai-surface) 100%);
+    box-shadow: 0 1px 0 var(--oai-border), 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .ccl-header-top {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    margin-bottom: 14px;
+    margin-bottom: 18px;
 }
 
 .ccl-header-title {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--oai-text-main);
     margin-bottom: 3px;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
 }
 
 .ccl-header-sub {
     font-size: 12px;
     color: var(--oai-text-muted);
+    letter-spacing: 0.005em;
 }
 
 .ccl-count-badge {
@@ -55,14 +80,16 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* ── Tabs ────────────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   TABS
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-tabs {
     display: flex;
     gap: 0;
 }
 
 .ccl-tab-btn {
-    padding: 10px 16px;
+    padding: 10px 18px;
     font-size: 12px;
     font-weight: 500;
     color: var(--oai-text-muted);
@@ -72,7 +99,10 @@
     cursor: pointer;
     transition: color 0.18s var(--ease-ui), border-color 0.18s var(--ease-ui);
     font-family: var(--font-sans);
-    letter-spacing: 0.01em;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-size: 11px;
+    margin-bottom: -1px;
 }
 
 .ccl-tab-btn:hover:not(.ccl-tab-active) {
@@ -85,12 +115,14 @@
     font-weight: 600;
 }
 
-/* ── Toolbar ─────────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   TOOLBAR
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-toolbar {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 22px;
+    gap: 10px;
+    padding: 10px 24px;
     border-bottom: 1px solid var(--oai-border);
     background: var(--oai-surface);
     flex-shrink: 0;
@@ -103,39 +135,47 @@
 
 .ccl-search-icon {
     position: absolute;
-    left: 11px;
+    left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--oai-text-muted);
-    font-size: 13px;
+    color: var(--oai-text-disabled);
+    font-size: 14px;
     pointer-events: none;
+    transition: color 0.15s var(--ease-ui);
+}
+
+.ccl-search-wrap:focus-within .ccl-search-icon {
+    color: var(--oai-primary);
 }
 
 .ccl-search-input {
     width: 100%;
-    height: 32px;
-    padding: 0 12px 0 32px;
+    height: 34px;
+    padding: 0 14px 0 36px;
     border-radius: var(--radius-md);
     border: 1px solid var(--oai-input-border);
     background: var(--oai-input-bg);
-    font-size: 12px;
+    font-size: 12.5px;
     color: var(--oai-text);
     font-family: var(--font-sans);
     outline: none;
     box-sizing: border-box;
-    transition: border-color 0.18s var(--ease-ui), box-shadow 0.18s var(--ease-ui);
+    transition: border-color 0.18s var(--ease-ui), box-shadow 0.18s var(--ease-ui), background 0.18s var(--ease-ui);
 }
 
 .ccl-search-input:focus {
     border-color: var(--oai-primary);
     box-shadow: 0 0 0 3px var(--oai-primary-dim);
+    background: var(--oai-surface);
 }
 
 .ccl-search-input::placeholder {
     color: var(--oai-text-disabled);
 }
 
-/* ── View toggle ─────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   VIEW TOGGLE
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-view-toggles {
     display: flex;
     border: 1px solid var(--oai-input-border);
@@ -145,8 +185,8 @@
 }
 
 .ccl-view-btn {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -168,16 +208,18 @@
     color: #020d14;
 }
 
-/* ── Grid / List wrapper ─────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   GRID / LIST WRAPPER
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-grid-wrap {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
+    padding: 22px 24px;
     background: var(--oai-bg);
     scrollbar-width: thin;
     scrollbar-color: var(--oai-border) transparent;
-    display: flex; /* Added for pagination layout */
-    flex-direction: column; /* Added for pagination layout */
+    display: flex;
+    flex-direction: column;
 }
 
 .ccl-list-wrap {
@@ -185,53 +227,103 @@
     background: var(--oai-surface);
 }
 
-/* ── Agent grid ──────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   AGENT GRID
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-agent-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1px;
-    background: var(--oai-border);
-    border: 1px solid var(--oai-border);
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 14px;
+    background: none;
+    border: none;
     border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    flex-grow: 1; /* Allow grid to grow and take available space */
+    flex-grow: 1;
 }
 
-/* ── Agent list (alternate view) ─────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   AGENT LIST (alternate view)
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-agent-list {
     grid-template-columns: 1fr;
     border-radius: 0;
     border-left: none;
     border-right: none;
+    gap: 1px;
 }
 
-/* ── Agent card (grid mode) ──────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   AGENT CARD — GRID MODE
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-agent-card {
     background: var(--oai-surface);
-    padding: 16px 18px;
+    padding: 18px 18px 14px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    transition: background 0.15s var(--ease-ui);
+    gap: 12px;
     outline: none;
+    border: 1px solid var(--oai-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition:
+            border-color 0.2s var(--ease-ui),
+            background 0.2s var(--ease-ui),
+            box-shadow 0.2s var(--ease-ui),
+            transform 0.2s var(--ease-ui);
+    animation: ccl-fade-in 0.25s var(--ease-ui) both;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Top-edge accent line that reveals on hover */
+.ccl-agent-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--oai-primary), var(--oai-vibrant-blue));
+    opacity: 0;
+    transition: opacity 0.2s var(--ease-ui);
 }
 
 .ccl-agent-card:hover {
     background: var(--oai-surface-light);
+    border-color: var(--oai-border-strong);
+    box-shadow: var(--shadow-md), 0 0 0 1px rgba(56,190,255,0.08);
+    transform: translateY(-2px);
+}
+
+.ccl-agent-card:hover::before {
+    opacity: 1;
 }
 
 .ccl-agent-card:focus-visible {
-    box-shadow: inset 0 0 0 2px var(--oai-primary);
+    box-shadow: 0 0 0 2px var(--oai-primary);
 }
 
-/* ── Agent card (list mode) ──────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   AGENT CARD — LIST MODE
+───────────────────────────────────────────────────────────────────────────── */
+.ccl-agent-list .ccl-agent-card {
+    border-radius: 0;
+    box-shadow: none;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    transform: none !important;
+}
+
+.ccl-agent-list .ccl-agent-card:first-child {
+    border-top: 1px solid var(--oai-border);
+}
+
+.ccl-agent-list .ccl-agent-card::before { display: none; }
+
 .ccl-list-card {
     flex-direction: row;
     align-items: center;
     gap: 14px;
-    padding: 11px 18px;
+    padding: 12px 20px;
 }
 
 .ccl-list-card .ccl-card-desc {
@@ -244,7 +336,15 @@
     flex-shrink: 0;
 }
 
-/* ── Card internals ──────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   CARD INTERNALS
+───────────────────────────────────────────────────────────────────────────── */
+.ccl-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
 .ccl-card-top {
     display: flex;
     align-items: flex-start;
@@ -258,16 +358,17 @@
 }
 
 .ccl-card-avatar {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     flex-shrink: 0;
-    box-shadow: var(--shadow-sm);
+    letter-spacing: 0.03em;
+    box-shadow: var(--shadow-sm), 0 0 0 1px rgba(255,255,255,0.08);
 }
 
 .ccl-card-meta { flex: 1; min-width: 0; }
@@ -280,7 +381,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
 }
 
 .ccl-card-type {
@@ -291,10 +392,14 @@
     text-overflow: ellipsis;
 }
 
+.ccl-card-body {
+    flex: 1;
+}
+
 .ccl-card-desc {
     font-size: 12px;
     color: var(--oai-text-muted);
-    line-height: 1.6;
+    line-height: 1.65;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -304,11 +409,33 @@
 .ccl-card-footer {
     display: flex;
     justify-content: flex-end;
-    padding-top: 8px;
+    padding-top: 10px;
     border-top: 1px solid var(--oai-border);
 }
 
-/* ── Status pill ─────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   STATUS DOT
+───────────────────────────────────────────────────────────────────────────── */
+.ccl-status-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    vertical-align: middle;
+    margin-left: 4px;
+    position: relative;
+    top: -1px;
+}
+
+/* Pulse only on active status */
+.ccl-status-dot[style*="4CAF50"] {
+    animation: ccl-pulse-dot 2.4s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   STATUS PILL
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-status-pill {
     display: inline-flex;
     align-items: center;
@@ -337,80 +464,210 @@
 .ccl-dot.ccl-pill-offline { background: var(--oai-error);   }
 .ccl-dot.ccl-pill-busy    { background: var(--oai-warning); }
 
-/* ── Open button ─────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   OPEN BUTTON
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-open-btn {
     font-size: 11px;
     font-weight: 500;
     color: var(--oai-text-muted);
     background: none;
     border: 1px solid var(--oai-input-border);
-    padding: 4px 11px;
+    padding: 5px 12px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     font-family: var(--font-sans);
     transition: all 0.15s var(--ease-ui);
-    letter-spacing: 0.01em;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-size: 10.5px;
 }
 
 .ccl-open-btn:hover {
     background: var(--oai-primary-dim);
     color: var(--oai-primary);
-    border-color: var(--oai-primary);
+    border-color: rgba(56, 190, 255, 0.4);
+    box-shadow: 0 0 10px var(--oai-primary-glow);
 }
 
-/* ── Empty state ─────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   LIST ITEM (alternate list-view card)
+───────────────────────────────────────────────────────────────────────────── */
+.ccl-agent-list-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 24px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--oai-border);
+    background: var(--oai-surface);
+    transition: background 0.15s var(--ease-ui);
+    animation: ccl-slide-in 0.2s var(--ease-ui) both;
+}
+
+.ccl-agent-list-item:hover {
+    background: var(--oai-surface-light);
+}
+
+.ccl-list-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.ccl-list-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.ccl-list-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--oai-text-main);
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 2px;
+}
+
+.ccl-list-desc {
+    font-size: 12px;
+    color: var(--oai-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ccl-list-open {
+    flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   EMPTY STATE
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-empty-msg {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 60px 20px;
-    color: var(--oai-text-muted);
+    padding: 72px 20px;
+    color: var(--oai-text-disabled);
     font-size: 13px;
-    background: var(--oai-surface);
+    letter-spacing: 0.01em;
 }
 
-/* ── Pagination ──────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   PAGINATION
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-pagination {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 15px 0;
-    gap: 8px;
+    padding: 14px 0;
+    gap: 6px;
     background: var(--oai-bg);
     border-top: 1px solid var(--oai-border);
     flex-shrink: 0;
+    margin-top: 8px;
 }
 
 .ccl-pagination-btn {
     background: var(--oai-input-bg);
     border: 1px solid var(--oai-input-border);
     color: var(--oai-text-muted);
-    padding: 6px 12px;
+    padding: 5px 12px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     font-size: 12px;
     font-weight: 500;
+    font-family: var(--font-sans);
     transition: all 0.15s var(--ease-ui);
+    min-width: 34px;
+    text-align: center;
 }
 
 .ccl-pagination-btn:hover:not(:disabled):not(.ccl-pagination-active) {
     background: var(--oai-surface-raised);
     color: var(--oai-text);
-    border-color: var(--oai-primary);
+    border-color: rgba(56,190,255,0.3);
 }
 
 .ccl-pagination-btn:disabled {
-    opacity: 0.5;
+    opacity: 0.35;
     cursor: not-allowed;
 }
 
 .ccl-pagination-active {
     background: var(--oai-primary);
-    color: var(--oai-on-primary);
+    color: #020d14;
     border-color: var(--oai-primary);
+    font-weight: 600;
+    box-shadow: 0 0 12px var(--oai-primary-glow);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   SETTINGS BUTTON
+───────────────────────────────────────────────────────────────────────────── */
+.ccl-settings-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--oai-text-muted);
+    background: var(--oai-input-bg);
+    border: 1px solid var(--oai-input-border);
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: all 0.18s var(--ease-ui);
+    letter-spacing: 0.01em;
+}
 
-/* ── Chat View ───────────────────────────────────────────────────────────── */
+.ccl-settings-btn:hover {
+    background: var(--oai-surface-raised);
+    color: var(--oai-text);
+    border-color: var(--oai-border-strong);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BACK BUTTON (shared)
+───────────────────────────────────────────────────────────────────────────── */
+.ccl-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--oai-input-bg);
+    border: 1px solid var(--oai-input-border);
+    color: var(--oai-text-muted);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 13px;
+    border-radius: var(--radius-sm);
+    transition: all 0.18s var(--ease-ui);
+    flex-shrink: 0;
+    font-family: var(--font-sans);
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+.ccl-back-btn:hover {
+    background: var(--oai-surface-raised);
+    color: var(--oai-text);
+    border-color: var(--oai-border-strong);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CHAT LAYOUT
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-chat-layout {
     display: flex;
     flex-direction: column;
@@ -420,84 +677,80 @@
     font-family: var(--font-sans);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   CHAT HEADER
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-chat-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 22px;
-    background: var(--oai-surface);
+    padding: 10px 20px;
+    background: linear-gradient(180deg, var(--oai-surface-raised) 0%, var(--oai-surface) 100%);
     border-bottom: 1px solid var(--oai-border);
     flex-shrink: 0;
-    box-shadow: var(--shadow-sm);
-}
-
-.ccl-back-btn {
-    background: var(--oai-input-bg);
-    border: 1px solid var(--oai-input-border);
-    color: var(--oai-text-muted);
-    cursor: pointer;
-    font-size: 1.1rem;
-    padding: 5px 11px;
-    border-radius: var(--radius-sm);
-    transition: all 0.18s var(--ease-ui);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.ccl-back-btn:hover {
-    background: var(--oai-surface-raised);
-    color: var(--oai-text);
-    border-color: var(--oai-primary);
+    box-shadow: 0 1px 0 var(--oai-border), 0 4px 16px rgba(0,0,0,0.25);
+    gap: 12px;
 }
 
 .ccl-chat-agent-info {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     flex: 1;
-    margin-left: 16px;
+    min-width: 0;
 }
 
 .ccl-chat-avatar {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     flex-shrink: 0;
-    box-shadow: var(--shadow-sm);
+    letter-spacing: 0.03em;
+    box-shadow: var(--shadow-sm), 0 0 0 1px rgba(255,255,255,0.08);
 }
 
 .ccl-chat-name {
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 600;
     color: var(--oai-text-main);
     margin-bottom: 2px;
     display: flex;
     align-items: center;
     gap: 6px;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ccl-chat-desc {
     font-size: 11px;
     color: var(--oai-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--font-mono);
+    letter-spacing: -0.01em;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   CHAT HEADER ACTIONS
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-header-actions {
     display: flex;
     gap: 6px;
+    flex-shrink: 0;
 }
 
 .ccl-toggle-trace-btn,
 .ccl-clear-btn {
     height: 30px;
-    padding: 0 12px;
+    padding: 0 13px;
     border-radius: var(--radius-sm);
     font-size: 11.5px;
     font-weight: 500;
@@ -508,21 +761,31 @@
     background: var(--oai-input-bg);
     color: var(--oai-text-muted);
     letter-spacing: 0.01em;
+    white-space: nowrap;
 }
 
 .ccl-toggle-trace-btn:hover {
-    background: var(--oai-surface-raised);
-    color: var(--oai-text);
-    border-color: var(--oai-primary);
+    background: var(--oai-primary-dim);
+    color: var(--oai-primary);
+    border-color: rgba(56, 190, 255, 0.4);
 }
 
 .ccl-clear-btn:hover {
     background: var(--oai-error-bg);
     color: var(--oai-error);
-    border-color: var(--oai-error);
+    border-color: rgba(248, 113, 113, 0.4);
 }
 
-/* ── Chat main content ───────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   CHAT MAIN AREA
+───────────────────────────────────────────────────────────────────────────── */
+.ccl-chat-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    gap: 0;
+}
+
 .ccl-chat-body {
     flex: 1;
     display: flex;
@@ -534,15 +797,12 @@
     margin: 14px;
     border: 1px solid var(--oai-border);
     box-shadow: var(--shadow-sm);
+    overflow: hidden; /* clips the sub-tab-bar corners */
 }
 
-.ccl-chat-main {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-}
-
-/* ── Sub-tab bar ─────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   SUB-TAB BAR
+───────────────────────────────────────────────────────────────────────────── */
 .ccl-sub-tab-bar {
     display: flex;
     align-items: center;
@@ -550,26 +810,70 @@
     border-bottom: 1px solid var(--oai-border);
     height: 40px;
     flex-shrink: 0;
-    padding: 0 22px;
+    padding: 0 18px;
     gap: 0;
 }
 
 .ccl-sub-tab {
-    padding: 8px 16px;
+    padding: 0 16px;
+    height: 100%;
+    display: flex;
+    align-items: center;
     background: none;
     border: none;
     border-bottom: 2px solid transparent;
     color: var(--oai-text-muted);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     cursor: pointer;
     font-family: var(--font-sans);
     transition: all 0.15s var(--ease-ui);
-    letter-spacing: 0.01em;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin-bottom: -1px;
 }
-.ccl-sub-tab:hover { color: var(--oai-text); }
+
+.ccl-sub-tab:hover {
+    color: var(--oai-text);
+}
+
 .ccl-sub-tab-active {
     color: var(--oai-primary);
     border-bottom-color: var(--oai-primary);
     font-weight: 600;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCROLLBAR STYLING (webkit)
+───────────────────────────────────────────────────────────────────────────── */
+.ccl-grid-wrap::-webkit-scrollbar,
+.ccl-chat-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+.ccl-grid-wrap::-webkit-scrollbar-track,
+.ccl-chat-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ccl-grid-wrap::-webkit-scrollbar-thumb,
+.ccl-chat-body::-webkit-scrollbar-thumb {
+    background: var(--oai-border);
+    border-radius: 10px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   STAGGER ANIMATION for cards
+───────────────────────────────────────────────────────────────────────────── */
+.ccl-agent-card:nth-child(1)  { animation-delay: 0.02s; }
+.ccl-agent-card:nth-child(2)  { animation-delay: 0.04s; }
+.ccl-agent-card:nth-child(3)  { animation-delay: 0.06s; }
+.ccl-agent-card:nth-child(4)  { animation-delay: 0.08s; }
+.ccl-agent-card:nth-child(5)  { animation-delay: 0.10s; }
+.ccl-agent-card:nth-child(6)  { animation-delay: 0.12s; }
+.ccl-agent-card:nth-child(7)  { animation-delay: 0.14s; }
+.ccl-agent-card:nth-child(8)  { animation-delay: 0.16s; }
+.ccl-agent-card:nth-child(9)  { animation-delay: 0.18s; }
+.ccl-agent-card:nth-child(10) { animation-delay: 0.20s; }
+.ccl-agent-card:nth-child(11) { animation-delay: 0.22s; }
+.ccl-agent-card:nth-child(12) { animation-delay: 0.24s; }
