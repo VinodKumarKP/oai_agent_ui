@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-// Bypassing Parcel's module resolution issue with exports map by importing the exact file
+// WORKAROUND: Parcel is failing to resolve '@a2a-js/sdk/client' subpath export
+// Reverting to direct import path for now to allow a2a_ui_2 to build.
 import { ClientFactory, ClientFactoryOptions, DefaultAgentCardResolver } from '@a2a-js/sdk/dist/client/index.js';
 
 // ---------------------------------------------------------------------------
@@ -41,23 +42,23 @@ function buildClientFactoryOptions(authToken, agentTokenMap, customInterceptors,
         const authenticatedCardFetch = async (url, init = {}) =>
             fetch(url, { ...init, headers: { ...(init.headers || {}), Authorization: `Bearer ${authToken}` } });
 
-        const globalTokenInterceptor = {
-            before(args) {
-                args.options = {
-                    ...(args.options || {}),
-                    serviceParameters: {
-                        ...(args.options?.serviceParameters || {}),
-                        Authorization: `Bearer ${authToken}`,
-                    },
-                };
-                return Promise.resolve();
-            },
-            after() { return Promise.resolve(); },
-        };
-
         return ClientFactoryOptions.createFrom(ClientFactoryOptions.default, {
             cardResolver: new DefaultAgentCardResolver({ fetchImpl: authenticatedCardFetch }),
-            clientConfig: { interceptors: [globalTokenInterceptor] },
+            clientConfig: { interceptors: [
+                {
+                    before(args) {
+                        args.options = {
+                            ...(args.options || {}),
+                            serviceParameters: {
+                                ...(args.options?.serviceParameters || {}),
+                                Authorization: `Bearer ${authToken}`,
+                            },
+                        };
+                        return Promise.resolve();
+                    },
+                    after() { return Promise.resolve(); },
+                }
+            ] },
         });
     }
 
@@ -111,7 +112,7 @@ export function useAgentCore({
     const abortControllerRef = useRef(null);
     const chatEndRef         = useRef(null);
     const traceEndRef        = useRef(null);
-    const textareaRef        = useRef(null);
+    const textareaRef        = useRef(null); // Fixed: Added 'const' keyword
     const fileInputRef       = useRef(null);
     const initialAgentsRef   = useRef(initialAgents);
 

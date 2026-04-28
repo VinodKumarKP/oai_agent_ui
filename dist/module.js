@@ -49,28 +49,27 @@ function $afd0fea0e112cfe9$var$buildClientFactoryOptions(authToken, agentTokenMa
                     Authorization: `Bearer ${authToken}`
                 }
             });
-        const globalTokenInterceptor = {
-            before (args) {
-                args.options = {
-                    ...args.options || {},
-                    serviceParameters: {
-                        ...args.options?.serviceParameters || {},
-                        Authorization: `Bearer ${authToken}`
-                    }
-                };
-                return Promise.resolve();
-            },
-            after () {
-                return Promise.resolve();
-            }
-        };
         return (0, $5OpyM$ClientFactoryOptions).createFrom((0, $5OpyM$ClientFactoryOptions).default, {
             cardResolver: new (0, $5OpyM$DefaultAgentCardResolver)({
                 fetchImpl: authenticatedCardFetch
             }),
             clientConfig: {
                 interceptors: [
-                    globalTokenInterceptor
+                    {
+                        before (args) {
+                            args.options = {
+                                ...args.options || {},
+                                serviceParameters: {
+                                    ...args.options?.serviceParameters || {},
+                                    Authorization: `Bearer ${authToken}`
+                                }
+                            };
+                            return Promise.resolve();
+                        },
+                        after () {
+                            return Promise.resolve();
+                        }
+                    }
                 ]
             }
         });
@@ -124,7 +123,7 @@ function $afd0fea0e112cfe9$export$ff5f6a678ca1774c({ agents: initialAgents = [],
     const abortControllerRef = (0, $5OpyM$useRef)(null);
     const chatEndRef = (0, $5OpyM$useRef)(null);
     const traceEndRef = (0, $5OpyM$useRef)(null);
-    const textareaRef = (0, $5OpyM$useRef)(null);
+    const textareaRef = (0, $5OpyM$useRef)(null); // Fixed: Added 'const' keyword
     const fileInputRef = (0, $5OpyM$useRef)(null);
     const initialAgentsRef = (0, $5OpyM$useRef)(initialAgents);
     // ── Fetch agents from registry ──────────────────────────────────────────

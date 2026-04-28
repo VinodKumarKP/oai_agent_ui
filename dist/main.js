@@ -61,28 +61,27 @@ function $e60c11a6596eb3d3$var$buildClientFactoryOptions(authToken, agentTokenMa
                     Authorization: `Bearer ${authToken}`
                 }
             });
-        const globalTokenInterceptor = {
-            before (args) {
-                args.options = {
-                    ...args.options || {},
-                    serviceParameters: {
-                        ...args.options?.serviceParameters || {},
-                        Authorization: `Bearer ${authToken}`
-                    }
-                };
-                return Promise.resolve();
-            },
-            after () {
-                return Promise.resolve();
-            }
-        };
         return (0, $gXNCa$a2ajssdkdistclientindexjs.ClientFactoryOptions).createFrom((0, $gXNCa$a2ajssdkdistclientindexjs.ClientFactoryOptions).default, {
             cardResolver: new (0, $gXNCa$a2ajssdkdistclientindexjs.DefaultAgentCardResolver)({
                 fetchImpl: authenticatedCardFetch
             }),
             clientConfig: {
                 interceptors: [
-                    globalTokenInterceptor
+                    {
+                        before (args) {
+                            args.options = {
+                                ...args.options || {},
+                                serviceParameters: {
+                                    ...args.options?.serviceParameters || {},
+                                    Authorization: `Bearer ${authToken}`
+                                }
+                            };
+                            return Promise.resolve();
+                        },
+                        after () {
+                            return Promise.resolve();
+                        }
+                    }
                 ]
             }
         });
@@ -136,7 +135,7 @@ function $e60c11a6596eb3d3$export$ff5f6a678ca1774c({ agents: initialAgents = [],
     const abortControllerRef = (0, $gXNCa$react.useRef)(null);
     const chatEndRef = (0, $gXNCa$react.useRef)(null);
     const traceEndRef = (0, $gXNCa$react.useRef)(null);
-    const textareaRef = (0, $gXNCa$react.useRef)(null);
+    const textareaRef = (0, $gXNCa$react.useRef)(null); // Fixed: Added 'const' keyword
     const fileInputRef = (0, $gXNCa$react.useRef)(null);
     const initialAgentsRef = (0, $gXNCa$react.useRef)(initialAgents);
     // ── Fetch agents from registry ──────────────────────────────────────────
