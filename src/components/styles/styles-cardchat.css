@@ -176,6 +176,8 @@
     background: var(--oai-bg);
     scrollbar-width: thin;
     scrollbar-color: var(--oai-border) transparent;
+    display: flex; /* Added for pagination layout */
+    flex-direction: column; /* Added for pagination layout */
 }
 
 .ccl-list-wrap {
@@ -193,6 +195,7 @@
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
+    flex-grow: 1; /* Allow grid to grow and take available space */
 }
 
 /* ── Agent list (alternate view) ─────────────────────────────────────────── */
@@ -364,6 +367,48 @@
     font-size: 13px;
     background: var(--oai-surface);
 }
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+.ccl-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 0;
+    gap: 8px;
+    background: var(--oai-bg);
+    border-top: 1px solid var(--oai-border);
+    flex-shrink: 0;
+}
+
+.ccl-pagination-btn {
+    background: var(--oai-input-bg);
+    border: 1px solid var(--oai-input-border);
+    color: var(--oai-text-muted);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.15s var(--ease-ui);
+}
+
+.ccl-pagination-btn:hover:not(:disabled):not(.ccl-pagination-active) {
+    background: var(--oai-surface-raised);
+    color: var(--oai-text);
+    border-color: var(--oai-primary);
+}
+
+.ccl-pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ccl-pagination-active {
+    background: var(--oai-primary);
+    color: var(--oai-on-primary);
+    border-color: var(--oai-primary);
+}
+
 
 /* ── Chat View ───────────────────────────────────────────────────────────── */
 .ccl-chat-layout {
