@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-// FIX: Using subpath export for @a2a-js/sdk/client as per package.json exports map
+// WORKAROUND: Parcel is failing to resolve '@a2a-js/sdk/client' subpath export.
+// Reverting to direct import path for a2a_ui_2 build.
 import { ClientFactory, ClientFactoryOptions, DefaultAgentCardResolver } from '@a2a-js/sdk/client';
 
 // ---------------------------------------------------------------------------
