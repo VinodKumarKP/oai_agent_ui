@@ -1,7 +1,7 @@
 require("./main.css");
 var $gXNCa$reactjsxruntime = require("react/jsx-runtime");
 var $gXNCa$react = require("react");
-var $gXNCa$a2ajssdkdistclientindexjs = require("@a2a-js/sdk/dist/client/index.js");
+var $gXNCa$a2ajssdkclient = require("@a2a-js/sdk/client");
 var $gXNCa$reactmarkdown = require("react-markdown");
 var $gXNCa$remarkgfm = require("remark-gfm");
 var $gXNCa$recharts = require("recharts");
@@ -61,8 +61,8 @@ function $e60c11a6596eb3d3$var$buildClientFactoryOptions(authToken, agentTokenMa
                     Authorization: `Bearer ${authToken}`
                 }
             });
-        return (0, $gXNCa$a2ajssdkdistclientindexjs.ClientFactoryOptions).createFrom((0, $gXNCa$a2ajssdkdistclientindexjs.ClientFactoryOptions).default, {
-            cardResolver: new (0, $gXNCa$a2ajssdkdistclientindexjs.DefaultAgentCardResolver)({
+        return (0, $gXNCa$a2ajssdkclient.ClientFactoryOptions).createFrom((0, $gXNCa$a2ajssdkclient.ClientFactoryOptions).default, {
+            cardResolver: new (0, $gXNCa$a2ajssdkclient.DefaultAgentCardResolver)({
                 fetchImpl: authenticatedCardFetch
             }),
             clientConfig: {
@@ -99,8 +99,8 @@ function $e60c11a6596eb3d3$var$buildClientFactoryOptions(authToken, agentTokenMa
                 }
             });
         };
-        return (0, $gXNCa$a2ajssdkdistclientindexjs.ClientFactoryOptions).createFrom((0, $gXNCa$a2ajssdkdistclientindexjs.ClientFactoryOptions).default, {
-            cardResolver: new (0, $gXNCa$a2ajssdkdistclientindexjs.DefaultAgentCardResolver)({
+        return (0, $gXNCa$a2ajssdkclient.ClientFactoryOptions).createFrom((0, $gXNCa$a2ajssdkclient.ClientFactoryOptions).default, {
+            cardResolver: new (0, $gXNCa$a2ajssdkclient.DefaultAgentCardResolver)({
                 fetchImpl: authenticatedCardFetch
             }),
             clientConfig: {
@@ -110,7 +110,7 @@ function $e60c11a6596eb3d3$var$buildClientFactoryOptions(authToken, agentTokenMa
             }
         });
     }
-    return (0, $gXNCa$a2ajssdkdistclientindexjs.ClientFactoryOptions).createFrom((0, $gXNCa$a2ajssdkdistclientindexjs.ClientFactoryOptions).default, {
+    return (0, $gXNCa$a2ajssdkclient.ClientFactoryOptions).createFrom((0, $gXNCa$a2ajssdkclient.ClientFactoryOptions).default, {
         clientConfig: {
             interceptors: customInterceptors ?? []
         }
@@ -135,7 +135,7 @@ function $e60c11a6596eb3d3$export$ff5f6a678ca1774c({ agents: initialAgents = [],
     const abortControllerRef = (0, $gXNCa$react.useRef)(null);
     const chatEndRef = (0, $gXNCa$react.useRef)(null);
     const traceEndRef = (0, $gXNCa$react.useRef)(null);
-    const textareaRef = (0, $gXNCa$react.useRef)(null); // Fixed: Added 'const' keyword
+    const textareaRef = (0, $gXNCa$react.useRef)(null);
     const fileInputRef = (0, $gXNCa$react.useRef)(null);
     const initialAgentsRef = (0, $gXNCa$react.useRef)(initialAgents);
     // ── Fetch agents from registry ──────────────────────────────────────────
@@ -367,7 +367,7 @@ function $e60c11a6596eb3d3$export$ff5f6a678ca1774c({ agents: initialAgents = [],
             let baseUrl = selectedAgent.endpoint;
             if (!baseUrl.endsWith('/')) baseUrl += '/';
             const factoryOptions = $e60c11a6596eb3d3$var$buildClientFactoryOptions(authToken, agentTokenMap, customInterceptors, baseUrl);
-            const factory = new (0, $gXNCa$a2ajssdkdistclientindexjs.ClientFactory)(factoryOptions);
+            const factory = new (0, $gXNCa$a2ajssdkclient.ClientFactory)(factoryOptions);
             const client = await factory.createFromUrl(baseUrl);
             const msgId = crypto?.randomUUID?.() ?? `msg-${Date.now()}-${Math.random()}`;
             const currentContextId = agentContexts[selectedAgentId];

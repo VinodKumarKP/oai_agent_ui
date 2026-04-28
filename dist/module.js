@@ -1,7 +1,7 @@
 import "./module.css";
 import {jsx as $5OpyM$jsx, jsxs as $5OpyM$jsxs, Fragment as $5OpyM$Fragment} from "react/jsx-runtime";
 import {useState as $5OpyM$useState, useRef as $5OpyM$useRef, useCallback as $5OpyM$useCallback, useEffect as $5OpyM$useEffect, useMemo as $5OpyM$useMemo} from "react";
-import {ClientFactoryOptions as $5OpyM$ClientFactoryOptions, DefaultAgentCardResolver as $5OpyM$DefaultAgentCardResolver, ClientFactory as $5OpyM$ClientFactory} from "@a2a-js/sdk/dist/client/index.js";
+import {ClientFactoryOptions as $5OpyM$ClientFactoryOptions, DefaultAgentCardResolver as $5OpyM$DefaultAgentCardResolver, ClientFactory as $5OpyM$ClientFactory} from "@a2a-js/sdk/client";
 import $5OpyM$reactmarkdown from "react-markdown";
 import $5OpyM$remarkgfm from "remark-gfm";
 import {ResponsiveContainer as $5OpyM$ResponsiveContainer, AreaChart as $5OpyM$AreaChart, CartesianGrid as $5OpyM$CartesianGrid, XAxis as $5OpyM$XAxis, YAxis as $5OpyM$YAxis, Tooltip as $5OpyM$Tooltip, ReferenceLine as $5OpyM$ReferenceLine, Area as $5OpyM$Area, PieChart as $5OpyM$PieChart, Pie as $5OpyM$Pie, Cell as $5OpyM$Cell, Legend as $5OpyM$Legend, BarChart as $5OpyM$BarChart, Bar as $5OpyM$Bar, RadarChart as $5OpyM$RadarChart, PolarGrid as $5OpyM$PolarGrid, PolarAngleAxis as $5OpyM$PolarAngleAxis, PolarRadiusAxis as $5OpyM$PolarRadiusAxis, Radar as $5OpyM$Radar, LineChart as $5OpyM$LineChart, Line as $5OpyM$Line} from "recharts";
@@ -123,7 +123,7 @@ function $afd0fea0e112cfe9$export$ff5f6a678ca1774c({ agents: initialAgents = [],
     const abortControllerRef = (0, $5OpyM$useRef)(null);
     const chatEndRef = (0, $5OpyM$useRef)(null);
     const traceEndRef = (0, $5OpyM$useRef)(null);
-    const textareaRef = (0, $5OpyM$useRef)(null); // Fixed: Added 'const' keyword
+    const textareaRef = (0, $5OpyM$useRef)(null);
     const fileInputRef = (0, $5OpyM$useRef)(null);
     const initialAgentsRef = (0, $5OpyM$useRef)(initialAgents);
     // ── Fetch agents from registry ──────────────────────────────────────────

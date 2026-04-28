@@ -37,5 +37,8 @@
     "process": "^0.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
+  },
+  "alias": {
+    "@a2a-js/sdk/client": "./node_modules/@a2a-js/sdk/dist/client/index.js"
   }
 }

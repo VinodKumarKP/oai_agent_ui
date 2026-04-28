@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-// WORKAROUND: Parcel is failing to resolve '@a2a-js/sdk/client' subpath export
-// Reverting to direct import path for now to allow a2a_ui_2 to build.
-import { ClientFactory, ClientFactoryOptions, DefaultAgentCardResolver } from '@a2a-js/sdk/dist/client/index.js';
+// FIX: Using subpath export for @a2a-js/sdk/client as per package.json exports map
+import { ClientFactory, ClientFactoryOptions, DefaultAgentCardResolver } from '@a2a-js/sdk/client';
 
 // ---------------------------------------------------------------------------
 // Auth helpers (unchanged from original AgentUI.js)
@@ -112,7 +111,7 @@ export function useAgentCore({
     const abortControllerRef = useRef(null);
     const chatEndRef         = useRef(null);
     const traceEndRef        = useRef(null);
-    const textareaRef        = useRef(null); // Fixed: Added 'const' keyword
+    const textareaRef        = useRef(null);
     const fileInputRef       = useRef(null);
     const initialAgentsRef   = useRef(initialAgents);
 
