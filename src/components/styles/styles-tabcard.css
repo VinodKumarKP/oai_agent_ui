@@ -1,9 +1,24 @@
 /*
- * styles-tabcard.css
- * Styles exclusive to TabCardLayout.
+ * styles-tabcard.css — Elevated Edition
+ * TabCardLayout: collapsible browse panel, tab bar, card-grid launcher.
  */
 
-/* ── Root container ──────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   KEYFRAMES
+───────────────────────────────────────────────────────────────────────────── */
+@keyframes tcl-fade-in {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tcl-pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.5); }
+    50%       { box-shadow: 0 0 0 4px rgba(52, 211, 153, 0); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ROOT CONTAINER
+───────────────────────────────────────────────────────────────────────────── */
 .tcl-container {
     display: flex;
     height: 100vh;
@@ -12,7 +27,9 @@
     font-family: var(--font-sans);
 }
 
-/* ── Browse panel (left) ─────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   BROWSE PANEL (left)
+───────────────────────────────────────────────────────────────────────────── */
 .tcl-browse {
     width: 220px;
     min-width: 220px;
@@ -23,6 +40,7 @@
     transition: width 0.24s var(--ease-ui), min-width 0.24s var(--ease-ui);
     overflow: hidden;
     flex-shrink: 0;
+    box-shadow: 1px 0 0 var(--oai-border);
 }
 
 .tcl-browse-collapsed {
@@ -34,12 +52,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 12px;
-    background: var(--oai-secondary);
+    padding: 0 10px;
+    background: linear-gradient(180deg, var(--oai-surface-raised) 0%, var(--oai-secondary) 100%);
     border-bottom: 1px solid var(--oai-border);
     height: 44px;
     box-sizing: border-box;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .tcl-browse-title {
@@ -57,7 +76,7 @@
     color: var(--oai-text-disabled);
     cursor: pointer;
     font-size: 1.1rem;
-    padding: 2px 4px;
+    padding: 3px 5px;
     border-radius: var(--radius-sm);
     transition: all 0.15s var(--ease-ui);
     display: flex;
@@ -65,15 +84,32 @@
     justify-content: center;
     flex-shrink: 0;
 }
-.tcl-browse-toggle:hover { color: var(--oai-text); background: var(--oai-surface-light); }
+.tcl-browse-toggle:hover {
+    color: var(--oai-text);
+    background: var(--oai-surface-raised);
+}
 
 .tcl-browse-search-wrap {
     padding: 10px 8px 6px;
+    position: relative;
 }
+
+.tcl-browse-search-wrap::before {
+    content: '⌕';
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-25%);
+    color: var(--oai-text-disabled);
+    font-size: 13px;
+    pointer-events: none;
+    transition: color 0.15s var(--ease-ui);
+}
+.tcl-browse-search-wrap:focus-within::before { color: var(--oai-primary); }
 
 .tcl-browse-search {
     width: 100%;
-    padding: 6px 10px;
+    padding: 6px 10px 6px 26px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--oai-input-border);
     background: var(--oai-input-bg);
@@ -92,7 +128,7 @@
 
 .tcl-browse-list {
     list-style: none;
-    padding: 4px 6px;
+    padding: 4px 5px;
     margin: 0;
     overflow-y: auto;
     flex: 1;
@@ -104,18 +140,24 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 8px;
+    padding: 6px 7px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     margin-bottom: 1px;
-    transition: all 0.14s var(--ease-ui);
+    transition: background 0.14s var(--ease-ui), box-shadow 0.14s var(--ease-ui);
+    border: 1px solid transparent;
 }
-.tcl-browse-item:hover { background: var(--oai-surface-light); }
+.tcl-browse-item:hover {
+    background: var(--oai-surface-light);
+}
 .tcl-browse-selected {
     background: var(--oai-primary-dim) !important;
-    box-shadow: inset 2px 0 0 var(--oai-primary);
+    border-color: rgba(56,190,255,0.15) !important;
+    box-shadow: inset 3px 0 0 var(--oai-primary);
 }
-.tcl-browse-selected .tcl-browse-name { color: var(--oai-primary) !important; }
+.tcl-browse-selected .tcl-browse-name {
+    color: var(--oai-primary) !important;
+}
 
 .tcl-browse-avatar {
     width: 22px;
@@ -125,8 +167,9 @@
     align-items: center;
     justify-content: center;
     font-size: 8.5px;
-    font-weight: 600;
+    font-weight: 700;
     flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
 }
 
 .tcl-browse-name {
@@ -136,19 +179,65 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: -0.01em;
 }
 
 .tcl-browse-empty {
     color: var(--oai-text-disabled);
     font-size: 11px;
-    font-style: italic;
-    padding: 14px;
+    padding: 20px 10px;
     text-align: center;
 }
 
+/* ── Browse Panel Pagination ─────────────────────────────────────────────── */
+.tcl-browse-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 7px 5px;
+    border-top: 1px solid var(--oai-border);
+    flex-shrink: 0;
+    background: var(--oai-surface);
+}
+
+.tcl-browse-page-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--oai-input-border);
+    background: var(--oai-input-bg);
+    color: var(--oai-text-muted);
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: all 0.15s var(--ease-ui);
+    flex-shrink: 0;
+}
+.tcl-browse-page-btn:hover:not(:disabled):not(.tcl-browse-page-active) {
+    background: var(--oai-surface-raised);
+    color: var(--oai-text);
+    border-color: rgba(56,190,255,0.3);
+}
+.tcl-browse-page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+.tcl-browse-page-active {
+    background: var(--oai-primary);
+    color: #020d14;
+    border-color: var(--oai-primary);
+    font-weight: 700;
+    box-shadow: 0 0 10px var(--oai-primary-glow);
+}
+
 .tcl-browse-refresh {
-    margin: 6px;
-    padding: 7px;
+    margin: 5px 6px;
+    padding: 6px 8px;
     background: none;
     border: 1px solid var(--oai-input-border);
     border-radius: var(--radius-sm);
@@ -160,14 +249,17 @@
     transition: all 0.18s var(--ease-ui);
     text-align: center;
     flex-shrink: 0;
+    letter-spacing: 0.01em;
 }
 .tcl-browse-refresh:hover {
-    background: var(--oai-surface-light);
+    background: var(--oai-surface-raised);
     color: var(--oai-text);
-    border-color: var(--oai-primary);
+    border-color: rgba(56,190,255,0.35);
 }
 
-/* ── Main area ───────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   MAIN AREA
+───────────────────────────────────────────────────────────────────────────── */
 .tcl-main {
     flex: 1;
     display: flex;
@@ -176,7 +268,9 @@
     min-width: 0;
 }
 
-/* ── Tab bar ─────────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   TAB BAR
+───────────────────────────────────────────────────────────────────────────── */
 .tcl-tab-bar {
     display: flex;
     align-items: flex-end;
@@ -187,7 +281,7 @@
     overflow-x: auto;
     scrollbar-width: none;
     padding: 0 10px;
-    gap: 2px;
+    gap: 3px;
 }
 .tcl-tab-bar::-webkit-scrollbar { display: none; }
 
@@ -206,17 +300,24 @@
     font-weight: 500;
     color: var(--oai-text-muted);
     white-space: nowrap;
-    transition: all 0.15s var(--ease-ui);
+    transition: background 0.15s var(--ease-ui), color 0.15s var(--ease-ui);
     font-family: var(--font-sans);
+    flex-shrink: 0;
 }
-.tcl-tab:hover { color: var(--oai-text); background: var(--oai-surface-light); }
+.tcl-tab:hover {
+    color: var(--oai-text);
+    background: var(--oai-surface-light);
+}
 .tcl-tab-active {
     color: var(--oai-primary);
     background: var(--oai-surface);
+    border-color: var(--oai-border-strong);
     border-bottom: 2px solid var(--oai-primary);
     height: 40px;
     z-index: 1;
     font-weight: 600;
+    /* Subtle top-glow on active tab */
+    box-shadow: 0 -2px 8px rgba(56,190,255,0.06);
 }
 
 .tcl-tab-avatar {
@@ -226,8 +327,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 7.5px;
-    font-weight: 600;
+    font-size: 7px;
+    font-weight: 700;
     flex-shrink: 0;
 }
 
@@ -240,7 +341,7 @@
 .tcl-tab-badge {
     background: var(--oai-error);
     color: #fff;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 700;
     border-radius: 10px;
     padding: 1px 5px;
@@ -257,14 +358,20 @@
     height: 16px;
     border-radius: 50%;
     color: var(--oai-text-muted);
-    font-size: 0.9rem;
+    font-size: 1rem;
     line-height: 1;
-    transition: all 0.15s;
-    margin-left: 2px;
+    transition: all 0.15s var(--ease-ui);
+    margin-left: 1px;
+    flex-shrink: 0;
 }
-.tcl-tab-close:hover { background: var(--oai-error-bg); color: var(--oai-error); }
+.tcl-tab-close:hover {
+    background: var(--oai-error-bg);
+    color: var(--oai-error);
+}
 
-/* ── Chat area (below tab bar) ───────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   CHAT AREA (below tab bar)
+───────────────────────────────────────────────────────────────────────────── */
 .tcl-chat-area {
     flex: 1;
     display: flex;
@@ -278,22 +385,28 @@
     box-shadow: var(--shadow-sm);
 }
 
-/* ── Chat header ─────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   CHAT HEADER
+───────────────────────────────────────────────────────────────────────────── */
 .tcl-chat-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 11px 16px;
+    padding: 10px 16px;
     border-bottom: 1px solid var(--oai-border);
     flex-shrink: 0;
-    background: var(--oai-surface);
+    background: linear-gradient(180deg, var(--oai-surface-raised) 0%, var(--oai-surface) 100%);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: 0 1px 0 var(--oai-border), 0 3px 12px rgba(0,0,0,0.2);
+    gap: 12px;
 }
 
 .tcl-chat-header-left {
     display: flex;
     align-items: center;
     gap: 12px;
+    min-width: 0;
+    flex: 1;
 }
 
 .tcl-chat-avatar {
@@ -303,10 +416,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 10px;
+    font-weight: 700;
     flex-shrink: 0;
-    box-shadow: var(--shadow-sm);
+    letter-spacing: 0.03em;
+    box-shadow: var(--shadow-sm), 0 0 0 1px rgba(255,255,255,0.07);
 }
 
 .tcl-chat-agent-name {
@@ -314,7 +428,10 @@
     font-weight: 600;
     color: var(--oai-text-main);
     margin-bottom: 3px;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .tcl-chat-agent-meta {
@@ -326,6 +443,9 @@
 .tcl-chat-agent-desc {
     font-size: 11px;
     color: var(--oai-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Status pill */
@@ -338,6 +458,7 @@
     padding: 2px 7px;
     border-radius: 20px;
     letter-spacing: 0.01em;
+    flex-shrink: 0;
 }
 .tcl-pill-online  { background: var(--oai-success-bg); color: var(--oai-success); }
 .tcl-pill-offline { background: var(--oai-error-bg);   color: var(--oai-error);   }
@@ -349,16 +470,16 @@
     border-radius: 50%;
     flex-shrink: 0;
 }
-.tcl-dot.tcl-pill-online  { background: var(--oai-success); box-shadow: 0 0 5px var(--oai-success); }
+.tcl-dot.tcl-pill-online  { background: var(--oai-success); box-shadow: 0 0 5px var(--oai-success); animation: tcl-pulse-dot 2.4s ease-in-out infinite; }
 .tcl-dot.tcl-pill-offline { background: var(--oai-error);   }
 .tcl-dot.tcl-pill-busy    { background: var(--oai-warning); }
 
-.tcl-header-actions { display: flex; gap: 6px; }
+.tcl-header-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
 .tcl-trace-btn,
 .tcl-clear-btn {
     height: 28px;
-    padding: 0 10px;
+    padding: 0 12px;
     border-radius: var(--radius-sm);
     font-size: 11.5px;
     font-weight: 500;
@@ -369,34 +490,47 @@
     background: var(--oai-input-bg);
     color: var(--oai-text-muted);
     letter-spacing: 0.01em;
+    white-space: nowrap;
 }
-.tcl-trace-btn:hover { background: var(--oai-surface-raised); color: var(--oai-text); border-color: var(--oai-primary); }
-.tcl-clear-btn:hover { background: var(--oai-error-bg); color: var(--oai-error); border-color: var(--oai-error); }
+.tcl-trace-btn:hover {
+    background: var(--oai-primary-dim);
+    color: var(--oai-primary);
+    border-color: rgba(56,190,255,0.4);
+}
+.tcl-clear-btn:hover {
+    background: var(--oai-error-bg);
+    color: var(--oai-error);
+    border-color: rgba(248,113,113,0.4);
+}
 
-/* ── Empty state (inside chat area, no agent selected) ───────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   EMPTY STATE
+───────────────────────────────────────────────────────────────────────────── */
 .tcl-empty-state {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--oai-text-muted);
+    color: var(--oai-text-disabled);
     font-size: 13px;
 }
 
-/* ── Card-grid launcher ──────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   CARD-GRID LAUNCHER (center, no tabs open)
+───────────────────────────────────────────────────────────────────────────── */
 .tcl-launcher {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    padding: 36px 28px;
+    padding: 40px 32px 24px;
     background: var(--oai-bg);
     scrollbar-width: thin;
     scrollbar-color: var(--oai-border) transparent;
 }
 
 .tcl-launcher-header {
-    margin-bottom: 24px;
+    margin-bottom: 28px;
     text-align: center;
 }
 
@@ -405,13 +539,13 @@
     font-weight: 600;
     color: var(--oai-text-main);
     margin-bottom: 6px;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
 }
 
 .tcl-launcher-sub {
     color: var(--oai-text-muted);
     font-size: 13px;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
 .tcl-launcher-search-wrap {
@@ -425,15 +559,17 @@
     left: 11px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--oai-text-muted);
-    font-size: 13px;
+    color: var(--oai-text-disabled);
+    font-size: 14px;
     pointer-events: none;
+    transition: color 0.15s var(--ease-ui);
 }
+.tcl-launcher-search-wrap:focus-within .tcl-launcher-search-icon { color: var(--oai-primary); }
 
 .tcl-launcher-search {
     width: 100%;
     height: 36px;
-    padding: 0 12px 0 32px;
+    padding: 0 14px 0 34px;
     border-radius: var(--radius-md);
     border: 1px solid var(--oai-input-border);
     font-size: 13px;
@@ -450,42 +586,131 @@
 }
 .tcl-launcher-search::placeholder { color: var(--oai-text-disabled); }
 
+/* ── Launcher Grid ─────────────────────────────────────────────────────────── */
 .tcl-launcher-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
-    gap: 1px;
-    background: var(--oai-border);
-    border: 1px solid var(--oai-border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
     max-width: 1100px;
     margin: 0 auto;
     width: 100%;
-    box-shadow: var(--shadow-sm);
+    flex-grow: 1;
 }
 
 .tcl-launcher-empty {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 50px 20px;
-    color: var(--oai-text-muted);
+    padding: 60px 20px;
+    color: var(--oai-text-disabled);
     font-size: 13px;
-    background: var(--oai-surface);
 }
 
-/* ── Agent card (in launcher grid) ──────────────────────────────────────── */
+/* ── Launcher Pagination ───────────────────────────────────────────────────── */
+.tcl-launcher-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 20px 0 4px;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.tcl-launcher-page-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--oai-input-border);
+    background: var(--oai-input-bg);
+    color: var(--oai-text-muted);
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: all 0.15s var(--ease-ui);
+}
+.tcl-launcher-page-btn:hover:not(:disabled):not(.tcl-launcher-page-active) {
+    background: var(--oai-surface-raised);
+    color: var(--oai-text);
+    border-color: rgba(56,190,255,0.3);
+}
+.tcl-launcher-page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+.tcl-launcher-page-active {
+    background: var(--oai-primary);
+    color: #020d14;
+    border-color: var(--oai-primary);
+    font-weight: 700;
+    box-shadow: 0 0 12px var(--oai-primary-glow);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   AGENT CARD (launcher grid)
+───────────────────────────────────────────────────────────────────────────── */
 .tcl-agent-card {
     background: var(--oai-surface);
-    padding: 16px 18px;
+    padding: 18px 18px 14px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    transition: background 0.15s var(--ease-ui);
     outline: none;
+    border: 1px solid var(--oai-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition:
+            border-color 0.2s var(--ease-ui),
+            background 0.2s var(--ease-ui),
+            box-shadow 0.2s var(--ease-ui),
+            transform 0.2s var(--ease-ui);
+    animation: tcl-fade-in 0.22s var(--ease-ui) both;
+    position: relative;
+    overflow: hidden;
 }
-.tcl-agent-card:hover { background: var(--oai-surface-light); }
-.tcl-agent-card:focus-visible { box-shadow: inset 0 0 0 2px var(--oai-primary); }
+
+.tcl-agent-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--oai-primary), var(--oai-vibrant-blue));
+    opacity: 0;
+    transition: opacity 0.2s var(--ease-ui);
+}
+
+.tcl-agent-card:hover {
+    background: var(--oai-surface-light);
+    border-color: var(--oai-border-strong);
+    box-shadow: var(--shadow-md), 0 0 0 1px rgba(56,190,255,0.08);
+    transform: translateY(-2px);
+}
+.tcl-agent-card:hover::before { opacity: 1; }
+
+.tcl-agent-card:focus-visible {
+    box-shadow: 0 0 0 2px var(--oai-primary);
+}
+
+/* Stagger entrance */
+.tcl-agent-card:nth-child(1)  { animation-delay: 0.02s; }
+.tcl-agent-card:nth-child(2)  { animation-delay: 0.04s; }
+.tcl-agent-card:nth-child(3)  { animation-delay: 0.06s; }
+.tcl-agent-card:nth-child(4)  { animation-delay: 0.08s; }
+.tcl-agent-card:nth-child(5)  { animation-delay: 0.10s; }
+.tcl-agent-card:nth-child(6)  { animation-delay: 0.12s; }
+.tcl-agent-card:nth-child(7)  { animation-delay: 0.14s; }
+.tcl-agent-card:nth-child(8)  { animation-delay: 0.16s; }
+.tcl-agent-card:nth-child(9)  { animation-delay: 0.18s; }
+.tcl-agent-card:nth-child(10) { animation-delay: 0.20s; }
+.tcl-agent-card:nth-child(11) { animation-delay: 0.22s; }
+.tcl-agent-card:nth-child(12) { animation-delay: 0.24s; }
 
 .tcl-card-top {
     display: flex;
@@ -494,16 +719,17 @@
 }
 
 .tcl-card-avatar {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     flex-shrink: 0;
-    box-shadow: var(--shadow-sm);
+    letter-spacing: 0.03em;
+    box-shadow: var(--shadow-sm), 0 0 0 1px rgba(255,255,255,0.07);
 }
 
 .tcl-card-meta { flex: 1; min-width: 0; }
@@ -516,7 +742,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
 }
 
 .tcl-card-type {
@@ -530,7 +756,7 @@
 .tcl-card-desc {
     font-size: 12px;
     color: var(--oai-text-muted);
-    line-height: 1.6;
+    line-height: 1.65;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -540,30 +766,34 @@
 .tcl-card-footer {
     display: flex;
     justify-content: flex-end;
-    padding-top: 8px;
+    padding-top: 10px;
     border-top: 1px solid var(--oai-border);
 }
 
 .tcl-open-btn {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 500;
     color: var(--oai-text-muted);
     background: none;
     border: 1px solid var(--oai-input-border);
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     font-family: var(--font-sans);
     transition: all 0.15s var(--ease-ui);
-    letter-spacing: 0.01em;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
 }
 .tcl-open-btn:hover {
     background: var(--oai-primary-dim);
     color: var(--oai-primary);
-    border-color: var(--oai-primary);
+    border-color: rgba(56,190,255,0.4);
+    box-shadow: 0 0 10px var(--oai-primary-glow);
 }
 
-/* ── Sub-tab bar ─────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   SUB-TAB BAR
+───────────────────────────────────────────────────────────────────────────── */
 .tcl-sub-tab-bar {
     display: flex;
     align-items: center;
@@ -576,21 +806,43 @@
 }
 
 .tcl-sub-tab {
-    padding: 8px 16px;
+    padding: 0 16px;
+    height: 100%;
+    display: flex;
+    align-items: center;
     background: none;
     border: none;
     border-bottom: 2px solid transparent;
     color: var(--oai-text-muted);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     cursor: pointer;
     font-family: var(--font-sans);
     transition: all 0.15s var(--ease-ui);
-    letter-spacing: 0.01em;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin-bottom: -1px;
 }
 .tcl-sub-tab:hover { color: var(--oai-text); }
 .tcl-sub-tab-active {
     color: var(--oai-primary);
     border-bottom-color: var(--oai-primary);
     font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCROLLBAR POLISH
+───────────────────────────────────────────────────────────────────────────── */
+.tcl-browse-list::-webkit-scrollbar,
+.tcl-launcher::-webkit-scrollbar {
+    width: 4px;
+}
+.tcl-browse-list::-webkit-scrollbar-track,
+.tcl-launcher::-webkit-scrollbar-track {
+    background: transparent;
+}
+.tcl-browse-list::-webkit-scrollbar-thumb,
+.tcl-launcher::-webkit-scrollbar-thumb {
+    background: var(--oai-border);
+    border-radius: 10px;
 }

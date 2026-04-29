@@ -8,7 +8,7 @@
  *
  * Receives all props from useAgentCore() via AgentUI.js.
  */
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
     StatusDot,
     ChatMessages,
@@ -101,9 +101,26 @@ export function SidebarLayout(props) {
 
     const [currentView, setCurrentView] = useState('chat');
     const [showSettings, setShowSettings] = useState(false);
+    const [agentPage, setAgentPage] = useState(1);
+    const agentsPerPage = 15;
+
     const selectedIndex = agents.findIndex(a => a.id === selectedAgentId);
     const { bg, color } = selectedAgent ? avatarStyle(selectedIndex >= 0 ? selectedIndex : 0) : {};
     const initials = selectedAgent ? agentInitials(selectedAgent.name) : '';
+
+    // Paginate the filtered agents
+    const totalAgentPages = Math.ceil(filteredAgents.length / agentsPerPage);
+    const paginatedAgents = useMemo(() => {
+        const start = (agentPage - 1) * agentsPerPage;
+        return filteredAgents.slice(start, start + agentsPerPage);
+    }, [filteredAgents, agentPage, agentsPerPage]);
+
+    // Reset to page 1 when search changes
+    const prevFilterLen = React.useRef(filteredAgents.length);
+    if (filteredAgents.length !== prevFilterLen.current) {
+        prevFilterLen.current = filteredAgents.length;
+        if (agentPage !== 1) setAgentPage(1);
+    }
 
     if (showSettings) {
         return <SettingsPage onBack={() => setShowSettings(false)} />;
@@ -133,10 +150,10 @@ export function SidebarLayout(props) {
                 </div>
 
                 <ul className="sl-agent-list">
-                    {filteredAgents.length === 0 ? (
+                    {paginatedAgents.length === 0 ? (
                         <div className="sl-no-agents">No agents found.</div>
                     ) : (
-                        filteredAgents.map((agent) => (
+                        paginatedAgents.map((agent) => (
                             <li
                                 key={agent.id}
                                 className={`sl-agent-item ${selectedAgentId === agent.id ? 'sl-selected' : ''}`}
@@ -154,6 +171,37 @@ export function SidebarLayout(props) {
                         ))
                     )}
                 </ul>
+
+                {/* Pagination */}
+                {totalAgentPages > 1 && (
+                    <div className="sl-pagination">
+                        <button
+                            className="sl-pagination-btn"
+                            onClick={() => setAgentPage(p => Math.max(1, p - 1))}
+                            disabled={agentPage === 1}
+                            title="Previous page"
+                        >
+                            ‹
+                        </button>
+                        {Array.from({ length: totalAgentPages }, (_, i) => i + 1).map(page => (
+                            <button
+                                key={page}
+                                className={`sl-pagination-btn ${agentPage === page ? 'sl-pagination-active' : ''}`}
+                                onClick={() => setAgentPage(page)}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                        <button
+                            className="sl-pagination-btn"
+                            onClick={() => setAgentPage(p => Math.min(totalAgentPages, p + 1))}
+                            disabled={agentPage === totalAgentPages}
+                            title="Next page"
+                        >
+                            ›
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* ── Main Chat Window ── */}

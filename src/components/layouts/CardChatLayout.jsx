@@ -111,7 +111,7 @@ function AgentRegistry({ agents, searchQuery, setSearchQuery, onOpen, registryEr
     const [activeTab, setActiveTab] = useState('all');
     const [isListView, setIsListView] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const agentsPerPage = 12; // Display 12 agents per page
+    const agentsPerPage = 10; // Display 15 agents per page
 
     const filtered = useMemo(() => {
         let list = agents;
