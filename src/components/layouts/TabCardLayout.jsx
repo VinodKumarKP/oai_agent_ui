@@ -14,7 +14,7 @@
  * When no agent tabs are open, the center shows the card-grid launcher.
  * Receives all props from useAgentCore() via AgentUI.js.
  */
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
     ChatMessages,
     ChatInput,
@@ -103,10 +103,7 @@ function TabBar({ openAgents, selectedAgentId, allAgents, unreadCounts, onSelect
                         className={`tcl-tab ${isActive ? 'tcl-tab-active' : ''}`}
                         onClick={() => onSelect(agent.id)}
                     >
-                        <div
-                            className="tcl-tab-avatar"
-                            style={{ background: bg, color }}
-                        >
+                        <div className="tcl-tab-avatar" style={{ background: bg, color }}>
                             {agentInitials(agent.name)}
                         </div>
                         <span className="tcl-tab-name">{agent.name}</span>
@@ -170,6 +167,23 @@ function BrowsePanel({
                          onOpen, fetchAgents,
                          isCollapsed, onToggle, onShowSettings,
                      }) {
+    const [page, setPage] = useState(1);
+    const itemsPerPage = 15;
+
+    // Reset to page 1 when the filtered list length changes (search changed)
+    const prevLen = React.useRef(filteredAgents.length);
+    if (filteredAgents.length !== prevLen.current) {
+        prevLen.current = filteredAgents.length;
+        if (page !== 1) setPage(1);
+    }
+
+    const totalPages = Math.ceil(filteredAgents.length / itemsPerPage);
+
+    const paged = useMemo(() => {
+        const start = (page - 1) * itemsPerPage;
+        return filteredAgents.slice(start, start + itemsPerPage);
+    }, [filteredAgents, page, itemsPerPage]);
+
     return (
         <div className={`tcl-browse ${isCollapsed ? 'tcl-browse-collapsed' : ''}`}>
             <div className="tcl-browse-hdr">
@@ -198,10 +212,10 @@ function BrowsePanel({
                     </div>
 
                     <ul className="tcl-browse-list">
-                        {filteredAgents.length === 0 ? (
+                        {paged.length === 0 ? (
                             <li className="tcl-browse-empty">No agents found.</li>
                         ) : (
-                            filteredAgents.map((agent) => {
+                            paged.map((agent) => {
                                 const idx = allAgents.findIndex(a => a.id === agent.id);
                                 const { bg, color } = avatarStyle(idx >= 0 ? idx : 0);
                                 return (
@@ -211,10 +225,7 @@ function BrowsePanel({
                                         onClick={() => onOpen(agent.id)}
                                         title={agent.description}
                                     >
-                                        <div
-                                            className="tcl-browse-avatar"
-                                            style={{ background: bg, color }}
-                                        >
+                                        <div className="tcl-browse-avatar" style={{ background: bg, color }}>
                                             {agentInitials(agent.name)}
                                         </div>
                                         <span className="tcl-browse-name">{agent.name}</span>
@@ -223,6 +234,30 @@ function BrowsePanel({
                             })
                         )}
                     </ul>
+
+                    {totalPages > 1 && (
+                        <div className="tcl-browse-pagination">
+                            <button
+                                className="tcl-browse-page-btn"
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                                title="Previous"
+                            >‹</button>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                                <button
+                                    key={p}
+                                    className={`tcl-browse-page-btn ${page === p ? 'tcl-browse-page-active' : ''}`}
+                                    onClick={() => setPage(p)}
+                                >{p}</button>
+                            ))}
+                            <button
+                                className="tcl-browse-page-btn"
+                                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                disabled={page === totalPages}
+                                title="Next"
+                            >›</button>
+                        </div>
+                    )}
 
                     <button className="tcl-browse-refresh" onClick={fetchAgents}>
                         ↻ Refresh
@@ -240,12 +275,32 @@ function BrowsePanel({
 // CardGridLauncher — shown in center when no tabs are open
 // ---------------------------------------------------------------------------
 function CardGridLauncher({ agents, searchQuery, setSearchQuery, onOpen }) {
-    const filtered = searchQuery.trim()
-        ? agents.filter(a =>
-            a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            a.description?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        : agents;
+    const [page, setPage] = useState(1);
+    const cardsPerPage = 12;
+
+    const filtered = useMemo(() => {
+        const q = searchQuery.trim().toLowerCase();
+        return q
+            ? agents.filter(a =>
+                a.name.toLowerCase().includes(q) ||
+                a.description?.toLowerCase().includes(q)
+            )
+            : agents;
+    }, [agents, searchQuery]);
+
+    // Reset to page 1 when search changes
+    const prevLen = React.useRef(filtered.length);
+    if (filtered.length !== prevLen.current) {
+        prevLen.current = filtered.length;
+        if (page !== 1) setPage(1);
+    }
+
+    const totalPages = Math.ceil(filtered.length / cardsPerPage);
+
+    const paged = useMemo(() => {
+        const start = (page - 1) * cardsPerPage;
+        return filtered.slice(start, start + cardsPerPage);
+    }, [filtered, page, cardsPerPage]);
 
     return (
         <div className="tcl-launcher">
@@ -263,15 +318,38 @@ function CardGridLauncher({ agents, searchQuery, setSearchQuery, onOpen }) {
                     />
                 </div>
             </div>
+
             <div className="tcl-launcher-grid">
-                {filtered.length === 0 ? (
+                {paged.length === 0 ? (
                     <div className="tcl-launcher-empty">No agents match your search.</div>
                 ) : (
-                    filtered.map((agent, i) => (
+                    paged.map((agent, i) => (
                         <AgentCard key={agent.id} agent={agent} index={i} onOpen={onOpen} />
                     ))
                 )}
             </div>
+
+            {totalPages > 1 && (
+                <div className="tcl-launcher-pagination">
+                    <button
+                        className="tcl-launcher-page-btn"
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                    >← Prev</button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                        <button
+                            key={p}
+                            className={`tcl-launcher-page-btn ${page === p ? 'tcl-launcher-page-active' : ''}`}
+                            onClick={() => setPage(p)}
+                        >{p}</button>
+                    ))}
+                    <button
+                        className="tcl-launcher-page-btn"
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        disabled={page === totalPages}
+                    >Next →</button>
+                </div>
+            )}
         </div>
     );
 }
@@ -388,7 +466,6 @@ export function TabCardLayout(props) {
                                                 expandedEvaluations={expandedEvaluations}
                                                 onToggleEvaluation={toggleEvaluation}
                                             />
-
                                             <ChatInput
                                                 message={message}
                                                 isLoading={isLoading}
