@@ -4464,9 +4464,27 @@ function $af5fd50f157de9d8$export$8295a33ab8a36876(props) {
     const { agents: agents, filteredAgents: filteredAgents, selectedAgent: selectedAgent, selectedAgentId: selectedAgentId, message: message, searchQuery: searchQuery, attachedFiles: attachedFiles, currentMessages: currentMessages, currentTraceLogs: currentTraceLogs, showTrace: showTrace, isLoading: isLoading, chatEndRef: chatEndRef, traceEndRef: traceEndRef, textareaRef: textareaRef, fileInputRef: fileInputRef, fetchAgents: fetchAgents, handleSelectAgent: handleSelectAgent, handleClearSession: handleClearSession, handleMessageChange: handleMessageChange, handleFileSelect: handleFileSelect, removeAttachment: removeAttachment, handleStopGeneration: handleStopGeneration, handleSendMessage: handleSendMessage, setSearchQuery: setSearchQuery, setShowTrace: setShowTrace, evaluations: evaluations, expandedEvaluations: expandedEvaluations, toggleEvaluation: toggleEvaluation, agentEvals: agentEvals, authToken: authToken } = props;
     const [currentView, setCurrentView] = (0, $gXNCa$react.useState)('chat');
     const [showSettings, setShowSettings] = (0, $gXNCa$react.useState)(false);
+    const [agentPage, setAgentPage] = (0, $gXNCa$react.useState)(1);
+    const agentsPerPage = 15;
     const selectedIndex = agents.findIndex((a)=>a.id === selectedAgentId);
     const { bg: bg, color: color } = selectedAgent ? (0, $ecc3e2655dc3a94c$export$b1592956d14148e9)(selectedIndex >= 0 ? selectedIndex : 0) : {};
     const initials = selectedAgent ? (0, $ecc3e2655dc3a94c$export$7d6e6cc5a7a4d165)(selectedAgent.name) : '';
+    // Paginate the filtered agents
+    const totalAgentPages = Math.ceil(filteredAgents.length / agentsPerPage);
+    const paginatedAgents = (0, $gXNCa$react.useMemo)(()=>{
+        const start = (agentPage - 1) * agentsPerPage;
+        return filteredAgents.slice(start, start + agentsPerPage);
+    }, [
+        filteredAgents,
+        agentPage,
+        agentsPerPage
+    ]);
+    // Reset to page 1 when search changes
+    const prevFilterLen = (0, ($parcel$interopDefault($gXNCa$react))).useRef(filteredAgents.length);
+    if (filteredAgents.length !== prevFilterLen.current) {
+        prevFilterLen.current = filteredAgents.length;
+        if (agentPage !== 1) setAgentPage(1);
+    }
     if (showSettings) return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)((0, $86b15e9fc93b58c4$export$8f6dcfe950367406), {
         onBack: ()=>setShowSettings(false)
     });
@@ -4508,10 +4526,10 @@ function $af5fd50f157de9d8$export$8295a33ab8a36876(props) {
                     }),
                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("ul", {
                         className: "sl-agent-list",
-                        children: filteredAgents.length === 0 ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                        children: paginatedAgents.length === 0 ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
                             className: "sl-no-agents",
                             children: "No agents found."
-                        }) : filteredAgents.map((agent)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("li", {
+                        }) : paginatedAgents.map((agent)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("li", {
                                 className: `sl-agent-item ${selectedAgentId === agent.id ? 'sl-selected' : ''}`,
                                 onClick: ()=>handleSelectAgent(agent.id),
                                 title: agent.description,
@@ -4534,6 +4552,32 @@ function $af5fd50f157de9d8$export$8295a33ab8a36876(props) {
                                     })
                                 ]
                             }, agent.id))
+                    }),
+                    totalAgentPages > 1 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "sl-pagination",
+                        children: [
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                className: "sl-pagination-btn",
+                                onClick: ()=>setAgentPage((p)=>Math.max(1, p - 1)),
+                                disabled: agentPage === 1,
+                                title: "Previous page",
+                                children: "\u2039"
+                            }),
+                            Array.from({
+                                length: totalAgentPages
+                            }, (_, i)=>i + 1).map((page)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                    className: `sl-pagination-btn ${agentPage === page ? 'sl-pagination-active' : ''}`,
+                                    onClick: ()=>setAgentPage(page),
+                                    children: page
+                                }, page)),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                className: "sl-pagination-btn",
+                                onClick: ()=>setAgentPage((p)=>Math.min(totalAgentPages, p + 1)),
+                                disabled: agentPage === totalAgentPages,
+                                title: "Next page",
+                                children: "\u203A"
+                            })
+                        ]
                     })
                 ]
             }),
@@ -5204,9 +5248,9 @@ function $be7488c82e1128c3$export$880f9f4aae674e9a({ messages: messages, agentNa
 // Helpers / Sub-components
 // ---------------------------------------------------------------------------
 function $f9ec7352374a6877$var$StatusDot({ status: status }) {
-    let color = '#ccc';
-    if (status === 'active') color = '#4CAF50'; // Green
-    if (status === 'inactive') color = '#F44336'; // Red
+    let color = 'var(--oai-text-disabled)';
+    if (status === 'active') color = '#4CAF50';
+    if (status === 'inactive') color = '#F44336';
     return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
         className: "ccl-status-dot",
         style: {
@@ -5340,6 +5384,8 @@ function $f9ec7352374a6877$var$SubTabBar({ currentView: currentView, setCurrentV
 function $f9ec7352374a6877$var$AgentRegistry({ agents: agents, searchQuery: searchQuery, setSearchQuery: setSearchQuery, onOpen: onOpen, registryError: registryError, onShowSettings: onShowSettings }) {
     const [activeTab, setActiveTab] = (0, $gXNCa$react.useState)('all');
     const [isListView, setIsListView] = (0, $gXNCa$react.useState)(false);
+    const [currentPage, setCurrentPage] = (0, $gXNCa$react.useState)(1);
+    const agentsPerPage = 10; // Display 15 agents per page
     const filtered = (0, $gXNCa$react.useMemo)(()=>{
         let list = agents;
         if (activeTab === 'online') list = list.filter((a)=>a.status === 'active');
@@ -5348,12 +5394,27 @@ function $f9ec7352374a6877$var$AgentRegistry({ agents: agents, searchQuery: sear
             const q = searchQuery.toLowerCase();
             list = list.filter((a)=>a.name.toLowerCase().includes(q) || a.description?.toLowerCase().includes(q));
         }
+        setCurrentPage(1); // Reset to first page on filter/tab change
         return list;
     }, [
         agents,
         activeTab,
         searchQuery
     ]);
+    // Pagination logic
+    const totalPages = Math.ceil(filtered.length / agentsPerPage);
+    const paginatedAgents = (0, $gXNCa$react.useMemo)(()=>{
+        const startIndex = (currentPage - 1) * agentsPerPage;
+        const endIndex = startIndex + agentsPerPage;
+        return filtered.slice(startIndex, endIndex);
+    }, [
+        filtered,
+        currentPage,
+        agentsPerPage
+    ]);
+    const handlePageChange = (pageNumber)=>{
+        setCurrentPage(pageNumber);
+    };
     const tabs = [
         {
             id: 'all',
@@ -5390,7 +5451,7 @@ function $f9ec7352374a6877$var$AgentRegistry({ agents: agents, searchQuery: sear
                                 ]
                             }),
                             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
-                                className: "ccl-back-btn",
+                                className: "ccl-settings-btn",
                                 onClick: onShowSettings,
                                 children: "Settings"
                             })
@@ -5462,17 +5523,45 @@ function $f9ec7352374a6877$var$AgentRegistry({ agents: agents, searchQuery: sear
                         " ",
                         registryError
                     ]
-                }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                    className: `ccl-agent-grid ${isListView ? 'ccl-agent-list' : ''}`,
-                    children: filtered.length === 0 ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                        className: "ccl-empty-msg",
-                        children: "No agents match your search."
-                    }) : filtered.map((agent, i)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($f9ec7352374a6877$var$AgentCard, {
-                            agent: agent,
-                            index: i,
-                            onOpen: onOpen,
-                            isListView: isListView
-                        }, agent.id))
+                }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+                    children: [
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                            className: `ccl-agent-grid ${isListView ? 'ccl-agent-list' : ''}`,
+                            children: paginatedAgents.length === 0 ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                className: "ccl-empty-msg",
+                                children: "No agents match your search."
+                            }) : paginatedAgents.map((agent, i)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($f9ec7352374a6877$var$AgentCard, {
+                                    agent: agent,
+                                    index: i,
+                                    onOpen: onOpen,
+                                    isListView: isListView
+                                }, agent.id))
+                        }),
+                        totalPages > 1 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                            className: "ccl-pagination",
+                            children: [
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                    onClick: ()=>handlePageChange(currentPage - 1),
+                                    disabled: currentPage === 1,
+                                    className: "ccl-pagination-btn",
+                                    children: "Previous"
+                                }),
+                                Array.from({
+                                    length: totalPages
+                                }, (_, i)=>i + 1).map((page)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                        onClick: ()=>handlePageChange(page),
+                                        className: `ccl-pagination-btn ${currentPage === page ? 'ccl-pagination-active' : ''}`,
+                                        children: page
+                                    }, page)),
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                    onClick: ()=>handlePageChange(currentPage + 1),
+                                    disabled: currentPage === totalPages,
+                                    className: "ccl-pagination-btn",
+                                    children: "Next"
+                                })
+                            ]
+                        })
+                    ]
                 })
             })
         ]

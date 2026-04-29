@@ -1,6 +1,6 @@
 import "./module.css";
 import {jsx as $5OpyM$jsx, jsxs as $5OpyM$jsxs, Fragment as $5OpyM$Fragment} from "react/jsx-runtime";
-import {useState as $5OpyM$useState, useRef as $5OpyM$useRef, useCallback as $5OpyM$useCallback, useEffect as $5OpyM$useEffect, useMemo as $5OpyM$useMemo} from "react";
+import $5OpyM$react, {useState as $5OpyM$useState, useRef as $5OpyM$useRef, useCallback as $5OpyM$useCallback, useEffect as $5OpyM$useEffect, useMemo as $5OpyM$useMemo} from "react";
 import {ClientFactoryOptions as $5OpyM$ClientFactoryOptions, DefaultAgentCardResolver as $5OpyM$DefaultAgentCardResolver, ClientFactory as $5OpyM$ClientFactory} from "@a2a-js/sdk/client";
 import $5OpyM$reactmarkdown from "react-markdown";
 import $5OpyM$remarkgfm from "remark-gfm";
@@ -4452,9 +4452,27 @@ function $91ca74acd8eeb46c$export$8295a33ab8a36876(props) {
     const { agents: agents, filteredAgents: filteredAgents, selectedAgent: selectedAgent, selectedAgentId: selectedAgentId, message: message, searchQuery: searchQuery, attachedFiles: attachedFiles, currentMessages: currentMessages, currentTraceLogs: currentTraceLogs, showTrace: showTrace, isLoading: isLoading, chatEndRef: chatEndRef, traceEndRef: traceEndRef, textareaRef: textareaRef, fileInputRef: fileInputRef, fetchAgents: fetchAgents, handleSelectAgent: handleSelectAgent, handleClearSession: handleClearSession, handleMessageChange: handleMessageChange, handleFileSelect: handleFileSelect, removeAttachment: removeAttachment, handleStopGeneration: handleStopGeneration, handleSendMessage: handleSendMessage, setSearchQuery: setSearchQuery, setShowTrace: setShowTrace, evaluations: evaluations, expandedEvaluations: expandedEvaluations, toggleEvaluation: toggleEvaluation, agentEvals: agentEvals, authToken: authToken } = props;
     const [currentView, setCurrentView] = (0, $5OpyM$useState)('chat');
     const [showSettings, setShowSettings] = (0, $5OpyM$useState)(false);
+    const [agentPage, setAgentPage] = (0, $5OpyM$useState)(1);
+    const agentsPerPage = 15;
     const selectedIndex = agents.findIndex((a)=>a.id === selectedAgentId);
     const { bg: bg, color: color } = selectedAgent ? (0, $52cf8225d0cc4dd9$export$b1592956d14148e9)(selectedIndex >= 0 ? selectedIndex : 0) : {};
     const initials = selectedAgent ? (0, $52cf8225d0cc4dd9$export$7d6e6cc5a7a4d165)(selectedAgent.name) : '';
+    // Paginate the filtered agents
+    const totalAgentPages = Math.ceil(filteredAgents.length / agentsPerPage);
+    const paginatedAgents = (0, $5OpyM$useMemo)(()=>{
+        const start = (agentPage - 1) * agentsPerPage;
+        return filteredAgents.slice(start, start + agentsPerPage);
+    }, [
+        filteredAgents,
+        agentPage,
+        agentsPerPage
+    ]);
+    // Reset to page 1 when search changes
+    const prevFilterLen = (0, $5OpyM$react).useRef(filteredAgents.length);
+    if (filteredAgents.length !== prevFilterLen.current) {
+        prevFilterLen.current = filteredAgents.length;
+        if (agentPage !== 1) setAgentPage(1);
+    }
     if (showSettings) return /*#__PURE__*/ (0, $5OpyM$jsx)((0, $2ac663ffd8618082$export$8f6dcfe950367406), {
         onBack: ()=>setShowSettings(false)
     });
@@ -4496,10 +4514,10 @@ function $91ca74acd8eeb46c$export$8295a33ab8a36876(props) {
                     }),
                     /*#__PURE__*/ (0, $5OpyM$jsx)("ul", {
                         className: "sl-agent-list",
-                        children: filteredAgents.length === 0 ? /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                        children: paginatedAgents.length === 0 ? /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
                             className: "sl-no-agents",
                             children: "No agents found."
-                        }) : filteredAgents.map((agent)=>/*#__PURE__*/ (0, $5OpyM$jsxs)("li", {
+                        }) : paginatedAgents.map((agent)=>/*#__PURE__*/ (0, $5OpyM$jsxs)("li", {
                                 className: `sl-agent-item ${selectedAgentId === agent.id ? 'sl-selected' : ''}`,
                                 onClick: ()=>handleSelectAgent(agent.id),
                                 title: agent.description,
@@ -4522,6 +4540,32 @@ function $91ca74acd8eeb46c$export$8295a33ab8a36876(props) {
                                     })
                                 ]
                             }, agent.id))
+                    }),
+                    totalAgentPages > 1 && /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                        className: "sl-pagination",
+                        children: [
+                            /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                className: "sl-pagination-btn",
+                                onClick: ()=>setAgentPage((p)=>Math.max(1, p - 1)),
+                                disabled: agentPage === 1,
+                                title: "Previous page",
+                                children: "\u2039"
+                            }),
+                            Array.from({
+                                length: totalAgentPages
+                            }, (_, i)=>i + 1).map((page)=>/*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                    className: `sl-pagination-btn ${agentPage === page ? 'sl-pagination-active' : ''}`,
+                                    onClick: ()=>setAgentPage(page),
+                                    children: page
+                                }, page)),
+                            /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                className: "sl-pagination-btn",
+                                onClick: ()=>setAgentPage((p)=>Math.min(totalAgentPages, p + 1)),
+                                disabled: agentPage === totalAgentPages,
+                                title: "Next page",
+                                children: "\u203A"
+                            })
+                        ]
                     })
                 ]
             }),
@@ -5192,9 +5236,9 @@ function $e246cd7cadbde14d$export$880f9f4aae674e9a({ messages: messages, agentNa
 // Helpers / Sub-components
 // ---------------------------------------------------------------------------
 function $7e86f0dc501a5e94$var$StatusDot({ status: status }) {
-    let color = '#ccc';
-    if (status === 'active') color = '#4CAF50'; // Green
-    if (status === 'inactive') color = '#F44336'; // Red
+    let color = 'var(--oai-text-disabled)';
+    if (status === 'active') color = '#4CAF50';
+    if (status === 'inactive') color = '#F44336';
     return /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
         className: "ccl-status-dot",
         style: {
@@ -5328,6 +5372,8 @@ function $7e86f0dc501a5e94$var$SubTabBar({ currentView: currentView, setCurrentV
 function $7e86f0dc501a5e94$var$AgentRegistry({ agents: agents, searchQuery: searchQuery, setSearchQuery: setSearchQuery, onOpen: onOpen, registryError: registryError, onShowSettings: onShowSettings }) {
     const [activeTab, setActiveTab] = (0, $5OpyM$useState)('all');
     const [isListView, setIsListView] = (0, $5OpyM$useState)(false);
+    const [currentPage, setCurrentPage] = (0, $5OpyM$useState)(1);
+    const agentsPerPage = 10; // Display 15 agents per page
     const filtered = (0, $5OpyM$useMemo)(()=>{
         let list = agents;
         if (activeTab === 'online') list = list.filter((a)=>a.status === 'active');
@@ -5336,12 +5382,27 @@ function $7e86f0dc501a5e94$var$AgentRegistry({ agents: agents, searchQuery: sear
             const q = searchQuery.toLowerCase();
             list = list.filter((a)=>a.name.toLowerCase().includes(q) || a.description?.toLowerCase().includes(q));
         }
+        setCurrentPage(1); // Reset to first page on filter/tab change
         return list;
     }, [
         agents,
         activeTab,
         searchQuery
     ]);
+    // Pagination logic
+    const totalPages = Math.ceil(filtered.length / agentsPerPage);
+    const paginatedAgents = (0, $5OpyM$useMemo)(()=>{
+        const startIndex = (currentPage - 1) * agentsPerPage;
+        const endIndex = startIndex + agentsPerPage;
+        return filtered.slice(startIndex, endIndex);
+    }, [
+        filtered,
+        currentPage,
+        agentsPerPage
+    ]);
+    const handlePageChange = (pageNumber)=>{
+        setCurrentPage(pageNumber);
+    };
     const tabs = [
         {
             id: 'all',
@@ -5378,7 +5439,7 @@ function $7e86f0dc501a5e94$var$AgentRegistry({ agents: agents, searchQuery: sear
                                 ]
                             }),
                             /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
-                                className: "ccl-back-btn",
+                                className: "ccl-settings-btn",
                                 onClick: onShowSettings,
                                 children: "Settings"
                             })
@@ -5450,17 +5511,45 @@ function $7e86f0dc501a5e94$var$AgentRegistry({ agents: agents, searchQuery: sear
                         " ",
                         registryError
                     ]
-                }) : /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
-                    className: `ccl-agent-grid ${isListView ? 'ccl-agent-list' : ''}`,
-                    children: filtered.length === 0 ? /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
-                        className: "ccl-empty-msg",
-                        children: "No agents match your search."
-                    }) : filtered.map((agent, i)=>/*#__PURE__*/ (0, $5OpyM$jsx)($7e86f0dc501a5e94$var$AgentCard, {
-                            agent: agent,
-                            index: i,
-                            onOpen: onOpen,
-                            isListView: isListView
-                        }, agent.id))
+                }) : /*#__PURE__*/ (0, $5OpyM$jsxs)((0, $5OpyM$Fragment), {
+                    children: [
+                        /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                            className: `ccl-agent-grid ${isListView ? 'ccl-agent-list' : ''}`,
+                            children: paginatedAgents.length === 0 ? /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                className: "ccl-empty-msg",
+                                children: "No agents match your search."
+                            }) : paginatedAgents.map((agent, i)=>/*#__PURE__*/ (0, $5OpyM$jsx)($7e86f0dc501a5e94$var$AgentCard, {
+                                    agent: agent,
+                                    index: i,
+                                    onOpen: onOpen,
+                                    isListView: isListView
+                                }, agent.id))
+                        }),
+                        totalPages > 1 && /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                            className: "ccl-pagination",
+                            children: [
+                                /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                    onClick: ()=>handlePageChange(currentPage - 1),
+                                    disabled: currentPage === 1,
+                                    className: "ccl-pagination-btn",
+                                    children: "Previous"
+                                }),
+                                Array.from({
+                                    length: totalPages
+                                }, (_, i)=>i + 1).map((page)=>/*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                        onClick: ()=>handlePageChange(page),
+                                        className: `ccl-pagination-btn ${currentPage === page ? 'ccl-pagination-active' : ''}`,
+                                        children: page
+                                    }, page)),
+                                /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                    onClick: ()=>handlePageChange(currentPage + 1),
+                                    disabled: currentPage === totalPages,
+                                    className: "ccl-pagination-btn",
+                                    children: "Next"
+                                })
+                            ]
+                        })
+                    ]
                 })
             })
         ]
