@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 // Styles for this component live in styles.css (cfg-* classes)
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
+
+const DESCRIPTION_MIN_LENGTH = 20;
+
+// Parses any URL into display segments; returns null if invalid.
 function parseUrl(raw) {
     try {
         const u = new URL(raw.trim());
@@ -9,6 +13,23 @@ function parseUrl(raw) {
     } catch {
         return null;
     }
+}
+
+// Returns true for valid Git remote URLs (HTTPS, SSH, and git:// protocols).
+function isValidGitUrl(raw) {
+    const s = raw.trim();
+    // HTTPS: https://github.com/user/repo or https://github.com/user/repo.git
+    if (/^https?:\/\/.+\/.+\/.+/.test(s)) return true;
+    // SSH: git@github.com:user/repo.git
+    if (/^git@[\w.-]+:[\w./-]+/.test(s)) return true;
+    // git:// protocol
+    if (/^git:\/\/.+/.test(s)) return true;
+    return false;
+}
+
+// Replaces spaces with underscores and lowercases a name string.
+function normalizeName(raw) {
+    return raw.replace(/ /g, '_').toLowerCase();
 }
 
 /* ── Register Tab ────────────────────────────────────────────────────────── */
@@ -21,13 +42,44 @@ function RegisterTab({ agentRegistryUrl, authToken }) {
     const [error, setError]             = useState('');
     const [success, setSuccess]         = useState('');
 
-    const parsedUrl = parseUrl(sourceUrl);
+    // Derived validation state (shown only when field has been touched)
+    const [nameTouched, setNameTouched]           = useState(false);
+    const [descTouched, setDescTouched]           = useState(false);
+    const [urlTouched, setUrlTouched]             = useState(false);
+
+    const parsedUrl     = parseUrl(sourceUrl);
+    const gitUrlValid   = isValidGitUrl(sourceUrl);
+    const descWordCount = description.trim().split(/\s+/).filter(Boolean).length;
+    const descValid     = description.trim().length >= DESCRIPTION_MIN_LENGTH;
+
+    const handleNameChange = (e) => {
+        setName(normalizeName(e.target.value));
+        setNameTouched(true);
+    };
+
+    const handleDescChange = (e) => {
+        setDescription(e.target.value);
+        setDescTouched(true);
+    };
+
+    const handleUrlChange = (e) => {
+        setSourceUrl(e.target.value);
+        setUrlTouched(true);
+    };
+
+    const validate = () => {
+        if (!name.trim())        return 'Name is required.';
+        if (!descValid)          return `Description must be at least ${DESCRIPTION_MIN_LENGTH} characters.`;
+        if (!sourceUrl.trim())   return 'Source URL is required.';
+        if (!gitUrlValid)        return 'Source URL must be a valid Git URL (HTTPS, SSH, or git://).';
+        return null;
+    };
 
     const handleRegister = async () => {
-        if (!name.trim() || !description.trim() || !sourceUrl.trim()) {
-            setError('All fields are required.');
-            return;
-        }
+        setNameTouched(true); setDescTouched(true); setUrlTouched(true);
+        const validationError = validate();
+        if (validationError) { setError(validationError); return; }
+
         setIsLoading(true);
         setError('');
         setSuccess('');
@@ -51,6 +103,7 @@ function RegisterTab({ agentRegistryUrl, authToken }) {
             if (response.ok) {
                 setSuccess('Agent registered successfully.');
                 setName(''); setDescription(''); setSourceUrl(''); setActive(true);
+                setNameTouched(false); setDescTouched(false); setUrlTouched(false);
             } else {
                 const err = await response.json().catch(() => ({}));
                 setError(err.message || err.detail || `Registration failed (${response.status})`);
@@ -72,57 +125,82 @@ function RegisterTab({ agentRegistryUrl, authToken }) {
 
             <div className="cfg-card">
                 {/* Name */}
-                <div className="cfg-field">
+                <div className={`cfg-field ${nameTouched && !name.trim() ? 'cfg-field--invalid' : ''}`}>
                     <div>
                         <div className="cfg-field-label">Name</div>
-                        <div className="cfg-field-hint">Unique display name</div>
-                    </div>
-                    <input
-                        type="text"
-                        className="cfg-input"
-                        placeholder="e.g. Code Reviewer"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                    />
-                </div>
-
-                {/* Description */}
-                <div className="cfg-field">
-                    <div>
-                        <div className="cfg-field-label">Description</div>
-                        <div className="cfg-field-hint">Brief purpose summary</div>
-                    </div>
-                    <textarea
-                        className="cfg-textarea"
-                        placeholder="What does this agent do?"
-                        value={description}
-                        onChange={e => setDescription(e.target.value)}
-                    />
-                </div>
-
-                {/* Source URL */}
-                <div className="cfg-field">
-                    <div>
-                        <div className="cfg-field-label">Source URL</div>
-                        <div className="cfg-field-hint">Endpoint or definition URL</div>
+                        <div className="cfg-field-hint">Lowercase · spaces become underscores</div>
                     </div>
                     <div>
                         <input
                             type="text"
-                            className="cfg-input"
-                            placeholder="https://example.com/agent"
-                            value={sourceUrl}
-                            onChange={e => setSourceUrl(e.target.value)}
+                            className={`cfg-input ${nameTouched && !name.trim() ? 'cfg-input--invalid' : ''}`}
+                            placeholder="e.g. code_reviewer"
+                            value={name}
+                            onChange={handleNameChange}
+                            onBlur={() => setNameTouched(true)}
                         />
-                        <div className={`cfg-url-preview ${parsedUrl ? 'visible' : ''}`}>
-                            {parsedUrl && (
-                                <>
-                                    <span className="cfg-url-scheme">{parsedUrl.scheme}</span>
-                                    <span className="cfg-url-host">{parsedUrl.host}</span>
-                                    <span className="cfg-url-path">{parsedUrl.path}</span>
-                                </>
+                        {nameTouched && !name.trim() && (
+                            <div className="cfg-field-error">Name is required.</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Description */}
+                <div className={`cfg-field ${descTouched && !descValid ? 'cfg-field--invalid' : ''}`}>
+                    <div>
+                        <div className="cfg-field-label">Description</div>
+                        <div className="cfg-field-hint">Min {DESCRIPTION_MIN_LENGTH} characters</div>
+                    </div>
+                    <div>
+                        <textarea
+                            className={`cfg-textarea ${descTouched && !descValid ? 'cfg-input--invalid' : ''}`}
+                            placeholder="Describe what this agent does, its capabilities, and intended use…"
+                            value={description}
+                            onChange={handleDescChange}
+                            onBlur={() => setDescTouched(true)}
+                        />
+                        <div className="cfg-field-meta">
+                            {descTouched && !descValid ? (
+                                <span className="cfg-field-error">
+                                    At least {DESCRIPTION_MIN_LENGTH} characters required ({description.trim().length} so far).
+                                </span>
+                            ) : (
+                                <span className="cfg-field-count">{description.trim().length} chars · {descWordCount} words</span>
                             )}
                         </div>
+                    </div>
+                </div>
+
+                {/* Source URL */}
+                <div className={`cfg-field ${urlTouched && sourceUrl && !gitUrlValid ? 'cfg-field--invalid' : ''}`}>
+                    <div>
+                        <div className="cfg-field-label">Source URL</div>
+                        <div className="cfg-field-hint">Must be a valid Git URL</div>
+                    </div>
+                    <div>
+                        <input
+                            type="text"
+                            className={`cfg-input ${urlTouched && sourceUrl && !gitUrlValid ? 'cfg-input--invalid' : ''}`}
+                            placeholder="https://github.com/org/repo.git"
+                            value={sourceUrl}
+                            onChange={handleUrlChange}
+                            onBlur={() => setUrlTouched(true)}
+                        />
+                        {urlTouched && sourceUrl && !gitUrlValid ? (
+                            <div className="cfg-field-error">
+                                Must be a valid Git URL — e.g. <code className="cfg-code">https://github.com/org/repo.git</code> or <code className="cfg-code">git@github.com:org/repo.git</code>
+                            </div>
+                        ) : (
+                            <div className={`cfg-url-preview ${parsedUrl && gitUrlValid ? 'visible' : ''}`}>
+                                {parsedUrl && gitUrlValid && (
+                                    <>
+                                        <span className="cfg-url-scheme">{parsedUrl.scheme}</span>
+                                        <span className="cfg-url-host">{parsedUrl.host}</span>
+                                        <span className="cfg-url-path">{parsedUrl.path}</span>
+                                    </>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 

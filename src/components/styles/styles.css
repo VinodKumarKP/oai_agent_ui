@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
-
 /* ── Reset & base ────────────────────────────────────────────────────────── */
 *,
 *::before,
@@ -2386,4 +2385,43 @@ html,
 
 .cfg-submit-icon {
   font-size: 15px;
+}
+
+/* ── Settings Page: field validation states ──────────────────────────────── */
+.cfg-input--invalid,
+.cfg-textarea.cfg-input--invalid {
+  border-color: var(--oai-error) !important;
+  box-shadow: 0 0 0 3px var(--oai-error-bg) !important;
+}
+
+.cfg-field--invalid .cfg-field-label {
+  color: var(--oai-error);
+}
+
+.cfg-field-error {
+  margin-top: 5px;
+  font-size: 11.5px;
+  color: var(--oai-error);
+  line-height: 1.4;
+}
+
+.cfg-field-meta {
+  margin-top: 5px;
+  min-height: 18px;
+}
+
+.cfg-field-count {
+  font-size: 11px;
+  color: var(--oai-text-disabled);
+  font-family: var(--font-mono);
+}
+
+.cfg-code {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  background: var(--oai-bg);
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid var(--oai-border);
+  color: var(--oai-text-muted);
 }
