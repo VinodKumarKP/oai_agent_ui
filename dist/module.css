@@ -2780,8 +2780,9 @@ body, html, #root {
 }
 
 .tcl-launcher-grid {
-  flex-grow: 1;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  align-content: start;
+  align-items: start;
   gap: 14px;
   width: 100%;
   max-width: 1100px;
@@ -3315,8 +3316,9 @@ body, html, #root {
   border-radius: var(--radius-lg);
   background: none;
   border: none;
-  flex-grow: 1;
   grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  align-content: start;
+  align-items: start;
   gap: 14px;
   display: grid;
 }

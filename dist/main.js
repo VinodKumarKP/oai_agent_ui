@@ -4894,6 +4894,23 @@ function $449b860f472a3c1e$var$SubTabBar({ currentView: currentView, setCurrentV
 // BrowsePanel
 // ---------------------------------------------------------------------------
 function $449b860f472a3c1e$var$BrowsePanel({ filteredAgents: filteredAgents, selectedAgentId: selectedAgentId, allAgents: allAgents, searchQuery: searchQuery, setSearchQuery: setSearchQuery, onOpen: onOpen, fetchAgents: fetchAgents, isCollapsed: isCollapsed, onToggle: onToggle, onShowSettings: onShowSettings }) {
+    const [page, setPage] = (0, $gXNCa$react.useState)(1);
+    const itemsPerPage = 15;
+    // Reset to page 1 when the filtered list length changes (search changed)
+    const prevLen = (0, ($parcel$interopDefault($gXNCa$react))).useRef(filteredAgents.length);
+    if (filteredAgents.length !== prevLen.current) {
+        prevLen.current = filteredAgents.length;
+        if (page !== 1) setPage(1);
+    }
+    const totalPages = Math.ceil(filteredAgents.length / itemsPerPage);
+    const paged = (0, $gXNCa$react.useMemo)(()=>{
+        const start = (page - 1) * itemsPerPage;
+        return filteredAgents.slice(start, start + itemsPerPage);
+    }, [
+        filteredAgents,
+        page,
+        itemsPerPage
+    ]);
     return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
         className: `tcl-browse ${isCollapsed ? 'tcl-browse-collapsed' : ''}`,
         children: [
@@ -4926,10 +4943,10 @@ function $449b860f472a3c1e$var$BrowsePanel({ filteredAgents: filteredAgents, sel
                     }),
                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("ul", {
                         className: "tcl-browse-list",
-                        children: filteredAgents.length === 0 ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("li", {
+                        children: paged.length === 0 ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("li", {
                             className: "tcl-browse-empty",
                             children: "No agents found."
-                        }) : filteredAgents.map((agent)=>{
+                        }) : paged.map((agent)=>{
                             const idx = allAgents.findIndex((a)=>a.id === agent.id);
                             const { bg: bg, color: color } = (0, $ecc3e2655dc3a94c$export$b1592956d14148e9)(idx >= 0 ? idx : 0);
                             return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("li", {
@@ -4953,6 +4970,32 @@ function $449b860f472a3c1e$var$BrowsePanel({ filteredAgents: filteredAgents, sel
                             }, agent.id);
                         })
                     }),
+                    totalPages > 1 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "tcl-browse-pagination",
+                        children: [
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                className: "tcl-browse-page-btn",
+                                onClick: ()=>setPage((p)=>Math.max(1, p - 1)),
+                                disabled: page === 1,
+                                title: "Previous",
+                                children: "\u2039"
+                            }),
+                            Array.from({
+                                length: totalPages
+                            }, (_, i)=>i + 1).map((p)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                    className: `tcl-browse-page-btn ${page === p ? 'tcl-browse-page-active' : ''}`,
+                                    onClick: ()=>setPage(p),
+                                    children: p
+                                }, p)),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                className: "tcl-browse-page-btn",
+                                onClick: ()=>setPage((p)=>Math.min(totalPages, p + 1)),
+                                disabled: page === totalPages,
+                                title: "Next",
+                                children: "\u203A"
+                            })
+                        ]
+                    }),
                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
                         className: "tcl-browse-refresh",
                         onClick: fetchAgents,
@@ -4972,7 +5015,30 @@ function $449b860f472a3c1e$var$BrowsePanel({ filteredAgents: filteredAgents, sel
 // CardGridLauncher — shown in center when no tabs are open
 // ---------------------------------------------------------------------------
 function $449b860f472a3c1e$var$CardGridLauncher({ agents: agents, searchQuery: searchQuery, setSearchQuery: setSearchQuery, onOpen: onOpen }) {
-    const filtered = searchQuery.trim() ? agents.filter((a)=>a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.description?.toLowerCase().includes(searchQuery.toLowerCase())) : agents;
+    const [page, setPage] = (0, $gXNCa$react.useState)(1);
+    const cardsPerPage = 12;
+    const filtered = (0, $gXNCa$react.useMemo)(()=>{
+        const q = searchQuery.trim().toLowerCase();
+        return q ? agents.filter((a)=>a.name.toLowerCase().includes(q) || a.description?.toLowerCase().includes(q)) : agents;
+    }, [
+        agents,
+        searchQuery
+    ]);
+    // Reset to page 1 when search changes
+    const prevLen = (0, ($parcel$interopDefault($gXNCa$react))).useRef(filtered.length);
+    if (filtered.length !== prevLen.current) {
+        prevLen.current = filtered.length;
+        if (page !== 1) setPage(1);
+    }
+    const totalPages = Math.ceil(filtered.length / cardsPerPage);
+    const paged = (0, $gXNCa$react.useMemo)(()=>{
+        const start = (page - 1) * cardsPerPage;
+        return filtered.slice(start, start + cardsPerPage);
+    }, [
+        filtered,
+        page,
+        cardsPerPage
+    ]);
     return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
         className: "tcl-launcher",
         children: [
@@ -5007,14 +5073,38 @@ function $449b860f472a3c1e$var$CardGridLauncher({ agents: agents, searchQuery: s
             }),
             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
                 className: "tcl-launcher-grid",
-                children: filtered.length === 0 ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                children: paged.length === 0 ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
                     className: "tcl-launcher-empty",
                     children: "No agents match your search."
-                }) : filtered.map((agent, i)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($449b860f472a3c1e$var$AgentCard, {
+                }) : paged.map((agent, i)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($449b860f472a3c1e$var$AgentCard, {
                         agent: agent,
                         index: i,
                         onOpen: onOpen
                     }, agent.id))
+            }),
+            totalPages > 1 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                className: "tcl-launcher-pagination",
+                children: [
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                        className: "tcl-launcher-page-btn",
+                        onClick: ()=>setPage((p)=>Math.max(1, p - 1)),
+                        disabled: page === 1,
+                        children: "\u2190 Prev"
+                    }),
+                    Array.from({
+                        length: totalPages
+                    }, (_, i)=>i + 1).map((p)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                            className: `tcl-launcher-page-btn ${page === p ? 'tcl-launcher-page-active' : ''}`,
+                            onClick: ()=>setPage(p),
+                            children: p
+                        }, p)),
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                        className: "tcl-launcher-page-btn",
+                        onClick: ()=>setPage((p)=>Math.min(totalPages, p + 1)),
+                        disabled: page === totalPages,
+                        children: "Next \u2192"
+                    })
+                ]
             })
         ]
     });
