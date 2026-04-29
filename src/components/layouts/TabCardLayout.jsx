@@ -373,8 +373,8 @@ export function TabCardLayout(props) {
         handleStopGeneration, handleSendMessage,
         setSearchQuery, setShowTrace,
         evaluations, expandedEvaluations, toggleEvaluation,
-        agentEvals,
-        authToken
+        authToken,
+        agentRegistryUrl,
     } = props;
 
     const [panelCollapsed, setPanelCollapsed] = useState(false);
@@ -387,7 +387,7 @@ export function TabCardLayout(props) {
     const initials = selectedAgent ? agentInitials(selectedAgent.name) : '';
 
     if (showSettings) {
-        return <SettingsPage onBack={() => setShowSettings(false)} />;
+        return <SettingsPage onBack={() => setShowSettings(false)} agentRegistryUrl={agentRegistryUrl} authToken={authToken} />;
     }
 
     return (

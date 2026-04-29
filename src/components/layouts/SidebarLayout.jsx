@@ -96,7 +96,8 @@ export function SidebarLayout(props) {
         setSearchQuery, setShowTrace,
         evaluations, expandedEvaluations, toggleEvaluation,
         agentEvals,
-        authToken
+        authToken,
+        agentRegistryUrl
     } = props;
 
     const [currentView, setCurrentView] = useState('chat');
@@ -123,7 +124,7 @@ export function SidebarLayout(props) {
     }
 
     if (showSettings) {
-        return <SettingsPage onBack={() => setShowSettings(false)} />;
+        return <SettingsPage onBack={() => setShowSettings(false)} agentRegistryUrl={agentRegistryUrl} authToken={authToken} />;
     }
 
     return (

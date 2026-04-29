@@ -289,6 +289,7 @@ export function CardChatLayout(props) {
         setShowTrace,
         evaluations, expandedEvaluations, toggleEvaluation,
         authToken,
+        agentRegistryUrl,
     } = props;
 
     const [currentView, setCurrentView] = useState('chat');
@@ -401,7 +402,7 @@ export function CardChatLayout(props) {
     }
 
     if (showSettings) {
-        return <SettingsPage onBack={() => setShowSettings(false)} />;
+        return <SettingsPage onBack={() => setShowSettings(false)} agentRegistryUrl={agentRegistryUrl} authToken={authToken} />;
     }
 
     return (
