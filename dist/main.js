@@ -593,7 +593,8 @@ function $e60c11a6596eb3d3$export$ff5f6a678ca1774c({ agents: initialAgents = [],
         setShowTrace: setShowTrace,
         fetchEvaluation: fetchEvaluation,
         toggleEvaluation: toggleEvaluation,
-        authToken: authToken
+        authToken: authToken,
+        agentRegistryUrl: agentRegistryUrl
     };
 }
 
@@ -4230,130 +4231,482 @@ function $e2c3eae86f05233c$export$aa9349e63a87bac1({ agentEndpoint: agentEndpoin
 
 
 
-function $86b15e9fc93b58c4$var$RegisterTab() {
-    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-        style: {
-            padding: '20px'
-        },
-        children: [
-            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("h3", {
-                style: {
-                    marginTop: 0
+// Styles for this component live in styles.css (cfg-* classes)
+/* ── Helpers ─────────────────────────────────────────────────────────────── */ const $86b15e9fc93b58c4$var$DESCRIPTION_MIN_LENGTH = 20;
+// Parses any URL into display segments; returns null if invalid.
+function $86b15e9fc93b58c4$var$parseUrl(raw) {
+    try {
+        const u = new URL(raw.trim());
+        return {
+            scheme: u.protocol + '//',
+            host: u.host,
+            path: u.pathname
+        };
+    } catch  {
+        return null;
+    }
+}
+// Returns true for valid Git remote URLs (HTTPS, SSH, and git:// protocols).
+function $86b15e9fc93b58c4$var$isValidGitUrl(raw) {
+    const s = raw.trim();
+    // HTTPS: https://github.com/user/repo or https://github.com/user/repo.git
+    if (/^https?:\/\/.+\/.+\/.+/.test(s)) return true;
+    // SSH: git@github.com:user/repo.git
+    if (/^git@[\w.-]+:[\w./-]+/.test(s)) return true;
+    // git:// protocol
+    if (/^git:\/\/.+/.test(s)) return true;
+    return false;
+}
+// Replaces spaces with underscores and lowercases a name string.
+function $86b15e9fc93b58c4$var$normalizeName(raw) {
+    return raw.replace(/ /g, '_').toLowerCase();
+}
+/* ── Register Tab ────────────────────────────────────────────────────────── */ function $86b15e9fc93b58c4$var$RegisterTab({ agentRegistryUrl: agentRegistryUrl, authToken: authToken }) {
+    const [name, setName] = (0, $gXNCa$react.useState)('');
+    const [description, setDescription] = (0, $gXNCa$react.useState)('');
+    const [sourceUrl, setSourceUrl] = (0, $gXNCa$react.useState)('');
+    const [active, setActive] = (0, $gXNCa$react.useState)(true);
+    const [isLoading, setIsLoading] = (0, $gXNCa$react.useState)(false);
+    const [error, setError] = (0, $gXNCa$react.useState)('');
+    const [success, setSuccess] = (0, $gXNCa$react.useState)('');
+    // Derived validation state (shown only when field has been touched)
+    const [nameTouched, setNameTouched] = (0, $gXNCa$react.useState)(false);
+    const [descTouched, setDescTouched] = (0, $gXNCa$react.useState)(false);
+    const [urlTouched, setUrlTouched] = (0, $gXNCa$react.useState)(false);
+    const parsedUrl = $86b15e9fc93b58c4$var$parseUrl(sourceUrl);
+    const gitUrlValid = $86b15e9fc93b58c4$var$isValidGitUrl(sourceUrl);
+    const descWordCount = description.trim().split(/\s+/).filter(Boolean).length;
+    const descValid = description.trim().length >= $86b15e9fc93b58c4$var$DESCRIPTION_MIN_LENGTH;
+    const handleNameChange = (e)=>{
+        setName($86b15e9fc93b58c4$var$normalizeName(e.target.value));
+        setNameTouched(true);
+    };
+    const handleDescChange = (e)=>{
+        setDescription(e.target.value);
+        setDescTouched(true);
+    };
+    const handleUrlChange = (e)=>{
+        setSourceUrl(e.target.value);
+        setUrlTouched(true);
+    };
+    const validate = ()=>{
+        if (!name.trim()) return 'Name is required.';
+        if (!descValid) return `Description must be at least ${$86b15e9fc93b58c4$var$DESCRIPTION_MIN_LENGTH} characters.`;
+        if (!sourceUrl.trim()) return 'Source URL is required.';
+        if (!gitUrlValid) return 'Source URL must be a valid Git URL (HTTPS, SSH, or git://).';
+        return null;
+    };
+    const handleRegister = async ()=>{
+        setNameTouched(true);
+        setDescTouched(true);
+        setUrlTouched(true);
+        const validationError = validate();
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+        setIsLoading(true);
+        setError('');
+        setSuccess('');
+        try {
+            const response = await fetch(`${agentRegistryUrl}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
                 },
-                children: "Register New Agent"
-            }),
+                body: JSON.stringify({
+                    name: name.trim(),
+                    description: description.trim(),
+                    source_url: sourceUrl.trim(),
+                    active: active,
+                    registered_via: 'dynamic'
+                })
+            });
+            if (response.ok) {
+                setSuccess('Agent registered successfully.');
+                setName('');
+                setDescription('');
+                setSourceUrl('');
+                setActive(true);
+                setNameTouched(false);
+                setDescTouched(false);
+                setUrlTouched(false);
+            } else {
+                const err = await response.json().catch(()=>({}));
+                setError(err.message || err.detail || `Registration failed (${response.status})`);
+            }
+        } catch  {
+            setError('Network error. Please try again.');
+        } finally{
+            setIsLoading(false);
+        }
+    };
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+        children: [
             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("p", {
-                children: "This is a placeholder for the agent registration form."
+                className: "cfg-intro",
+                children: "Add a new agent to the registry. Once registered, it will appear in the sidebar and be available for conversations."
+            }),
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                className: "cfg-section-label",
+                children: "Agent details"
             }),
             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                style: {
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '16px',
-                    maxWidth: '400px'
-                },
-                children: [
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
-                        type: "text",
-                        placeholder: "Agent Name",
-                        className: "sl-search"
-                    }),
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("textarea", {
-                        placeholder: "Description",
-                        className: "chat-input textarea",
-                        style: {
-                            height: '80px'
-                        }
-                    }),
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
-                        type: "text",
-                        placeholder: "Endpoint URL",
-                        className: "sl-search"
-                    }),
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
-                        className: "sl-logs-refresh-btn",
-                        style: {
-                            alignSelf: 'flex-start'
-                        },
-                        children: "Register Agent"
-                    })
-                ]
-            })
-        ]
-    });
-}
-function $86b15e9fc93b58c4$var$TokenTab() {
-    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-        style: {
-            padding: '20px'
-        },
-        children: [
-            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("h3", {
-                style: {
-                    marginTop: 0
-                },
-                children: "Manage Tokens"
-            }),
-            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("p", {
-                children: "This is a placeholder for the token management interface."
-            })
-        ]
-    });
-}
-function $86b15e9fc93b58c4$export$8f6dcfe950367406({ onBack: onBack }) {
-    const [activeTab, setActiveTab] = (0, $gXNCa$react.useState)('register');
-    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-        className: "ccl-registry",
-        children: [
-            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                className: "ccl-registry-header",
+                className: "cfg-card",
                 children: [
                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                        className: "ccl-header-top",
+                        className: `cfg-field ${nameTouched && !name.trim() ? 'cfg-field--invalid' : ''}`,
                         children: [
                             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
                                 children: [
                                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "ccl-header-title",
-                                        children: "Settings"
+                                        className: "cfg-field-label",
+                                        children: "Name"
                                     }),
                                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "ccl-header-sub",
-                                        children: "Manage agent registry and tokens"
+                                        className: "cfg-field-hint",
+                                        children: "Lowercase \xb7 spaces become underscores"
                                     })
                                 ]
                             }),
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
-                                className: "ccl-back-btn",
-                                onClick: onBack,
-                                children: "\u2190 Back to Registry"
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
+                                        type: "text",
+                                        className: `cfg-input ${nameTouched && !name.trim() ? 'cfg-input--invalid' : ''}`,
+                                        placeholder: "e.g. code_reviewer",
+                                        value: name,
+                                        onChange: handleNameChange,
+                                        onBlur: ()=>setNameTouched(true)
+                                    }),
+                                    nameTouched && !name.trim() && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        className: "cfg-field-error",
+                                        children: "Name is required."
+                                    })
+                                ]
                             })
                         ]
                     }),
                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                        className: "ccl-tabs",
+                        className: `cfg-field ${descTouched && !descValid ? 'cfg-field--invalid' : ''}`,
                         children: [
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
-                                className: `ccl-tab-btn ${activeTab === 'register' ? 'ccl-tab-active' : ''}`,
-                                onClick: ()=>setActiveTab('register'),
-                                children: "Register"
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        className: "cfg-field-label",
+                                        children: "Description"
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        className: "cfg-field-hint",
+                                        children: [
+                                            "Min ",
+                                            $86b15e9fc93b58c4$var$DESCRIPTION_MIN_LENGTH,
+                                            " characters"
+                                        ]
+                                    })
+                                ]
                             }),
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
-                                className: `ccl-tab-btn ${activeTab === 'token' ? 'ccl-tab-active' : ''}`,
-                                onClick: ()=>setActiveTab('token'),
-                                children: "Token"
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("textarea", {
+                                        className: `cfg-textarea ${descTouched && !descValid ? 'cfg-input--invalid' : ''}`,
+                                        placeholder: "Describe what this agent does, its capabilities, and intended use\u2026",
+                                        value: description,
+                                        onChange: handleDescChange,
+                                        onBlur: ()=>setDescTouched(true)
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        className: "cfg-field-meta",
+                                        children: descTouched && !descValid ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+                                            className: "cfg-field-error",
+                                            children: [
+                                                "At least ",
+                                                $86b15e9fc93b58c4$var$DESCRIPTION_MIN_LENGTH,
+                                                " characters required (",
+                                                description.trim().length,
+                                                " so far)."
+                                            ]
+                                        }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+                                            className: "cfg-field-count",
+                                            children: [
+                                                description.trim().length,
+                                                " chars \xb7 ",
+                                                descWordCount,
+                                                " words"
+                                            ]
+                                        })
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: `cfg-field ${urlTouched && sourceUrl && !gitUrlValid ? 'cfg-field--invalid' : ''}`,
+                        children: [
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        className: "cfg-field-label",
+                                        children: "Source URL"
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        className: "cfg-field-hint",
+                                        children: "Must be a valid Git URL"
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
+                                        type: "text",
+                                        className: `cfg-input ${urlTouched && sourceUrl && !gitUrlValid ? 'cfg-input--invalid' : ''}`,
+                                        placeholder: "https://github.com/org/repo.git",
+                                        value: sourceUrl,
+                                        onChange: handleUrlChange,
+                                        onBlur: ()=>setUrlTouched(true)
+                                    }),
+                                    urlTouched && sourceUrl && !gitUrlValid ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        className: "cfg-field-error",
+                                        children: [
+                                            "Must be a valid Git URL \u2014 e.g. ",
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("code", {
+                                                className: "cfg-code",
+                                                children: "https://github.com/org/repo.git"
+                                            }),
+                                            " or ",
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("code", {
+                                                className: "cfg-code",
+                                                children: "git@github.com:org/repo.git"
+                                            })
+                                        ]
+                                    }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        className: `cfg-url-preview ${parsedUrl && gitUrlValid ? 'visible' : ''}`,
+                                        children: parsedUrl && gitUrlValid && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+                                            children: [
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                    className: "cfg-url-scheme",
+                                                    children: parsedUrl.scheme
+                                                }),
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                    className: "cfg-url-host",
+                                                    children: parsedUrl.host
+                                                }),
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                    className: "cfg-url-path",
+                                                    children: parsedUrl.path
+                                                })
+                                            ]
+                                        })
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "cfg-field cfg-field--last",
+                        children: [
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        className: "cfg-field-label",
+                                        children: "Status"
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        className: "cfg-field-hint",
+                                        children: "Enable immediately on register"
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "cfg-toggle-row",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("label", {
+                                        className: "cfg-toggle",
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
+                                                type: "checkbox",
+                                                checked: active,
+                                                onChange: (e)=>setActive(e.target.checked)
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-toggle-track"
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                        className: `cfg-toggle-status ${active ? 'is-active' : ''}`,
+                                        children: active ? 'Active' : 'Inactive'
+                                    })
+                                ]
                             })
                         ]
                     })
                 ]
             }),
             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                className: "ccl-grid-wrap",
-                style: {
-                    background: 'var(--oai-surface)'
-                },
+                className: "cfg-actions cfg-actions--card",
                 children: [
-                    activeTab === 'register' && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($86b15e9fc93b58c4$var$RegisterTab, {}),
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "cfg-actions-feedback",
+                        children: [
+                            error && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "cfg-notice cfg-notice-error",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                        className: "cfg-notice-icon",
+                                        children: "\u2715"
+                                    }),
+                                    error
+                                ]
+                            }),
+                            success && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "cfg-notice cfg-notice-success",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                        className: "cfg-notice-icon",
+                                        children: "\u2713"
+                                    }),
+                                    success
+                                ]
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                        className: "cfg-submit-btn",
+                        onClick: handleRegister,
+                        disabled: isLoading,
+                        children: isLoading ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+                            children: [
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                    className: "cfg-spinner"
+                                }),
+                                "Registering\u2026"
+                            ]
+                        }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+                            children: [
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                    className: "cfg-submit-icon",
+                                    children: "+"
+                                }),
+                                "Register Agent"
+                            ]
+                        })
+                    })
+                ]
+            })
+        ]
+    });
+}
+/* ── Token Tab ───────────────────────────────────────────────────────────── */ function $86b15e9fc93b58c4$var$TokenTab() {
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+        className: "cfg-card",
+        children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+            className: "cfg-token-placeholder",
+            children: [
+                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                    className: "cfg-token-icon",
+                    children: "\uD83D\uDD11"
+                }),
+                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                    className: "cfg-token-title",
+                    children: "Token Management"
+                }),
+                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                    className: "cfg-token-desc",
+                    children: "Issue, rotate, and revoke authentication tokens for the agent registry. Coming soon."
+                })
+            ]
+        })
+    });
+}
+function $86b15e9fc93b58c4$export$8f6dcfe950367406({ onBack: onBack, agentRegistryUrl: agentRegistryUrl, authToken: authToken }) {
+    const [activeTab, setActiveTab] = (0, $gXNCa$react.useState)('register');
+    const tabs = [
+        {
+            id: 'register',
+            label: 'Register Agent',
+            icon: "\u2295"
+        },
+        {
+            id: 'token',
+            label: 'Tokens',
+            icon: "\uD83D\uDD11"
+        }
+    ];
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+        className: "cfg-wrap",
+        children: [
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                className: "cfg-header",
+                children: [
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "cfg-header-top",
+                        children: [
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        className: "cfg-breadcrumb",
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                children: "Registry"
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                className: "cfg-breadcrumb-sep",
+                                                children: "\u203A"
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                className: "cfg-breadcrumb-cur",
+                                                children: "Settings"
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        className: "cfg-title",
+                                        children: "Settings"
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        className: "cfg-subtitle",
+                                        children: "Manage agent registry and authentication tokens"
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("button", {
+                                className: "cfg-back-btn",
+                                onClick: onBack,
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                        className: "cfg-back-arrow",
+                                        children: "\u2190"
+                                    }),
+                                    "Back to Registry"
+                                ]
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                        className: "cfg-tabs",
+                        children: tabs.map((t)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("button", {
+                                className: `cfg-tab ${activeTab === t.id ? 'cfg-tab-active' : ''}`,
+                                onClick: ()=>setActiveTab(t.id),
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                        className: "cfg-tab-icon",
+                                        children: t.icon
+                                    }),
+                                    t.label
+                                ]
+                            }, t.id))
+                    })
+                ]
+            }),
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                className: "cfg-body",
+                children: [
+                    activeTab === 'register' && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($86b15e9fc93b58c4$var$RegisterTab, {
+                        agentRegistryUrl: agentRegistryUrl,
+                        authToken: authToken
+                    }),
                     activeTab === 'token' && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($86b15e9fc93b58c4$var$TokenTab, {})
                 ]
             })
@@ -4461,7 +4814,7 @@ function $af5fd50f157de9d8$var$SubTabBar({ currentView: currentView, setCurrentV
     });
 }
 function $af5fd50f157de9d8$export$8295a33ab8a36876(props) {
-    const { agents: agents, filteredAgents: filteredAgents, selectedAgent: selectedAgent, selectedAgentId: selectedAgentId, message: message, searchQuery: searchQuery, attachedFiles: attachedFiles, currentMessages: currentMessages, currentTraceLogs: currentTraceLogs, showTrace: showTrace, isLoading: isLoading, chatEndRef: chatEndRef, traceEndRef: traceEndRef, textareaRef: textareaRef, fileInputRef: fileInputRef, fetchAgents: fetchAgents, handleSelectAgent: handleSelectAgent, handleClearSession: handleClearSession, handleMessageChange: handleMessageChange, handleFileSelect: handleFileSelect, removeAttachment: removeAttachment, handleStopGeneration: handleStopGeneration, handleSendMessage: handleSendMessage, setSearchQuery: setSearchQuery, setShowTrace: setShowTrace, evaluations: evaluations, expandedEvaluations: expandedEvaluations, toggleEvaluation: toggleEvaluation, agentEvals: agentEvals, authToken: authToken } = props;
+    const { agents: agents, filteredAgents: filteredAgents, selectedAgent: selectedAgent, selectedAgentId: selectedAgentId, message: message, searchQuery: searchQuery, attachedFiles: attachedFiles, currentMessages: currentMessages, currentTraceLogs: currentTraceLogs, showTrace: showTrace, isLoading: isLoading, chatEndRef: chatEndRef, traceEndRef: traceEndRef, textareaRef: textareaRef, fileInputRef: fileInputRef, fetchAgents: fetchAgents, handleSelectAgent: handleSelectAgent, handleClearSession: handleClearSession, handleMessageChange: handleMessageChange, handleFileSelect: handleFileSelect, removeAttachment: removeAttachment, handleStopGeneration: handleStopGeneration, handleSendMessage: handleSendMessage, setSearchQuery: setSearchQuery, setShowTrace: setShowTrace, evaluations: evaluations, expandedEvaluations: expandedEvaluations, toggleEvaluation: toggleEvaluation, agentEvals: agentEvals, authToken: authToken, agentRegistryUrl: agentRegistryUrl } = props;
     const [currentView, setCurrentView] = (0, $gXNCa$react.useState)('chat');
     const [showSettings, setShowSettings] = (0, $gXNCa$react.useState)(false);
     const [agentPage, setAgentPage] = (0, $gXNCa$react.useState)(1);
@@ -4486,7 +4839,9 @@ function $af5fd50f157de9d8$export$8295a33ab8a36876(props) {
         if (agentPage !== 1) setAgentPage(1);
     }
     if (showSettings) return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)((0, $86b15e9fc93b58c4$export$8f6dcfe950367406), {
-        onBack: ()=>setShowSettings(false)
+        onBack: ()=>setShowSettings(false),
+        agentRegistryUrl: agentRegistryUrl,
+        authToken: authToken
     });
     return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
         className: "sl-container",
@@ -5110,7 +5465,7 @@ function $449b860f472a3c1e$var$CardGridLauncher({ agents: agents, searchQuery: s
     });
 }
 function $449b860f472a3c1e$export$1806ed9300cedcd4(props) {
-    const { agents: agents, filteredAgents: filteredAgents, openAgents: openAgents, selectedAgent: selectedAgent, selectedAgentId: selectedAgentId, message: message, searchQuery: searchQuery, attachedFiles: attachedFiles, currentMessages: currentMessages, currentTraceLogs: currentTraceLogs, showTrace: showTrace, isLoading: isLoading, unreadCounts: unreadCounts, chatEndRef: chatEndRef, traceEndRef: traceEndRef, textareaRef: textareaRef, fileInputRef: fileInputRef, fetchAgents: fetchAgents, handleSelectAgent: handleSelectAgent, handleCloseTab: handleCloseTab, handleClearSession: handleClearSession, handleMessageChange: handleMessageChange, handleFileSelect: handleFileSelect, removeAttachment: removeAttachment, handleStopGeneration: handleStopGeneration, handleSendMessage: handleSendMessage, setSearchQuery: setSearchQuery, setShowTrace: setShowTrace, evaluations: evaluations, expandedEvaluations: expandedEvaluations, toggleEvaluation: toggleEvaluation, agentEvals: agentEvals, authToken: authToken } = props;
+    const { agents: agents, filteredAgents: filteredAgents, openAgents: openAgents, selectedAgent: selectedAgent, selectedAgentId: selectedAgentId, message: message, searchQuery: searchQuery, attachedFiles: attachedFiles, currentMessages: currentMessages, currentTraceLogs: currentTraceLogs, showTrace: showTrace, isLoading: isLoading, unreadCounts: unreadCounts, chatEndRef: chatEndRef, traceEndRef: traceEndRef, textareaRef: textareaRef, fileInputRef: fileInputRef, fetchAgents: fetchAgents, handleSelectAgent: handleSelectAgent, handleCloseTab: handleCloseTab, handleClearSession: handleClearSession, handleMessageChange: handleMessageChange, handleFileSelect: handleFileSelect, removeAttachment: removeAttachment, handleStopGeneration: handleStopGeneration, handleSendMessage: handleSendMessage, setSearchQuery: setSearchQuery, setShowTrace: setShowTrace, evaluations: evaluations, expandedEvaluations: expandedEvaluations, toggleEvaluation: toggleEvaluation, authToken: authToken, agentRegistryUrl: agentRegistryUrl } = props;
     const [panelCollapsed, setPanelCollapsed] = (0, $gXNCa$react.useState)(false);
     const [currentView, setCurrentView] = (0, $gXNCa$react.useState)('chat');
     const [showSettings, setShowSettings] = (0, $gXNCa$react.useState)(false);
@@ -5119,7 +5474,9 @@ function $449b860f472a3c1e$export$1806ed9300cedcd4(props) {
     const { bg: bg, color: color } = selectedAgent ? (0, $ecc3e2655dc3a94c$export$b1592956d14148e9)(selectedIndex >= 0 ? selectedIndex : 0) : {};
     const initials = selectedAgent ? (0, $ecc3e2655dc3a94c$export$7d6e6cc5a7a4d165)(selectedAgent.name) : '';
     if (showSettings) return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)((0, $86b15e9fc93b58c4$export$8f6dcfe950367406), {
-        onBack: ()=>setShowSettings(false)
+        onBack: ()=>setShowSettings(false),
+        agentRegistryUrl: agentRegistryUrl,
+        authToken: authToken
     });
     return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
         className: "tcl-container",
@@ -5658,7 +6015,7 @@ function $f9ec7352374a6877$var$AgentRegistry({ agents: agents, searchQuery: sear
     });
 }
 function $f9ec7352374a6877$export$f1bb7d87e7dd8c29(props) {
-    const { agents: agents, selectedAgent: selectedAgent, selectedAgentId: selectedAgentId, message: message, searchQuery: searchQuery, attachedFiles: attachedFiles, currentMessages: currentMessages, currentTraceLogs: currentTraceLogs, showTrace: showTrace, isLoading: isLoading, registryError: registryError, chatEndRef: chatEndRef, traceEndRef: traceEndRef, textareaRef: textareaRef, fileInputRef: fileInputRef, handleSelectAgent: handleSelectAgent, handleClearSession: handleClearSession, handleMessageChange: handleMessageChange, handleFileSelect: handleFileSelect, removeAttachment: removeAttachment, handleStopGeneration: handleStopGeneration, handleSendMessage: handleSendMessage, setSearchQuery: setSearchQuery, setShowTrace: setShowTrace, evaluations: evaluations, expandedEvaluations: expandedEvaluations, toggleEvaluation: toggleEvaluation, authToken: authToken } = props;
+    const { agents: agents, selectedAgent: selectedAgent, selectedAgentId: selectedAgentId, message: message, searchQuery: searchQuery, attachedFiles: attachedFiles, currentMessages: currentMessages, currentTraceLogs: currentTraceLogs, showTrace: showTrace, isLoading: isLoading, registryError: registryError, chatEndRef: chatEndRef, traceEndRef: traceEndRef, textareaRef: textareaRef, fileInputRef: fileInputRef, handleSelectAgent: handleSelectAgent, handleClearSession: handleClearSession, handleMessageChange: handleMessageChange, handleFileSelect: handleFileSelect, removeAttachment: removeAttachment, handleStopGeneration: handleStopGeneration, handleSendMessage: handleSendMessage, setSearchQuery: setSearchQuery, setShowTrace: setShowTrace, evaluations: evaluations, expandedEvaluations: expandedEvaluations, toggleEvaluation: toggleEvaluation, authToken: authToken, agentRegistryUrl: agentRegistryUrl } = props;
     const [currentView, setCurrentView] = (0, $gXNCa$react.useState)('chat');
     const [showSettings, setShowSettings] = (0, $gXNCa$react.useState)(false);
     // If an agent is selected, show the chat view
@@ -5791,7 +6148,9 @@ function $f9ec7352374a6877$export$f1bb7d87e7dd8c29(props) {
         });
     }
     if (showSettings) return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)((0, $86b15e9fc93b58c4$export$8f6dcfe950367406), {
-        onBack: ()=>setShowSettings(false)
+        onBack: ()=>setShowSettings(false),
+        agentRegistryUrl: agentRegistryUrl,
+        authToken: authToken
     });
     return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($f9ec7352374a6877$var$AgentRegistry, {
         agents: agents,
