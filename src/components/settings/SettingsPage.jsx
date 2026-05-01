@@ -37,12 +37,19 @@ function RegisterTab({ agentRegistryUrl, authToken }) {
     const [name, setName]               = useState('');
     const [description, setDescription] = useState('');
     const [sourceUrl, setSourceUrl]     = useState('');
+    const [endpoint, setEndpoint]       = useState('');
+    const [port, setPort]               = useState('');
+    const [framework, setFramework]     = useState('langgraph');
+    const [tags, setTags]               = useState([]);
+    const [tagInput, setTagInput]        = useState('');
+    const [prompts, setPrompts]          = useState([]);
+    const [promptInput, setPromptInput]  = useState('');
     const [active, setActive]           = useState(true);
     const [isLoading, setIsLoading]     = useState(false);
     const [error, setError]             = useState('');
     const [success, setSuccess]         = useState('');
 
-    // Derived validation state (shown only when field has been touched)
+    // Touched states for validation
     const [nameTouched, setNameTouched]           = useState(false);
     const [descTouched, setDescTouched]           = useState(false);
     const [urlTouched, setUrlTouched]             = useState(false);
@@ -65,6 +72,48 @@ function RegisterTab({ agentRegistryUrl, authToken }) {
     const handleUrlChange = (e) => {
         setSourceUrl(e.target.value);
         setUrlTouched(true);
+    };
+
+    const handleFrameworkChange = (e) => {
+        setFramework(e.target.value);
+    };
+
+    const handleAddTag = () => {
+        const trimmed = tagInput.trim();
+        if (trimmed && !tags.includes(trimmed)) {
+            setTags([...tags, trimmed]);
+            setTagInput('');
+        }
+    };
+
+    const handleRemoveTag = (index) => {
+        setTags(tags.filter((_, i) => i !== index));
+    };
+
+    const handleTagKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleAddTag();
+        }
+    };
+
+    const handleAddPrompt = () => {
+        const trimmed = promptInput.trim();
+        if (trimmed && !prompts.includes(trimmed)) {
+            setPrompts([...prompts, trimmed]);
+            setPromptInput('');
+        }
+    };
+
+    const handleRemovePrompt = (index) => {
+        setPrompts(prompts.filter((_, i) => i !== index));
+    };
+
+    const handlePromptKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleAddPrompt();
+        }
     };
 
     const validate = () => {
@@ -94,19 +143,26 @@ function RegisterTab({ agentRegistryUrl, authToken }) {
                 body: JSON.stringify({
                     name: name.trim(),
                     description: description.trim(),
-                    source_url: sourceUrl.trim(),
+                    source: sourceUrl.trim(),
+                    endpoint: endpoint.trim() || null,
+                    port: port ? parseInt(port, 10) : null,
+                    framework,
+                    tags,
+                    prompts,
                     active,
-                    registered_via: 'dynamic',
+                    registered_via: 'registry',
                 }),
             });
 
             if (response.ok) {
                 setSuccess('Agent registered successfully.');
-                setName(''); setDescription(''); setSourceUrl(''); setActive(true);
+                setName(''); setDescription(''); setSourceUrl(''); setEndpoint(''); setPort('');
+                setFramework('langgraph'); setActive(true); setTags([]); setPrompts('');
                 setNameTouched(false); setDescTouched(false); setUrlTouched(false);
             } else {
                 const err = await response.json().catch(() => ({}));
-                setError(err.message || err.detail || `Registration failed (${response.status})`);
+                const errorMsg = err.message || (typeof err.detail === 'string' ? err.detail : err.detail?.msg || JSON.stringify(err.detail)) || `Registration failed (${response.status})`;
+                setError(errorMsg);
             }
         } catch {
             setError('Network error. Please try again.');
@@ -200,6 +256,156 @@ function RegisterTab({ agentRegistryUrl, authToken }) {
                                     </>
                                 )}
                             </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Endpoint (Optional) */}
+                <div className="cfg-field">
+                    <div>
+                        <div className="cfg-field-label">Endpoint</div>
+                        <div className="cfg-field-hint">Optional · agent server address</div>
+                    </div>
+                    <div>
+                        <input
+                            type="text"
+                            className="cfg-input"
+                            placeholder="e.g. http://localhost:8000"
+                            value={endpoint}
+                            onChange={(e) => setEndpoint(e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                {/* Port (Optional) */}
+                <div className="cfg-field">
+                    <div>
+                        <div className="cfg-field-label">Port</div>
+                        <div className="cfg-field-hint">Optional · numeric port number</div>
+                    </div>
+                    <div>
+                        <input
+                            type="number"
+                            className="cfg-input"
+                            placeholder="e.g. 8000"
+                            value={port}
+                            onChange={(e) => setPort(e.target.value)}
+                            min="1"
+                            max="65535"
+                        />
+                    </div>
+                </div>
+
+                {/* Framework */}
+                <div className="cfg-field">
+                    <div>
+                        <div className="cfg-field-label">Framework</div>
+                        <div className="cfg-field-hint">Select the agent framework</div>
+                    </div>
+                    <div>
+                        <select
+                            className="cfg-input"
+                            value={framework}
+                            onChange={handleFrameworkChange}
+                        >
+                            <option value="langgraph">LangGraph</option>
+                            <option value="strands">Strands</option>
+                            <option value="crewai">CrewAI</option>
+                            <option value="openai">OpenAI</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Tags */}
+                <div className="cfg-field">
+                    <div>
+                        <div className="cfg-field-label">Tags</div>
+                        <div className="cfg-field-hint">Optional · add descriptive tags</div>
+                    </div>
+                    <div>
+                        <div className="cfg-list-input-container">
+                            <input
+                                type="text"
+                                className="cfg-input"
+                                placeholder="Enter a tag and press Enter"
+                                value={tagInput}
+                                onChange={(e) => setTagInput(e.target.value)}
+                                onKeyDown={handleTagKeyPress}
+                            />
+                            <button
+                                type="button"
+                                className="cfg-list-add-btn"
+                                onClick={handleAddTag}
+                                disabled={!tagInput.trim()}
+                            >
+                                +
+                            </button>
+                        </div>
+                        {tags.length > 0 && (
+                            <div className="cfg-list-items">
+                                {tags.map((tag, index) => (
+                                    <div key={index} className="cfg-list-item">
+                                        <span className="cfg-list-item-text">{tag}</span>
+                                        <button
+                                            type="button"
+                                            className="cfg-list-item-remove"
+                                            onClick={() => handleRemoveTag(index)}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {tags.length === 0 && (
+                            <div className="cfg-list-empty">No tags added yet</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Prompts */}
+                <div className="cfg-field">
+                    <div>
+                        <div className="cfg-field-label">Prompts</div>
+                        <div className="cfg-field-hint">Optional · add system prompts or instructions</div>
+                    </div>
+                    <div>
+                        <div className="cfg-list-input-container">
+                            <textarea
+                                className="cfg-input cfg-textarea-compact"
+                                placeholder="Enter a prompt and press Enter"
+                                value={promptInput}
+                                onChange={(e) => setPromptInput(e.target.value)}
+                                onKeyDown={handlePromptKeyPress}
+                                rows="2"
+                            />
+                            <button
+                                type="button"
+                                className="cfg-list-add-btn"
+                                onClick={handleAddPrompt}
+                                disabled={!promptInput.trim()}
+                            >
+                                +
+                            </button>
+                        </div>
+                        {prompts.length > 0 && (
+                            <div className="cfg-list-items">
+                                {prompts.map((prompt, index) => (
+                                    <div key={index} className="cfg-list-item cfg-list-item-prompt">
+                                        <span className="cfg-list-item-text">{prompt}</span>
+                                        <button
+                                            type="button"
+                                            className="cfg-list-item-remove"
+                                            onClick={() => handleRemovePrompt(index)}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {prompts.length === 0 && (
+                            <div className="cfg-list-empty">No prompts added yet</div>
                         )}
                     </div>
                 </div>
