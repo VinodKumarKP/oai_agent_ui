@@ -538,13 +538,13 @@ function AgentLifeCycleTab({ agentRegistryUrl, authToken }) {
         setError('');
         setSuccess('');
         try {
-            const response = await fetch(`${agentRegistryUrl}/registry/${action}`, {
+            const response = await fetch(`${agentRegistryUrl}/lifecycle/${agentName}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${authToken}`,
                 },
-                body: JSON.stringify({ name: agentName }),
+                body: JSON.stringify({ action: action }),
             });
             if (response.ok) {
                 const verb = action === 'refresh' ? 'redeployed' : `${action}ed`;
@@ -734,10 +734,10 @@ function AgentLifeCycleTab({ agentRegistryUrl, authToken }) {
                                             </button>
                                             <button
                                                 className="cfg-button cfg-button-secondary"
-                                                onClick={() => handleAgentAction(agent.name, 'refresh')}
+                                                onClick={() => handleAgentAction(agent.name, 'rebuild')}
                                                 disabled={isLoading}
                                             >
-                                                Redeploy
+                                                Rebuild
                                             </button>
                                         </div>
                                     </div>
