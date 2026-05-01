@@ -4407,417 +4407,434 @@ function $86b15e9fc93b58c4$var$normalizeName(raw) {
                 className: "cfg-intro",
                 children: "Add a new agent to the registry. Once registered, it will appear in the sidebar and be available for conversations."
             }),
-            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                className: "cfg-section-label",
-                children: "Agent details"
-            }),
             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
                 className: "cfg-card",
                 children: [
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                        className: `cfg-field ${nameTouched && !name.trim() ? 'cfg-field--invalid' : ''}`,
-                        children: [
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-label",
-                                        children: "Name"
-                                    }),
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-hint",
-                                        children: "Lowercase \xb7 spaces become underscores"
-                                    })
-                                ]
-                            }),
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
-                                        type: "text",
-                                        className: `cfg-input ${nameTouched && !name.trim() ? 'cfg-input--invalid' : ''}`,
-                                        placeholder: "e.g. code_reviewer",
-                                        value: name,
-                                        onChange: handleNameChange,
-                                        onBlur: ()=>setNameTouched(true)
-                                    }),
-                                    nameTouched && !name.trim() && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-error",
-                                        children: "Name is required."
-                                    })
-                                ]
-                            })
-                        ]
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                        className: "cfg-card-header",
+                        children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                            className: "cfg-card-header-text",
+                            children: [
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                    className: "cfg-card-title",
+                                    children: "Agent Details"
+                                }),
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                    className: "cfg-card-subtitle",
+                                    children: "Configure the new agent's properties."
+                                })
+                            ]
+                        })
                     }),
                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                        className: `cfg-field ${descTouched && !descValid ? 'cfg-field--invalid' : ''}`,
+                        className: "cfg-card-body",
                         children: [
                             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: `cfg-field ${nameTouched && !name.trim() ? 'cfg-field--invalid' : ''}`,
                                 children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-label",
-                                        children: "Description"
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-label",
+                                                children: "Name"
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-hint",
+                                                children: "Lowercase \xb7 spaces become underscores"
+                                            })
+                                        ]
                                     }),
                                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                        className: "cfg-field-hint",
                                         children: [
-                                            "Min ",
-                                            $86b15e9fc93b58c4$var$DESCRIPTION_MIN_LENGTH,
-                                            " characters"
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
+                                                type: "text",
+                                                className: `cfg-input ${nameTouched && !name.trim() ? 'cfg-input--invalid' : ''}`,
+                                                placeholder: "e.g. code_reviewer",
+                                                value: name,
+                                                onChange: handleNameChange,
+                                                onBlur: ()=>setNameTouched(true)
+                                            }),
+                                            nameTouched && !name.trim() && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-error",
+                                                children: "Name is required."
+                                            })
                                         ]
                                     })
                                 ]
                             }),
                             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: `cfg-field ${descTouched && !descValid ? 'cfg-field--invalid' : ''}`,
                                 children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("textarea", {
-                                        className: `cfg-textarea ${descTouched && !descValid ? 'cfg-input--invalid' : ''}`,
-                                        placeholder: "Describe what this agent does, its capabilities, and intended use\u2026",
-                                        value: description,
-                                        onChange: handleDescChange,
-                                        onBlur: ()=>setDescTouched(true)
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-label",
+                                                children: "Description"
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                className: "cfg-field-hint",
+                                                children: [
+                                                    "Min ",
+                                                    $86b15e9fc93b58c4$var$DESCRIPTION_MIN_LENGTH,
+                                                    " characters"
+                                                ]
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("textarea", {
+                                                className: `cfg-textarea ${descTouched && !descValid ? 'cfg-input--invalid' : ''}`,
+                                                placeholder: "Describe what this agent does, its capabilities, and intended use\u2026",
+                                                value: description,
+                                                onChange: handleDescChange,
+                                                onBlur: ()=>setDescTouched(true)
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-meta",
+                                                children: descTouched && !descValid ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+                                                    className: "cfg-field-error",
+                                                    children: [
+                                                        "At least ",
+                                                        $86b15e9fc93b58c4$var$DESCRIPTION_MIN_LENGTH,
+                                                        " characters required (",
+                                                        description.trim().length,
+                                                        " so far)."
+                                                    ]
+                                                }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+                                                    className: "cfg-field-count",
+                                                    children: [
+                                                        description.trim().length,
+                                                        " chars \xb7 ",
+                                                        descWordCount,
+                                                        " words"
+                                                    ]
+                                                })
+                                            })
+                                        ]
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: `cfg-field ${urlTouched && sourceUrl && !gitUrlValid ? 'cfg-field--invalid' : ''}`,
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-label",
+                                                children: "Source URL"
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-hint",
+                                                children: "Must be a valid Git URL"
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
+                                                type: "text",
+                                                className: `cfg-input ${urlTouched && sourceUrl && !gitUrlValid ? 'cfg-input--invalid' : ''}`,
+                                                placeholder: "https://github.com/org/repo.git",
+                                                value: sourceUrl,
+                                                onChange: handleUrlChange,
+                                                onBlur: ()=>setUrlTouched(true)
+                                            }),
+                                            urlTouched && sourceUrl && !gitUrlValid ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                className: "cfg-field-error",
+                                                children: [
+                                                    "Must be a valid Git URL \u2014 e.g. ",
+                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("code", {
+                                                        className: "cfg-code",
+                                                        children: "https://github.com/org/repo.git"
+                                                    }),
+                                                    " or ",
+                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("code", {
+                                                        className: "cfg-code",
+                                                        children: "git@github.com:org/repo.git"
+                                                    })
+                                                ]
+                                            }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: `cfg-url-preview ${parsedUrl && gitUrlValid ? 'visible' : ''}`,
+                                                children: parsedUrl && gitUrlValid && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                            className: "cfg-url-scheme",
+                                                            children: parsedUrl.scheme
+                                                        }),
+                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                            className: "cfg-url-host",
+                                                            children: parsedUrl.host
+                                                        }),
+                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                            className: "cfg-url-path",
+                                                            children: parsedUrl.path
+                                                        })
+                                                    ]
+                                                })
+                                            })
+                                        ]
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "cfg-field",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-label",
+                                                children: "Endpoint"
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-hint",
+                                                children: "Optional \xb7 agent server address"
+                                            })
+                                        ]
                                     }),
                                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-meta",
-                                        children: descTouched && !descValid ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
-                                            className: "cfg-field-error",
-                                            children: [
-                                                "At least ",
-                                                $86b15e9fc93b58c4$var$DESCRIPTION_MIN_LENGTH,
-                                                " characters required (",
-                                                description.trim().length,
-                                                " so far)."
-                                            ]
-                                        }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
-                                            className: "cfg-field-count",
-                                            children: [
-                                                description.trim().length,
-                                                " chars \xb7 ",
-                                                descWordCount,
-                                                " words"
-                                            ]
+                                        children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
+                                            type: "text",
+                                            className: "cfg-input",
+                                            placeholder: "e.g. http://localhost:8000",
+                                            value: endpoint,
+                                            onChange: (e)=>setEndpoint(e.target.value)
                                         })
                                     })
                                 ]
-                            })
-                        ]
-                    }),
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                        className: `cfg-field ${urlTouched && sourceUrl && !gitUrlValid ? 'cfg-field--invalid' : ''}`,
-                        children: [
+                            }),
                             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "cfg-field",
                                 children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-label",
-                                        children: "Source URL"
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-label",
+                                                children: "Port"
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-hint",
+                                                children: "Optional \xb7 numeric port number"
+                                            })
+                                        ]
                                     }),
                                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-hint",
-                                        children: "Must be a valid Git URL"
+                                        children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
+                                            type: "number",
+                                            className: "cfg-input",
+                                            placeholder: "e.g. 8000",
+                                            value: port,
+                                            onChange: (e)=>setPort(e.target.value),
+                                            min: "1",
+                                            max: "65535"
+                                        })
                                     })
                                 ]
                             }),
                             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "cfg-field",
                                 children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
-                                        type: "text",
-                                        className: `cfg-input ${urlTouched && sourceUrl && !gitUrlValid ? 'cfg-input--invalid' : ''}`,
-                                        placeholder: "https://github.com/org/repo.git",
-                                        value: sourceUrl,
-                                        onChange: handleUrlChange,
-                                        onBlur: ()=>setUrlTouched(true)
-                                    }),
-                                    urlTouched && sourceUrl && !gitUrlValid ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                        className: "cfg-field-error",
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
                                         children: [
-                                            "Must be a valid Git URL \u2014 e.g. ",
-                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("code", {
-                                                className: "cfg-code",
-                                                children: "https://github.com/org/repo.git"
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-label",
+                                                children: "Framework"
                                             }),
-                                            " or ",
-                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("code", {
-                                                className: "cfg-code",
-                                                children: "git@github.com:org/repo.git"
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-hint",
+                                                children: "Select the agent framework"
                                             })
                                         ]
-                                    }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: `cfg-url-preview ${parsedUrl && gitUrlValid ? 'visible' : ''}`,
-                                        children: parsedUrl && gitUrlValid && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("select", {
+                                            className: "cfg-input",
+                                            value: framework,
+                                            onChange: handleFrameworkChange,
                                             children: [
-                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
-                                                    className: "cfg-url-scheme",
-                                                    children: parsedUrl.scheme
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("option", {
+                                                    value: "langgraph",
+                                                    children: "LangGraph"
                                                 }),
-                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
-                                                    className: "cfg-url-host",
-                                                    children: parsedUrl.host
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("option", {
+                                                    value: "strands",
+                                                    children: "Strands"
                                                 }),
-                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
-                                                    className: "cfg-url-path",
-                                                    children: parsedUrl.path
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("option", {
+                                                    value: "crewai",
+                                                    children: "CrewAI"
+                                                }),
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("option", {
+                                                    value: "openai",
+                                                    children: "OpenAI"
                                                 })
                                             ]
                                         })
                                     })
                                 ]
-                            })
-                        ]
-                    }),
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                        className: "cfg-field",
-                        children: [
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-label",
-                                        children: "Endpoint"
-                                    }),
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-hint",
-                                        children: "Optional \xb7 agent server address"
-                                    })
-                                ]
-                            }),
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
-                                    type: "text",
-                                    className: "cfg-input",
-                                    placeholder: "e.g. http://localhost:8000",
-                                    value: endpoint,
-                                    onChange: (e)=>setEndpoint(e.target.value)
-                                })
-                            })
-                        ]
-                    }),
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                        className: "cfg-field",
-                        children: [
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-label",
-                                        children: "Port"
-                                    }),
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-hint",
-                                        children: "Optional \xb7 numeric port number"
-                                    })
-                                ]
-                            }),
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
-                                    type: "number",
-                                    className: "cfg-input",
-                                    placeholder: "e.g. 8000",
-                                    value: port,
-                                    onChange: (e)=>setPort(e.target.value),
-                                    min: "1",
-                                    max: "65535"
-                                })
-                            })
-                        ]
-                    }),
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                        className: "cfg-field",
-                        children: [
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-label",
-                                        children: "Framework"
-                                    }),
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-hint",
-                                        children: "Select the agent framework"
-                                    })
-                                ]
-                            }),
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("select", {
-                                    className: "cfg-input",
-                                    value: framework,
-                                    onChange: handleFrameworkChange,
-                                    children: [
-                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("option", {
-                                            value: "langgraph",
-                                            children: "LangGraph"
-                                        }),
-                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("option", {
-                                            value: "strands",
-                                            children: "Strands"
-                                        }),
-                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("option", {
-                                            value: "crewai",
-                                            children: "CrewAI"
-                                        }),
-                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("option", {
-                                            value: "openai",
-                                            children: "OpenAI"
-                                        })
-                                    ]
-                                })
-                            })
-                        ]
-                    }),
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                        className: "cfg-field",
-                        children: [
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-label",
-                                        children: "Tags"
-                                    }),
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-hint",
-                                        children: "Optional \xb7 add descriptive tags"
-                                    })
-                                ]
                             }),
                             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "cfg-field",
                                 children: [
                                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                        className: "cfg-list-input-container",
                                         children: [
-                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
-                                                type: "text",
-                                                className: "cfg-input",
-                                                placeholder: "Enter a tag and press Enter",
-                                                value: tagInput,
-                                                onChange: (e)=>setTagInput(e.target.value),
-                                                onKeyDown: handleTagKeyPress
-                                            }),
-                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
-                                                type: "button",
-                                                className: "cfg-list-add-btn",
-                                                onClick: handleAddTag,
-                                                disabled: !tagInput.trim(),
-                                                children: "+"
-                                            })
-                                        ]
-                                    }),
-                                    tags.length > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-list-items",
-                                        children: tags.map((tag, index)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                                className: "cfg-list-item",
-                                                children: [
-                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
-                                                        className: "cfg-list-item-text",
-                                                        children: tag
-                                                    }),
-                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
-                                                        type: "button",
-                                                        className: "cfg-list-item-remove",
-                                                        onClick: ()=>handleRemoveTag(index),
-                                                        children: "\u2715"
-                                                    })
-                                                ]
-                                            }, index))
-                                    }),
-                                    tags.length === 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-list-empty",
-                                        children: "No tags added yet"
-                                    })
-                                ]
-                            })
-                        ]
-                    }),
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                        className: "cfg-field",
-                        children: [
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-label",
-                                        children: "Prompts"
-                                    }),
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-hint",
-                                        children: "Optional \xb7 add system prompts or instructions"
-                                    })
-                                ]
-                            }),
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                        className: "cfg-list-input-container",
-                                        children: [
-                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("textarea", {
-                                                className: "cfg-input cfg-textarea-compact",
-                                                placeholder: "Enter a prompt and press Enter",
-                                                value: promptInput,
-                                                onChange: (e)=>setPromptInput(e.target.value),
-                                                onKeyDown: handlePromptKeyPress,
-                                                rows: "2"
-                                            }),
-                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
-                                                type: "button",
-                                                className: "cfg-list-add-btn",
-                                                onClick: handleAddPrompt,
-                                                disabled: !promptInput.trim(),
-                                                children: "+"
-                                            })
-                                        ]
-                                    }),
-                                    prompts.length > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-list-items",
-                                        children: prompts.map((prompt, index)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                                className: "cfg-list-item cfg-list-item-prompt",
-                                                children: [
-                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
-                                                        className: "cfg-list-item-text",
-                                                        children: prompt
-                                                    }),
-                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
-                                                        type: "button",
-                                                        className: "cfg-list-item-remove",
-                                                        onClick: ()=>handleRemovePrompt(index),
-                                                        children: "\u2715"
-                                                    })
-                                                ]
-                                            }, index))
-                                    }),
-                                    prompts.length === 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-list-empty",
-                                        children: "No prompts added yet"
-                                    })
-                                ]
-                            })
-                        ]
-                    }),
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                        className: "cfg-field cfg-field--last",
-                        children: [
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-label",
-                                        children: "Status"
-                                    }),
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-field-hint",
-                                        children: "Enable immediately on register"
-                                    })
-                                ]
-                            }),
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                className: "cfg-toggle-row",
-                                children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("label", {
-                                        className: "cfg-toggle",
-                                        children: [
-                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
-                                                type: "checkbox",
-                                                checked: active,
-                                                onChange: (e)=>setActive(e.target.checked)
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-label",
+                                                children: "Tags"
                                             }),
                                             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                                className: "cfg-toggle-track"
+                                                className: "cfg-field-hint",
+                                                children: "Optional \xb7 add descriptive tags"
                                             })
                                         ]
                                     }),
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
-                                        className: `cfg-toggle-status ${active ? 'is-active' : ''}`,
-                                        children: active ? 'Active' : 'Inactive'
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                className: "cfg-list-input-container",
+                                                children: [
+                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
+                                                        type: "text",
+                                                        className: "cfg-input",
+                                                        placeholder: "Enter a tag and press Enter",
+                                                        value: tagInput,
+                                                        onChange: (e)=>setTagInput(e.target.value),
+                                                        onKeyDown: handleTagKeyPress
+                                                    }),
+                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                        type: "button",
+                                                        className: "cfg-list-add-btn",
+                                                        onClick: handleAddTag,
+                                                        disabled: !tagInput.trim(),
+                                                        children: "+"
+                                                    })
+                                                ]
+                                            }),
+                                            tags.length > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-list-items",
+                                                children: tags.map((tag, index)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                        className: "cfg-list-item",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                className: "cfg-list-item-text",
+                                                                children: tag
+                                                            }),
+                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                                type: "button",
+                                                                className: "cfg-list-item-remove",
+                                                                onClick: ()=>handleRemoveTag(index),
+                                                                children: "\u2715"
+                                                            })
+                                                        ]
+                                                    }, index))
+                                            }),
+                                            tags.length === 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-list-empty",
+                                                children: "No tags added yet"
+                                            })
+                                        ]
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "cfg-field",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-label",
+                                                children: "Prompts"
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-hint",
+                                                children: "Optional \xb7 add system prompts or instructions"
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                className: "cfg-list-input-container",
+                                                children: [
+                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("textarea", {
+                                                        className: "cfg-input cfg-textarea-compact",
+                                                        placeholder: "Enter a prompt and press Enter",
+                                                        value: promptInput,
+                                                        onChange: (e)=>setPromptInput(e.target.value),
+                                                        onKeyDown: handlePromptKeyPress,
+                                                        rows: "2"
+                                                    }),
+                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                        type: "button",
+                                                        className: "cfg-list-add-btn",
+                                                        onClick: handleAddPrompt,
+                                                        disabled: !promptInput.trim(),
+                                                        children: "+"
+                                                    })
+                                                ]
+                                            }),
+                                            prompts.length > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-list-items",
+                                                children: prompts.map((prompt, index)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                        className: "cfg-list-item cfg-list-item-prompt",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                className: "cfg-list-item-text",
+                                                                children: prompt
+                                                            }),
+                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                                type: "button",
+                                                                className: "cfg-list-item-remove",
+                                                                onClick: ()=>handleRemovePrompt(index),
+                                                                children: "\u2715"
+                                                            })
+                                                        ]
+                                                    }, index))
+                                            }),
+                                            prompts.length === 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-list-empty",
+                                                children: "No prompts added yet"
+                                            })
+                                        ]
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "cfg-field cfg-field--last",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-label",
+                                                children: "Status"
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                className: "cfg-field-hint",
+                                                children: "Enable immediately on register"
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        className: "cfg-toggle-row",
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("label", {
+                                                className: "cfg-toggle",
+                                                children: [
+                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
+                                                        type: "checkbox",
+                                                        checked: active,
+                                                        onChange: (e)=>setActive(e.target.checked)
+                                                    }),
+                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                        className: "cfg-toggle-track"
+                                                    })
+                                                ]
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                className: `cfg-toggle-status ${active ? 'is-active' : ''}`,
+                                                children: active ? 'Active' : 'Inactive'
+                                            })
+                                        ]
                                     })
                                 ]
                             })
@@ -4868,11 +4885,849 @@ function $86b15e9fc93b58c4$var$normalizeName(raw) {
                             children: [
                                 /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
                                     className: "cfg-submit-icon",
-                                    children: "+"
+                                    children: "\u2191"
                                 }),
                                 "Register Agent"
                             ]
                         })
+                    })
+                ]
+            })
+        ]
+    });
+}
+/* ── Agent Life Cycle Tab ────────────────────────────────────────────────── */ // Derives initials from an agent name for the avatar (e.g. "data_pipeline" → "DP").
+function $86b15e9fc93b58c4$var$agentInitials(name = '') {
+    return name.split(/[_\-\s]+/).filter(Boolean).slice(0, 2).map((w)=>w[0].toUpperCase()).join('');
+}
+// Cycles through a small set of avatar palette classes based on name hash.
+const $86b15e9fc93b58c4$var$LC_AVATAR_PALETTES = [
+    'lc-av-blue',
+    'lc-av-teal',
+    'lc-av-amber',
+    'lc-av-coral',
+    'lc-av-purple'
+];
+function $86b15e9fc93b58c4$var$agentAvatarClass(name = '') {
+    const hash = [
+        ...name
+    ].reduce((acc, ch)=>acc + ch.charCodeAt(0), 0);
+    return $86b15e9fc93b58c4$var$LC_AVATAR_PALETTES[hash % $86b15e9fc93b58c4$var$LC_AVATAR_PALETTES.length];
+}
+function $86b15e9fc93b58c4$var$AgentLifeCycleTab({ agentRegistryUrl: agentRegistryUrl, authToken: authToken }) {
+    const [agents, setAgents] = (0, $gXNCa$react.useState)([]);
+    const [isFetching, setIsFetching] = (0, $gXNCa$react.useState)(false); // true only while GET /info is in-flight
+    const [isActing, setIsActing] = (0, $gXNCa$react.useState)(false); // true while a lifecycle action is running
+    const [error, setError] = (0, $gXNCa$react.useState)('');
+    const [success, setSuccess] = (0, $gXNCa$react.useState)('');
+    const [page, setPage] = (0, $gXNCa$react.useState)(1);
+    // Per-agent stream state: { [agentName]: { output, isStreaming, isOpen, action } }
+    const [agentStreams, setAgentStreams] = (0, $gXNCa$react.useState)({});
+    const outputRefs = (0, $gXNCa$react.useRef)({});
+    (0, $gXNCa$react.useEffect)(()=>{
+        fetchAgents();
+    }, []);
+    // Auto-scroll each stream output as it grows
+    (0, $gXNCa$react.useEffect)(()=>{
+        Object.keys(agentStreams).forEach((name)=>{
+            const ref = outputRefs.current[name];
+            if (ref) ref.scrollTop = ref.scrollHeight;
+        });
+    }, [
+        agentStreams
+    ]);
+    const setAgentStream = (agentName, patch)=>{
+        setAgentStreams((prev)=>({
+                ...prev,
+                [agentName]: {
+                    ...prev[agentName],
+                    ...patch
+                }
+            }));
+    };
+    const fetchAgents = async ()=>{
+        setIsFetching(true);
+        setError('');
+        try {
+            const response = await fetch(`${agentRegistryUrl}/info`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                const agentsList = Array.isArray(data) ? data : data.agents ? Object.entries(data.agents).map(([name, details])=>({
+                        name: name,
+                        ...details
+                    })) : [];
+                setAgents(agentsList);
+                setPage(1);
+            } else {
+                const err = await response.json().catch(()=>({}));
+                setError(err.message || `Failed to fetch agents (${response.status})`);
+            }
+        } catch  {
+            setError('Network error. Failed to fetch agents.');
+        } finally{
+            setIsFetching(false);
+        }
+    };
+    const handleAgentAction = async (agentName, action)=>{
+        // Open the log panel and mark as streaming
+        setAgentStream(agentName, {
+            output: '',
+            isStreaming: true,
+            isOpen: true,
+            action: action
+        });
+        setIsActing(true);
+        setError('');
+        setSuccess('');
+        try {
+            const response = await fetch(`${agentRegistryUrl}/lifecycle/${agentName}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    action: action,
+                    stream_output: true
+                })
+            });
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || `Failed to ${action} agent '${agentName}' (${response.status})`);
+            }
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            const read = ()=>{
+                reader.read().then(({ done: done, value: value })=>{
+                    if (done) {
+                        const verb = action === 'redeploy' ? 'redeployed' : `${action}ed`;
+                        setSuccess(`Agent '${agentName}' ${verb} successfully.`);
+                        // Mark streaming done — panel stays open so user can read the output
+                        setAgentStream(agentName, {
+                            isStreaming: false
+                        });
+                        fetchAgents();
+                        setIsActing(false);
+                        return;
+                    }
+                    const chunk = decoder.decode(value, {
+                        stream: true
+                    });
+                    setAgentStreams((prev)=>({
+                            ...prev,
+                            [agentName]: {
+                                ...prev[agentName],
+                                output: (prev[agentName]?.output || '') + chunk
+                            }
+                        }));
+                    read();
+                }).catch((e)=>{
+                    setError(e.message);
+                    setAgentStream(agentName, {
+                        isStreaming: false
+                    });
+                    setIsActing(false);
+                });
+            };
+            read();
+        } catch (e) {
+            setError(e.message);
+            setAgentStream(agentName, {
+                isStreaming: false
+            });
+            setIsActing(false);
+        }
+    };
+    const toggleLogPanel = (agentName)=>{
+        setAgentStreams((prev)=>({
+                ...prev,
+                [agentName]: {
+                    ...prev[agentName],
+                    isOpen: !prev[agentName]?.isOpen
+                }
+            }));
+    };
+    const clearLog = (agentName)=>{
+        setAgentStreams((prev)=>({
+                ...prev,
+                [agentName]: {
+                    ...prev[agentName],
+                    output: '',
+                    isOpen: false
+                }
+            }));
+    };
+    // Search + filter state
+    const [search, setSearch] = (0, $gXNCa$react.useState)('');
+    const [statusFilter, setStatusFilter] = (0, $gXNCa$react.useState)('all'); // 'all' | 'active' | 'stopped'
+    const [expandedAgent, setExpandedAgent] = (0, $gXNCa$react.useState)(null); // name of expanded row
+    const [sortField, setSortField] = (0, $gXNCa$react.useState)('name'); // 'name' | 'status' | 'framework'
+    const [sortDir, setSortDir] = (0, $gXNCa$react.useState)('asc');
+    // Derived counts (always from full list)
+    const activeCount = agents.filter((a)=>(a.status || '').toLowerCase() === 'active').length;
+    const stoppedCount = agents.filter((a)=>(a.status || '').toLowerCase() === 'stopped').length;
+    const otherCount = agents.length - activeCount - stoppedCount;
+    // Filter + search + sort pipeline
+    const filteredAgents = agents.filter((a)=>{
+        const s = (a.status || '').toLowerCase();
+        if (statusFilter === 'active') return s === 'active';
+        if (statusFilter === 'stopped') return s === 'stopped';
+        if (statusFilter === 'other') return s !== 'active' && s !== 'stopped';
+        return true;
+    }).filter((a)=>{
+        if (!search.trim()) return true;
+        const q = search.toLowerCase();
+        return (a.name || '').toLowerCase().includes(q) || (a.description || '').toLowerCase().includes(q) || (a.framework || '').toLowerCase().includes(q) || (a.tags || []).some((t)=>t.toLowerCase().includes(q));
+    }).sort((a, b)=>{
+        let va = (a[sortField] || '').toLowerCase();
+        let vb = (b[sortField] || '').toLowerCase();
+        return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    });
+    // Pagination on filtered set
+    const LC_PAGE_SIZE_TABLE = 15;
+    const totalPages = Math.max(1, Math.ceil(filteredAgents.length / LC_PAGE_SIZE_TABLE));
+    const safePage = Math.min(page, totalPages);
+    const pageAgents = filteredAgents.slice((safePage - 1) * LC_PAGE_SIZE_TABLE, safePage * LC_PAGE_SIZE_TABLE);
+    const handleSort = (field)=>{
+        if (sortField === field) setSortDir((d)=>d === 'asc' ? 'desc' : 'asc');
+        else {
+            setSortField(field);
+            setSortDir('asc');
+        }
+    };
+    const toggleExpand = (name)=>setExpandedAgent((prev)=>prev === name ? null : name);
+    const SortIcon = ({ field: field })=>{
+        if (sortField !== field) return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+            className: "lc-th-sort lc-th-sort--inactive",
+            children: "\u2195"
+        });
+        return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+            className: "lc-th-sort",
+            children: sortDir === 'asc' ? "\u2191" : "\u2193"
+        });
+    };
+    const filterTabs = [
+        {
+            id: 'all',
+            label: 'All',
+            count: agents.length
+        },
+        {
+            id: 'active',
+            label: 'Active',
+            count: activeCount
+        },
+        {
+            id: 'stopped',
+            label: 'Stopped',
+            count: stoppedCount
+        },
+        ...otherCount > 0 ? [
+            {
+                id: 'other',
+                label: 'Other',
+                count: otherCount
+            }
+        ] : []
+    ];
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+        children: [
+            !isFetching && agents.length > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                className: "lc-summary",
+                children: [
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "lc-stat-card",
+                        children: [
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                className: "lc-stat-label",
+                                children: "Total"
+                            }),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                className: "lc-stat-value",
+                                children: agents.length
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "lc-stat-card",
+                        children: [
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                className: "lc-stat-label",
+                                children: "Active"
+                            }),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                className: "lc-stat-value lc-stat-active",
+                                children: activeCount
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "lc-stat-card",
+                        children: [
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                className: "lc-stat-label",
+                                children: "Stopped"
+                            }),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                className: "lc-stat-value lc-stat-stopped",
+                                children: stoppedCount
+                            })
+                        ]
+                    }),
+                    otherCount > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "lc-stat-card",
+                        children: [
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                className: "lc-stat-label",
+                                children: "Other"
+                            }),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                className: "lc-stat-value",
+                                children: otherCount
+                            })
+                        ]
+                    })
+                ]
+            }),
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                className: "cfg-card",
+                children: [
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "lc-toolbar",
+                        children: [
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                className: "lc-filter-tabs",
+                                children: filterTabs.map((tab)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("button", {
+                                        className: `lc-filter-tab ${statusFilter === tab.id ? 'lc-filter-tab--active' : ''}`,
+                                        onClick: ()=>{
+                                            setStatusFilter(tab.id);
+                                            setPage(1);
+                                        },
+                                        children: [
+                                            tab.label,
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                className: "lc-filter-tab-count",
+                                                children: tab.count
+                                            })
+                                        ]
+                                    }, tab.id))
+                            }),
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "lc-toolbar-right",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                        className: "lc-search-wrap",
+                                        children: [
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                className: "lc-search-icon",
+                                                children: "\u2315"
+                                            }),
+                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("input", {
+                                                type: "text",
+                                                className: "lc-search",
+                                                placeholder: "Search agents\u2026",
+                                                value: search,
+                                                onChange: (e)=>{
+                                                    setSearch(e.target.value);
+                                                    setPage(1);
+                                                }
+                                            }),
+                                            search && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                className: "lc-search-clear",
+                                                onClick: ()=>{
+                                                    setSearch('');
+                                                    setPage(1);
+                                                },
+                                                children: "\u2715"
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                        className: "cfg-button cfg-button-secondary",
+                                        onClick: fetchAgents,
+                                        disabled: isFetching,
+                                        children: isFetching ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+                                            children: [
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                    className: "cfg-spinner"
+                                                }),
+                                                "Refreshing\u2026"
+                                            ]
+                                        }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+                                            children: [
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                    className: "cfg-refresh-icon",
+                                                    children: "\u21BA"
+                                                }),
+                                                "Refresh"
+                                            ]
+                                        })
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    (error || success) && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "lc-notices",
+                        children: [
+                            error && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "cfg-notice cfg-notice-error",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                        className: "cfg-notice-icon",
+                                        children: "\u2715"
+                                    }),
+                                    error
+                                ]
+                            }),
+                            success && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "cfg-notice cfg-notice-success",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                        className: "cfg-notice-icon",
+                                        children: "\u2713"
+                                    }),
+                                    success
+                                ]
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "lc-table-wrap",
+                        children: [
+                            isFetching && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "lc-loading-row",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        className: "cfg-spinner"
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                        children: "Loading agents\u2026"
+                                    })
+                                ]
+                            }),
+                            !isFetching && filteredAgents.length === 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                className: "lc-table-empty",
+                                children: search || statusFilter !== 'all' ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+                                    children: [
+                                        "No agents match your filters. ",
+                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                            className: "lc-clear-filters",
+                                            onClick: ()=>{
+                                                setSearch('');
+                                                setStatusFilter('all');
+                                            },
+                                            children: "Clear filters"
+                                        })
+                                    ]
+                                }) : 'No agents registered yet.'
+                            }),
+                            pageAgents.length > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("table", {
+                                className: "lc-table",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("thead", {
+                                        children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("tr", {
+                                            children: [
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("th", {
+                                                    className: "lc-th lc-th-expand"
+                                                }),
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("th", {
+                                                    className: "lc-th lc-th-agent",
+                                                    onClick: ()=>handleSort('name'),
+                                                    children: [
+                                                        "Agent ",
+                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)(SortIcon, {
+                                                            field: "name"
+                                                        })
+                                                    ]
+                                                }),
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("th", {
+                                                    className: "lc-th lc-th-status",
+                                                    onClick: ()=>handleSort('status'),
+                                                    children: [
+                                                        "Status ",
+                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)(SortIcon, {
+                                                            field: "status"
+                                                        })
+                                                    ]
+                                                }),
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("th", {
+                                                    className: "lc-th lc-th-framework",
+                                                    onClick: ()=>handleSort('framework'),
+                                                    children: [
+                                                        "Framework ",
+                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)(SortIcon, {
+                                                            field: "framework"
+                                                        })
+                                                    ]
+                                                }),
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("th", {
+                                                    className: "lc-th lc-th-tags",
+                                                    children: "Tags"
+                                                }),
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("th", {
+                                                    className: "lc-th lc-th-actions",
+                                                    children: "Actions"
+                                                })
+                                            ]
+                                        })
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("tbody", {
+                                        children: pageAgents.map((agent, index)=>{
+                                            const status = (agent.status || 'unknown').toLowerCase();
+                                            const initials = $86b15e9fc93b58c4$var$agentInitials(agent.name);
+                                            const avatarCls = $86b15e9fc93b58c4$var$agentAvatarClass(agent.name || '');
+                                            const stream = agentStreams[agent.name] || {};
+                                            const isStreaming = !!stream.isStreaming;
+                                            const isLogOpen = !!stream.isOpen;
+                                            const hasLog = !!stream.output;
+                                            const isExpanded = expandedAgent === agent.name;
+                                            return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, ($parcel$interopDefault($gXNCa$react))).Fragment, {
+                                                children: [
+                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("tr", {
+                                                        className: `lc-tr ${isExpanded ? 'lc-tr--expanded' : ''} ${isStreaming ? 'lc-tr--streaming' : ''}`,
+                                                        onClick: ()=>toggleExpand(agent.name),
+                                                        children: [
+                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("td", {
+                                                                className: "lc-td lc-td-expand",
+                                                                children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                    className: `lc-chevron ${isExpanded ? 'lc-chevron--open' : ''}`,
+                                                                    children: "\u203A"
+                                                                })
+                                                            }),
+                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("td", {
+                                                                className: "lc-td lc-td-agent",
+                                                                children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                    className: "lc-row-agent",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                                            className: `lc-avatar lc-avatar--sm ${avatarCls}`,
+                                                                            children: initials
+                                                                        }),
+                                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                            className: "lc-row-agent-text",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+                                                                                    className: "lc-row-name",
+                                                                                    children: [
+                                                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                            className: "lc-agent-name-prefix",
+                                                                                            children: "/"
+                                                                                        }),
+                                                                                        agent.name || 'Unknown'
+                                                                                    ]
+                                                                                }),
+                                                                                agent.description && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                    className: "lc-row-desc",
+                                                                                    children: agent.description
+                                                                                })
+                                                                            ]
+                                                                        }),
+                                                                        isStreaming && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                            className: "lc-log-pulse",
+                                                                            title: "Action in progress"
+                                                                        })
+                                                                    ]
+                                                                })
+                                                            }),
+                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("td", {
+                                                                className: "lc-td lc-td-status",
+                                                                onClick: (e)=>e.stopPropagation(),
+                                                                children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                    className: `lc-status-badge lc-status-${status}`,
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                            className: "lc-status-dot"
+                                                                        }),
+                                                                        agent.status || 'Unknown'
+                                                                    ]
+                                                                })
+                                                            }),
+                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("td", {
+                                                                className: "lc-td lc-td-framework",
+                                                                children: agent.framework ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                    className: "lc-fw-badge",
+                                                                    children: agent.framework
+                                                                }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                    className: "lc-td-empty",
+                                                                    children: "\u2014"
+                                                                })
+                                                            }),
+                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("td", {
+                                                                className: "lc-td lc-td-tags",
+                                                                onClick: (e)=>e.stopPropagation(),
+                                                                children: agent.tags && agent.tags.length > 0 ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                    className: "lc-agent-tags lc-agent-tags--row",
+                                                                    children: [
+                                                                        agent.tags.slice(0, 3).map((tag)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+                                                                                className: "lc-tag",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-tag-hash",
+                                                                                        children: "#"
+                                                                                    }),
+                                                                                    tag
+                                                                                ]
+                                                                            }, tag)),
+                                                                        agent.tags.length > 3 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+                                                                            className: "lc-tag lc-tag--more",
+                                                                            children: [
+                                                                                "+",
+                                                                                agent.tags.length - 3
+                                                                            ]
+                                                                        })
+                                                                    ]
+                                                                }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                    className: "lc-td-empty",
+                                                                    children: "\u2014"
+                                                                })
+                                                            }),
+                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("td", {
+                                                                className: "lc-td lc-td-actions",
+                                                                onClick: (e)=>e.stopPropagation(),
+                                                                children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                    className: "lc-row-actions",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                                            className: "cfg-button lc-btn-stop lc-btn--xs",
+                                                                            onClick: ()=>handleAgentAction(agent.name, 'stop'),
+                                                                            disabled: isActing || status !== 'active',
+                                                                            title: "Stop",
+                                                                            children: "\u25A0"
+                                                                        }),
+                                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                                            className: "cfg-button lc-btn-start lc-btn--xs",
+                                                                            onClick: ()=>handleAgentAction(agent.name, 'start'),
+                                                                            disabled: isActing || status === 'active',
+                                                                            title: "Start",
+                                                                            children: "\u25B6"
+                                                                        }),
+                                                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                                            className: "cfg-button cfg-button-secondary lc-btn--xs",
+                                                                            onClick: ()=>handleAgentAction(agent.name, 'rebuild'),
+                                                                            disabled: isActing,
+                                                                            title: "Redeploy",
+                                                                            children: "\u21BA"
+                                                                        }),
+                                                                        (hasLog || isStreaming) && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                                            className: `lc-log-toggle-btn lc-btn--xs ${isLogOpen ? 'lc-log-toggle-btn--open' : ''}`,
+                                                                            onClick: ()=>toggleLogPanel(agent.name),
+                                                                            title: isLogOpen ? 'Hide logs' : 'Show logs',
+                                                                            children: "\u2261"
+                                                                        })
+                                                                    ]
+                                                                })
+                                                            })
+                                                        ]
+                                                    }),
+                                                    isExpanded && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("tr", {
+                                                        className: "lc-tr-detail",
+                                                        children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("td", {
+                                                            colSpan: 6,
+                                                            className: "lc-td-detail",
+                                                            children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                className: "lc-detail-body",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                        className: "lc-detail-meta",
+                                                                        children: [
+                                                                            agent.endpoint && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                                className: "lc-detail-meta-item",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-detail-meta-key",
+                                                                                        children: "Endpoint"
+                                                                                    }),
+                                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-detail-meta-val",
+                                                                                        children: agent.endpoint
+                                                                                    })
+                                                                                ]
+                                                                            }),
+                                                                            agent.port && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                                className: "lc-detail-meta-item",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-detail-meta-key",
+                                                                                        children: "Port"
+                                                                                    }),
+                                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-detail-meta-val",
+                                                                                        children: agent.port
+                                                                                    })
+                                                                                ]
+                                                                            }),
+                                                                            agent.framework && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                                className: "lc-detail-meta-item",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-detail-meta-key",
+                                                                                        children: "Framework"
+                                                                                    }),
+                                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-detail-meta-val",
+                                                                                        children: agent.framework
+                                                                                    })
+                                                                                ]
+                                                                            }),
+                                                                            agent.source && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                                className: "lc-detail-meta-item",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-detail-meta-key",
+                                                                                        children: "Source"
+                                                                                    }),
+                                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-detail-meta-val lc-mono",
+                                                                                        children: agent.source
+                                                                                    })
+                                                                                ]
+                                                                            })
+                                                                        ]
+                                                                    }),
+                                                                    agent.tags && agent.tags.length > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                                                        className: "lc-detail-tags",
+                                                                        children: agent.tags.map((tag)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+                                                                                className: "lc-tag",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-tag-hash",
+                                                                                        children: "#"
+                                                                                    }),
+                                                                                    tag
+                                                                                ]
+                                                                            }, tag))
+                                                                    }),
+                                                                    (hasLog || isStreaming) && isLogOpen && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                        className: "lc-stream-panel",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                                className: "lc-stream-panel-header",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-stream-panel-title",
+                                                                                        children: isStreaming ? /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+                                                                                            children: [
+                                                                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                                    className: "lc-stream-live-dot"
+                                                                                                }),
+                                                                                                "Live \u2014 ",
+                                                                                                stream.action
+                                                                                            ]
+                                                                                        }) : /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+                                                                                            children: [
+                                                                                                "Log \u2014 ",
+                                                                                                stream.action
+                                                                                            ]
+                                                                                        })
+                                                                                    }),
+                                                                                    !isStreaming && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                                                        className: "lc-stream-clear-btn",
+                                                                                        onClick: ()=>clearLog(agent.name),
+                                                                                        children: "Clear"
+                                                                                    })
+                                                                                ]
+                                                                            }),
+                                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                                className: "lc-stream-output",
+                                                                                ref: (el)=>{
+                                                                                    outputRefs.current[agent.name] = el;
+                                                                                },
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("pre", {
+                                                                                        className: "lc-stream-pre",
+                                                                                        children: stream.output || (isStreaming ? "Waiting for output\u2026" : '')
+                                                                                    }),
+                                                                                    isStreaming && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-stream-cursor",
+                                                                                        children: "\u258B"
+                                                                                    })
+                                                                                ]
+                                                                            })
+                                                                        ]
+                                                                    }),
+                                                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                                                        className: "lc-detail-actions",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                                                className: "cfg-button lc-btn-stop",
+                                                                                onClick: ()=>handleAgentAction(agent.name, 'stop'),
+                                                                                disabled: isActing || status !== 'active',
+                                                                                children: "\u25A0 Stop"
+                                                                            }),
+                                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                                                className: "cfg-button lc-btn-start",
+                                                                                onClick: ()=>handleAgentAction(agent.name, 'start'),
+                                                                                disabled: isActing || status === 'active',
+                                                                                children: "\u25B6 Start"
+                                                                            }),
+                                                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                                                                className: "cfg-button cfg-button-secondary",
+                                                                                onClick: ()=>handleAgentAction(agent.name, 'rebuild'),
+                                                                                disabled: isActing,
+                                                                                children: "\u21BA Redeploy"
+                                                                            }),
+                                                                            (hasLog || isStreaming) && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("button", {
+                                                                                className: `lc-log-toggle-btn ${isLogOpen ? 'lc-log-toggle-btn--open' : ''}`,
+                                                                                onClick: ()=>toggleLogPanel(agent.name),
+                                                                                children: [
+                                                                                    isStreaming && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                                                        className: "lc-log-pulse"
+                                                                                    }),
+                                                                                    isLogOpen ? "\u25B2 Hide Logs" : "\u25BC Show Logs"
+                                                                                ]
+                                                                            })
+                                                                        ]
+                                                                    })
+                                                                ]
+                                                            })
+                                                        })
+                                                    })
+                                                ]
+                                            }, agent.name || index);
+                                        })
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    !isFetching && filteredAgents.length > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                        className: "lc-pagination",
+                        children: [
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                className: "lc-page-info",
+                                children: filteredAgents.length === agents.length ? `${agents.length} agent${agents.length !== 1 ? 's' : ''}` : `${filteredAgents.length} of ${agents.length} agents`
+                            }),
+                            totalPages > 1 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "lc-page-controls",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                        className: "lc-page-btn",
+                                        onClick: ()=>setPage((p)=>Math.max(1, p - 1)),
+                                        disabled: safePage === 1,
+                                        children: "\u2039"
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+                                        className: "lc-page-counter",
+                                        children: [
+                                            safePage,
+                                            " / ",
+                                            totalPages
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                        className: "lc-page-btn",
+                                        onClick: ()=>setPage((p)=>Math.min(totalPages, p + 1)),
+                                        disabled: safePage === totalPages,
+                                        children: "\u203A"
+                                    })
+                                ]
+                            })
+                        ]
                     })
                 ]
             })
@@ -4887,7 +5742,7 @@ function $86b15e9fc93b58c4$var$normalizeName(raw) {
             children: [
                 /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
                     className: "cfg-token-icon",
-                    children: "\uD83D\uDD11"
+                    children: "\u25C8"
                 }),
                 /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
                     className: "cfg-token-title",
@@ -4896,6 +5751,10 @@ function $86b15e9fc93b58c4$var$normalizeName(raw) {
                 /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
                     className: "cfg-token-desc",
                     children: "Issue, rotate, and revoke authentication tokens for the agent registry. Coming soon."
+                }),
+                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                    className: "cfg-token-badge",
+                    children: "Coming soon"
                 })
             ]
         })
@@ -4907,12 +5766,17 @@ function $86b15e9fc93b58c4$export$8f6dcfe950367406({ onBack: onBack, agentRegist
         {
             id: 'register',
             label: 'Register Agent',
-            icon: "\u2295"
+            icon: "\uFF0B"
+        },
+        {
+            id: 'lifecycle',
+            label: 'Agent Lifecycle',
+            icon: "\u25CE"
         },
         {
             id: 'token',
             label: 'Tokens',
-            icon: "\uD83D\uDD11"
+            icon: "\u25C8"
         }
     ];
     return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
@@ -4985,6 +5849,10 @@ function $86b15e9fc93b58c4$export$8f6dcfe950367406({ onBack: onBack, agentRegist
                 className: "cfg-body",
                 children: [
                     activeTab === 'register' && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($86b15e9fc93b58c4$var$RegisterTab, {
+                        agentRegistryUrl: agentRegistryUrl,
+                        authToken: authToken
+                    }),
+                    activeTab === 'lifecycle' && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($86b15e9fc93b58c4$var$AgentLifeCycleTab, {
                         agentRegistryUrl: agentRegistryUrl,
                         authToken: authToken
                     }),
