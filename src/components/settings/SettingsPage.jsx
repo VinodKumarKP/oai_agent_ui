@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 // Styles for this component live in styles.css (cfg-* classes)
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
@@ -478,8 +478,6 @@ function RegisterTab({ agentRegistryUrl, authToken }) {
 
 /* ── Agent Life Cycle Tab ────────────────────────────────────────────────── */
 
-const LC_PAGE_SIZE = 5;
-
 // Derives initials from an agent name for the avatar (e.g. "data_pipeline" → "DP").
 function agentInitials(name = '') {
     return name
@@ -498,16 +496,38 @@ function agentAvatarClass(name = '') {
 }
 
 function AgentLifeCycleTab({ agentRegistryUrl, authToken }) {
-    const [agents, setAgents]     = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError]       = useState('');
-    const [success, setSuccess]   = useState('');
-    const [page, setPage]         = useState(1);
+    const [agents, setAgents] = useState([]);
+    const [isFetching, setIsFetching] = useState(false);  // true only while GET /info is in-flight
+    const [isActing, setIsActing]     = useState(false);  // true while a lifecycle action is running
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [page, setPage] = useState(1);
 
-    useEffect(() => { fetchAgents(); }, []);
+    // Per-agent stream state: { [agentName]: { output, isStreaming, isOpen, action } }
+    const [agentStreams, setAgentStreams] = useState({});
+    const outputRefs = useRef({});
+
+    useEffect(() => {
+        fetchAgents();
+    }, []);
+
+    // Auto-scroll each stream output as it grows
+    useEffect(() => {
+        Object.keys(agentStreams).forEach(name => {
+            const ref = outputRefs.current[name];
+            if (ref) ref.scrollTop = ref.scrollHeight;
+        });
+    }, [agentStreams]);
+
+    const setAgentStream = (agentName, patch) => {
+        setAgentStreams(prev => ({
+            ...prev,
+            [agentName]: { ...prev[agentName], ...patch },
+        }));
+    };
 
     const fetchAgents = async () => {
-        setIsLoading(true);
+        setIsFetching(true);
         setError('');
         try {
             const response = await fetch(`${agentRegistryUrl}/info`, {
@@ -529,14 +549,17 @@ function AgentLifeCycleTab({ agentRegistryUrl, authToken }) {
         } catch {
             setError('Network error. Failed to fetch agents.');
         } finally {
-            setIsLoading(false);
+            setIsFetching(false);
         }
     };
 
     const handleAgentAction = async (agentName, action) => {
-        setIsLoading(true);
+        // Open the log panel and mark as streaming
+        setAgentStream(agentName, { output: '', isStreaming: true, isOpen: true, action });
+        setIsActing(true);
         setError('');
         setSuccess('');
+
         try {
             const response = await fetch(`${agentRegistryUrl}/lifecycle/${agentName}`, {
                 method: 'POST',
@@ -544,56 +567,136 @@ function AgentLifeCycleTab({ agentRegistryUrl, authToken }) {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${authToken}`,
                 },
-                body: JSON.stringify({ action: action }),
+                body: JSON.stringify({ action, stream_output: true }),
             });
-            if (response.ok) {
-                const verb = action === 'refresh' ? 'redeployed' : `${action}ed`;
-                setSuccess(`Agent '${agentName}' ${verb} successfully.`);
-                fetchAgents();
-            } else {
-                const err = await response.json().catch(() => ({}));
-                setError(err.message || `Failed to ${action} agent '${agentName}' (${response.status})`);
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || `Failed to ${action} agent '${agentName}' (${response.status})`);
             }
-        } catch {
-            setError(`Network error. Failed to ${action} agent '${agentName}'.`);
-        } finally {
-            setIsLoading(false);
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+
+            const read = () => {
+                reader.read().then(({ done, value }) => {
+                    if (done) {
+                        const verb = action === 'redeploy' ? 'redeployed' : `${action}ed`;
+                        setSuccess(`Agent '${agentName}' ${verb} successfully.`);
+                        // Mark streaming done — panel stays open so user can read the output
+                        setAgentStream(agentName, { isStreaming: false });
+                        fetchAgents();
+                        setIsActing(false);
+                        return;
+                    }
+                    const chunk = decoder.decode(value, { stream: true });
+                    setAgentStreams(prev => ({
+                        ...prev,
+                        [agentName]: {
+                            ...prev[agentName],
+                            output: (prev[agentName]?.output || '') + chunk,
+                        },
+                    }));
+                    read();
+                }).catch(e => {
+                    setError(e.message);
+                    setAgentStream(agentName, { isStreaming: false });
+                    setIsActing(false);
+                });
+            };
+
+            read();
+
+        } catch (e) {
+            setError(e.message);
+            setAgentStream(agentName, { isStreaming: false });
+            setIsActing(false);
         }
     };
 
-    // Pagination math
-    const totalPages  = Math.max(1, Math.ceil(agents.length / LC_PAGE_SIZE));
-    const safePage    = Math.min(page, totalPages);
-    const pageAgents  = agents.slice((safePage - 1) * LC_PAGE_SIZE, safePage * LC_PAGE_SIZE);
+    const toggleLogPanel = (agentName) => {
+        setAgentStreams(prev => ({
+            ...prev,
+            [agentName]: { ...prev[agentName], isOpen: !prev[agentName]?.isOpen },
+        }));
+    };
 
-    // Summary counts
+    const clearLog = (agentName) => {
+        setAgentStreams(prev => ({
+            ...prev,
+            [agentName]: { ...prev[agentName], output: '', isOpen: false },
+        }));
+    };
+
+    // Search + filter state
+    const [search, setSearch]         = useState('');
+    const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'active' | 'stopped'
+    const [expandedAgent, setExpandedAgent] = useState(null); // name of expanded row
+    const [sortField, setSortField]   = useState('name');     // 'name' | 'status' | 'framework'
+    const [sortDir, setSortDir]       = useState('asc');
+
+    // Derived counts (always from full list)
     const activeCount  = agents.filter(a => (a.status || '').toLowerCase() === 'active').length;
     const stoppedCount = agents.filter(a => (a.status || '').toLowerCase() === 'stopped').length;
+    const otherCount   = agents.length - activeCount - stoppedCount;
 
-    // Pagination page numbers with ellipsis
-    const buildPageNumbers = () => {
-        if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
-        const pages = new Set([1, totalPages, safePage, safePage - 1, safePage + 1].filter(p => p >= 1 && p <= totalPages));
-        const sorted = [...pages].sort((a, b) => a - b);
-        const result = [];
-        sorted.forEach((p, i) => {
-            if (i > 0 && p - sorted[i - 1] > 1) result.push('…');
-            result.push(p);
+    // Filter + search + sort pipeline
+    const filteredAgents = agents
+        .filter(a => {
+            const s = (a.status || '').toLowerCase();
+            if (statusFilter === 'active')  return s === 'active';
+            if (statusFilter === 'stopped') return s === 'stopped';
+            if (statusFilter === 'other')   return s !== 'active' && s !== 'stopped';
+            return true;
+        })
+        .filter(a => {
+            if (!search.trim()) return true;
+            const q = search.toLowerCase();
+            return (
+                (a.name || '').toLowerCase().includes(q) ||
+                (a.description || '').toLowerCase().includes(q) ||
+                (a.framework || '').toLowerCase().includes(q) ||
+                (a.tags || []).some(t => t.toLowerCase().includes(q))
+            );
+        })
+        .sort((a, b) => {
+            let va = (a[sortField] || '').toLowerCase();
+            let vb = (b[sortField] || '').toLowerCase();
+            return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
         });
-        return result;
+
+    // Pagination on filtered set
+    const LC_PAGE_SIZE_TABLE = 15;
+    const totalPages = Math.max(1, Math.ceil(filteredAgents.length / LC_PAGE_SIZE_TABLE));
+    const safePage   = Math.min(page, totalPages);
+    const pageAgents = filteredAgents.slice((safePage - 1) * LC_PAGE_SIZE_TABLE, safePage * LC_PAGE_SIZE_TABLE);
+
+    const handleSort = (field) => {
+        if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+        else { setSortField(field); setSortDir('asc'); }
     };
+
+    const toggleExpand = (name) => setExpandedAgent(prev => prev === name ? null : name);
+
+    const SortIcon = ({ field }) => {
+        if (sortField !== field) return <span className="lc-th-sort lc-th-sort--inactive">↕</span>;
+        return <span className="lc-th-sort">{sortDir === 'asc' ? '↑' : '↓'}</span>;
+    };
+
+    const filterTabs = [
+        { id: 'all',     label: 'All',     count: agents.length },
+        { id: 'active',  label: 'Active',  count: activeCount },
+        { id: 'stopped', label: 'Stopped', count: stoppedCount },
+        ...(otherCount > 0 ? [{ id: 'other', label: 'Other', count: otherCount }] : []),
+    ];
 
     return (
         <>
-            <p className="cfg-intro">
-                Manage the lifecycle of registered agents: stop, restart, or redeploy them.
-            </p>
-
-            {/* Summary stats */}
-            {!isLoading && agents.length > 0 && (
+            {/* Summary stat bar */}
+            {!isFetching && agents.length > 0 && (
                 <div className="lc-summary">
                     <div className="lc-stat-card">
-                        <div className="lc-stat-label">Total agents</div>
+                        <div className="lc-stat-label">Total</div>
                         <div className="lc-stat-value">{agents.length}</div>
                     </div>
                     <div className="lc-stat-card">
@@ -604,189 +707,311 @@ function AgentLifeCycleTab({ agentRegistryUrl, authToken }) {
                         <div className="lc-stat-label">Stopped</div>
                         <div className="lc-stat-value lc-stat-stopped">{stoppedCount}</div>
                     </div>
+                    {otherCount > 0 && (
+                        <div className="lc-stat-card">
+                            <div className="lc-stat-label">Other</div>
+                            <div className="lc-stat-value">{otherCount}</div>
+                        </div>
+                    )}
                 </div>
             )}
 
             <div className="cfg-card">
-                <div className="cfg-card-header">
-                    <div className="cfg-card-header-text">
-                        <div className="cfg-card-title">Registered Agents</div>
-                        <div className="cfg-card-subtitle">
-                            {agents.length > 0
-                                ? `Showing ${(safePage - 1) * LC_PAGE_SIZE + 1}–${Math.min(safePage * LC_PAGE_SIZE, agents.length)} of ${agents.length}`
-                                : 'View and manage the lifecycle of your agents.'}
-                        </div>
+                {/* Toolbar: filter tabs + search + refresh */}
+                <div className="lc-toolbar">
+                    <div className="lc-filter-tabs">
+                        {filterTabs.map(tab => (
+                            <button
+                                key={tab.id}
+                                className={`lc-filter-tab ${statusFilter === tab.id ? 'lc-filter-tab--active' : ''}`}
+                                onClick={() => { setStatusFilter(tab.id); setPage(1); }}
+                            >
+                                {tab.label}
+                                <span className="lc-filter-tab-count">{tab.count}</span>
+                            </button>
+                        ))}
                     </div>
-                    <div className="cfg-card-actions">
+                    <div className="lc-toolbar-right">
+                        <div className="lc-search-wrap">
+                            <span className="lc-search-icon">⌕</span>
+                            <input
+                                type="text"
+                                className="lc-search"
+                                placeholder="Search agents…"
+                                value={search}
+                                onChange={e => { setSearch(e.target.value); setPage(1); }}
+                            />
+                            {search && (
+                                <button className="lc-search-clear" onClick={() => { setSearch(''); setPage(1); }}>✕</button>
+                            )}
+                        </div>
                         <button
                             className="cfg-button cfg-button-secondary"
                             onClick={fetchAgents}
-                            disabled={isLoading}
+                            disabled={isFetching}
                         >
-                            {isLoading ? (
-                                <><div className="cfg-spinner" />Refreshing…</>
-                            ) : (
-                                <><span className="cfg-refresh-icon">↺</span>Refresh</>
-                            )}
+                            {isFetching
+                                ? <><div className="cfg-spinner" />Refreshing…</>
+                                : <><span className="cfg-refresh-icon">↺</span>Refresh</>
+                            }
                         </button>
                     </div>
                 </div>
 
-                <div className="cfg-card-body">
-                    {isLoading && (
+                {/* Feedback notices */}
+                {(error || success) && (
+                    <div className="lc-notices">
+                        {error   && <div className="cfg-notice cfg-notice-error"><span className="cfg-notice-icon">✕</span>{error}</div>}
+                        {success && <div className="cfg-notice cfg-notice-success"><span className="cfg-notice-icon">✓</span>{success}</div>}
+                    </div>
+                )}
+
+                {/* Table */}
+                <div className="lc-table-wrap">
+                    {isFetching && (
                         <div className="lc-loading-row">
-                            <div className="cfg-spinner" />
-                            <span>Loading agents…</span>
-                        </div>
-                    )}
-                    {error && (
-                        <div className="cfg-notice cfg-notice-error">
-                            <span className="cfg-notice-icon">✕</span>{error}
-                        </div>
-                    )}
-                    {success && (
-                        <div className="cfg-notice cfg-notice-success">
-                            <span className="cfg-notice-icon">✓</span>{success}
+                            <div className="cfg-spinner" /><span>Loading agents…</span>
                         </div>
                     )}
 
-                    {!isLoading && agents.length === 0 && !error && (
-                        <div className="cfg-list-empty">No agents registered yet.</div>
+                    {!isFetching && filteredAgents.length === 0 && (
+                        <div className="lc-table-empty">
+                            {search || statusFilter !== 'all'
+                                ? <>No agents match your filters. <button className="lc-clear-filters" onClick={() => { setSearch(''); setStatusFilter('all'); }}>Clear filters</button></>
+                                : 'No agents registered yet.'
+                            }
+                        </div>
                     )}
 
-                    {!isLoading && pageAgents.length > 0 && (
-                        <div className="lc-agent-list">
+                    {pageAgents.length > 0 && (
+                        <table className="lc-table">
+                            <thead>
+                            <tr>
+                                <th className="lc-th lc-th-expand" />
+                                <th className="lc-th lc-th-agent" onClick={() => handleSort('name')}>
+                                    Agent <SortIcon field="name" />
+                                </th>
+                                <th className="lc-th lc-th-status" onClick={() => handleSort('status')}>
+                                    Status <SortIcon field="status" />
+                                </th>
+                                <th className="lc-th lc-th-framework" onClick={() => handleSort('framework')}>
+                                    Framework <SortIcon field="framework" />
+                                </th>
+                                <th className="lc-th lc-th-tags">Tags</th>
+                                <th className="lc-th lc-th-actions">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                             {pageAgents.map((agent, index) => {
-                                const status    = (agent.status || 'unknown').toLowerCase();
-                                const initials  = agentInitials(agent.name);
-                                const avatarCls = agentAvatarClass(agent.name || '');
+                                const status     = (agent.status || 'unknown').toLowerCase();
+                                const initials   = agentInitials(agent.name);
+                                const avatarCls  = agentAvatarClass(agent.name || '');
+                                const stream     = agentStreams[agent.name] || {};
+                                const isStreaming = !!stream.isStreaming;
+                                const isLogOpen  = !!stream.isOpen;
+                                const hasLog     = !!stream.output;
+                                const isExpanded = expandedAgent === agent.name;
 
                                 return (
-                                    <div key={agent.name || index} className="lc-agent-card">
-                                        {/* Card top: avatar + name + status */}
-                                        <div className="lc-agent-top">
-                                            <div className={`lc-avatar ${avatarCls}`}>{initials}</div>
-                                            <div className="lc-agent-info">
-                                                <div className="lc-agent-name">
-                                                    <span className="lc-agent-name-prefix">/</span>
-                                                    {agent.name || 'Unknown Agent'}
+                                    <React.Fragment key={agent.name || index}>
+                                        {/* ── Main row ── */}
+                                        <tr
+                                            className={`lc-tr ${isExpanded ? 'lc-tr--expanded' : ''} ${isStreaming ? 'lc-tr--streaming' : ''}`}
+                                            onClick={() => toggleExpand(agent.name)}
+                                        >
+                                            {/* Expand chevron */}
+                                            <td className="lc-td lc-td-expand">
+                                                <span className={`lc-chevron ${isExpanded ? 'lc-chevron--open' : ''}`}>›</span>
+                                            </td>
+
+                                            {/* Agent name + description */}
+                                            <td className="lc-td lc-td-agent">
+                                                <div className="lc-row-agent">
+                                                    <div className={`lc-avatar lc-avatar--sm ${avatarCls}`}>{initials}</div>
+                                                    <div className="lc-row-agent-text">
+                                                            <span className="lc-row-name">
+                                                                <span className="lc-agent-name-prefix">/</span>{agent.name || 'Unknown'}
+                                                            </span>
+                                                        {agent.description && (
+                                                            <span className="lc-row-desc">{agent.description}</span>
+                                                        )}
+                                                    </div>
+                                                    {isStreaming && <span className="lc-log-pulse" title="Action in progress" />}
                                                 </div>
-                                                {agent.description && (
-                                                    <div className="lc-agent-desc">{agent.description}</div>
-                                                )}
-                                            </div>
-                                            <div className={`lc-status-badge lc-status-${status}`}>
-                                                <span className="lc-status-dot" />
-                                                {agent.status || 'Unknown'}
-                                            </div>
-                                        </div>
+                                            </td>
 
-                                        {/* Meta pills */}
-                                        {(agent.framework || agent.endpoint || agent.port) && (
-                                            <div className="lc-agent-meta">
-                                                {agent.framework && (
-                                                    <span className="lc-meta-pill">
-                                                        <span className="lc-meta-key">Framework</span>
-                                                        {agent.framework}
-                                                    </span>
-                                                )}
-                                                {agent.endpoint && (
-                                                    <span className="lc-meta-pill">
-                                                        <span className="lc-meta-key">Endpoint</span>
-                                                        {agent.endpoint}
-                                                    </span>
-                                                )}
-                                                {agent.port && (
-                                                    <span className="lc-meta-pill">
-                                                        <span className="lc-meta-key">Port</span>
-                                                        {agent.port}
-                                                    </span>
-                                                )}
-                                            </div>
+                                            {/* Status */}
+                                            <td className="lc-td lc-td-status" onClick={e => e.stopPropagation()}>
+                                                <div className={`lc-status-badge lc-status-${status}`}>
+                                                    <span className="lc-status-dot" />
+                                                    {agent.status || 'Unknown'}
+                                                </div>
+                                            </td>
+
+                                            {/* Framework */}
+                                            <td className="lc-td lc-td-framework">
+                                                {agent.framework
+                                                    ? <span className="lc-fw-badge">{agent.framework}</span>
+                                                    : <span className="lc-td-empty">—</span>
+                                                }
+                                            </td>
+
+                                            {/* Tags */}
+                                            <td className="lc-td lc-td-tags" onClick={e => e.stopPropagation()}>
+                                                {agent.tags && agent.tags.length > 0
+                                                    ? <div className="lc-agent-tags lc-agent-tags--row">
+                                                        {agent.tags.slice(0, 3).map(tag => (
+                                                            <span key={tag} className="lc-tag">
+                                                                    <span className="lc-tag-hash">#</span>{tag}
+                                                                </span>
+                                                        ))}
+                                                        {agent.tags.length > 3 && (
+                                                            <span className="lc-tag lc-tag--more">+{agent.tags.length - 3}</span>
+                                                        )}
+                                                    </div>
+                                                    : <span className="lc-td-empty">—</span>
+                                                }
+                                            </td>
+
+                                            {/* Inline action buttons */}
+                                            <td className="lc-td lc-td-actions" onClick={e => e.stopPropagation()}>
+                                                <div className="lc-row-actions">
+                                                    <button
+                                                        className="cfg-button lc-btn-stop lc-btn--xs"
+                                                        onClick={() => handleAgentAction(agent.name, 'stop')}
+                                                        disabled={isActing || status !== 'active'}
+                                                        title="Stop"
+                                                    >■</button>
+                                                    <button
+                                                        className="cfg-button lc-btn-start lc-btn--xs"
+                                                        onClick={() => handleAgentAction(agent.name, 'start')}
+                                                        disabled={isActing || status === 'active'}
+                                                        title="Start"
+                                                    >▶</button>
+                                                    <button
+                                                        className="cfg-button cfg-button-secondary lc-btn--xs"
+                                                        onClick={() => handleAgentAction(agent.name, 'rebuild')}
+                                                        disabled={isActing}
+                                                        title="Redeploy"
+                                                    >↺</button>
+                                                    {(hasLog || isStreaming) && (
+                                                        <button
+                                                            className={`lc-log-toggle-btn lc-btn--xs ${isLogOpen ? 'lc-log-toggle-btn--open' : ''}`}
+                                                            onClick={() => toggleLogPanel(agent.name)}
+                                                            title={isLogOpen ? 'Hide logs' : 'Show logs'}
+                                                        >≡</button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        {/* ── Expanded detail row ── */}
+                                        {isExpanded && (
+                                            <tr className="lc-tr-detail">
+                                                <td colSpan={6} className="lc-td-detail">
+                                                    <div className="lc-detail-body">
+                                                        {/* Meta grid */}
+                                                        <div className="lc-detail-meta">
+                                                            {agent.endpoint && (
+                                                                <div className="lc-detail-meta-item">
+                                                                    <span className="lc-detail-meta-key">Endpoint</span>
+                                                                    <span className="lc-detail-meta-val">{agent.endpoint}</span>
+                                                                </div>
+                                                            )}
+                                                            {agent.port && (
+                                                                <div className="lc-detail-meta-item">
+                                                                    <span className="lc-detail-meta-key">Port</span>
+                                                                    <span className="lc-detail-meta-val">{agent.port}</span>
+                                                                </div>
+                                                            )}
+                                                            {agent.framework && (
+                                                                <div className="lc-detail-meta-item">
+                                                                    <span className="lc-detail-meta-key">Framework</span>
+                                                                    <span className="lc-detail-meta-val">{agent.framework}</span>
+                                                                </div>
+                                                            )}
+                                                            {agent.source && (
+                                                                <div className="lc-detail-meta-item">
+                                                                    <span className="lc-detail-meta-key">Source</span>
+                                                                    <span className="lc-detail-meta-val lc-mono">{agent.source}</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* All tags */}
+                                                        {agent.tags && agent.tags.length > 0 && (
+                                                            <div className="lc-detail-tags">
+                                                                {agent.tags.map(tag => (
+                                                                    <span key={tag} className="lc-tag">
+                                                                            <span className="lc-tag-hash">#</span>{tag}
+                                                                        </span>
+                                                                ))}
+                                                            </div>
+                                                        )}
+
+                                                        {/* Stream log panel */}
+                                                        {(hasLog || isStreaming) && isLogOpen && (
+                                                            <div className="lc-stream-panel">
+                                                                <div className="lc-stream-panel-header">
+                                                                        <span className="lc-stream-panel-title">
+                                                                            {isStreaming
+                                                                                ? <><span className="lc-stream-live-dot" />Live — {stream.action}</>
+                                                                                : <>Log — {stream.action}</>
+                                                                            }
+                                                                        </span>
+                                                                    {!isStreaming && (
+                                                                        <button className="lc-stream-clear-btn" onClick={() => clearLog(agent.name)}>Clear</button>
+                                                                    )}
+                                                                </div>
+                                                                <div className="lc-stream-output" ref={el => { outputRefs.current[agent.name] = el; }}>
+                                                                        <pre className="lc-stream-pre">
+                                                                            {stream.output || (isStreaming ? 'Waiting for output…' : '')}
+                                                                        </pre>
+                                                                    {isStreaming && <span className="lc-stream-cursor">▋</span>}
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Action buttons inside detail */}
+                                                        <div className="lc-detail-actions">
+                                                            <button className="cfg-button lc-btn-stop" onClick={() => handleAgentAction(agent.name, 'stop')} disabled={isActing || status !== 'active'}>■ Stop</button>
+                                                            <button className="cfg-button lc-btn-start" onClick={() => handleAgentAction(agent.name, 'start')} disabled={isActing || status === 'active'}>▶ Start</button>
+                                                            <button className="cfg-button cfg-button-secondary" onClick={() => handleAgentAction(agent.name, 'rebuild')} disabled={isActing}>↺ Redeploy</button>
+                                                            {(hasLog || isStreaming) && (
+                                                                <button className={`lc-log-toggle-btn ${isLogOpen ? 'lc-log-toggle-btn--open' : ''}`} onClick={() => toggleLogPanel(agent.name)}>
+                                                                    {isStreaming && <span className="lc-log-pulse" />}
+                                                                    {isLogOpen ? '▲ Hide Logs' : '▼ Show Logs'}
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         )}
-
-                                        {/* Tag chips */}
-                                        {agent.tags && agent.tags.length > 0 && (
-                                            <div className="lc-agent-tags">
-                                                {agent.tags.map(tag => (
-                                                    <span key={tag} className="lc-tag">{tag}</span>
-                                                ))}
-                                            </div>
-                                        )}
-
-                                        <div className="lc-card-divider" />
-
-                                        {/* Actions */}
-                                        <div className="lc-agent-actions">
-                                            <button
-                                                className="cfg-button lc-btn-stop"
-                                                onClick={() => handleAgentAction(agent.name, 'stop')}
-                                                disabled={isLoading || status !== 'active'}
-                                            >
-                                                Stop
-                                            </button>
-                                            <button
-                                                className="cfg-button lc-btn-start"
-                                                onClick={() => handleAgentAction(agent.name, 'start')}
-                                                disabled={isLoading || status === 'active'}
-                                            >
-                                                Start
-                                            </button>
-                                            <button
-                                                className="cfg-button cfg-button-secondary"
-                                                onClick={() => handleAgentAction(agent.name, 'rebuild')}
-                                                disabled={isLoading}
-                                            >
-                                                Rebuild
-                                            </button>
-                                        </div>
-                                    </div>
+                                    </React.Fragment>
                                 );
                             })}
-                        </div>
+                            </tbody>
+                        </table>
                     )}
                 </div>
 
                 {/* Pagination footer */}
-                {!isLoading && totalPages > 1 && (
+                {!isFetching && filteredAgents.length > 0 && (
                     <div className="lc-pagination">
-                        <button
-                            className="lc-page-btn"
-                            onClick={() => setPage(p => Math.max(1, p - 1))}
-                            disabled={safePage === 1}
-                            aria-label="Previous page"
-                        >
-                            ‹
-                        </button>
-
-                        {buildPageNumbers().map((item, i) =>
-                            item === '…' ? (
-                                <span key={`ellipsis-${i}`} className="lc-page-ellipsis">…</span>
-                            ) : (
-                                <button
-                                    key={item}
-                                    className={`lc-page-btn ${safePage === item ? 'lc-page-active' : ''}`}
-                                    onClick={() => setPage(item)}
-                                    aria-label={`Page ${item}`}
-                                    aria-current={safePage === item ? 'page' : undefined}
-                                >
-                                    {item}
-                                </button>
-                            )
-                        )}
-
-                        <button
-                            className="lc-page-btn"
-                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                            disabled={safePage === totalPages}
-                            aria-label="Next page"
-                        >
-                            ›
-                        </button>
-
                         <span className="lc-page-info">
-                            {safePage} / {totalPages}
+                            {filteredAgents.length === agents.length
+                                ? `${agents.length} agent${agents.length !== 1 ? 's' : ''}`
+                                : `${filteredAgents.length} of ${agents.length} agents`
+                            }
                         </span>
+                        {totalPages > 1 && (
+                            <div className="lc-page-controls">
+                                <button className="lc-page-btn" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage === 1}>‹</button>
+                                <span className="lc-page-counter">{safePage} / {totalPages}</span>
+                                <button className="lc-page-btn" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}>›</button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
