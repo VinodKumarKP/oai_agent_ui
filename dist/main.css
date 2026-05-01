@@ -1520,7 +1520,6 @@ body, html, #root {
 }
 
 .agent-list {
-  flex: 1;
   margin: 0;
   padding: 6px;
   list-style: none;
@@ -2733,6 +2732,112 @@ body, html, #root {
   border-radius: 3px;
   padding: 1px 4px;
   font-size: 10.5px;
+}
+
+.cfg-list-input-container {
+  align-items: flex-start;
+  gap: 8px;
+  display: flex;
+}
+
+.cfg-list-add-btn {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--oai-input-border);
+  background: var(--oai-input-bg);
+  width: 36px;
+  height: 36px;
+  color: var(--oai-text-muted);
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  transition: all .18s var(--ease-ui);
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  display: flex;
+}
+
+.cfg-list-add-btn:hover:not(:disabled) {
+  background: var(--oai-primary-dim);
+  color: var(--oai-primary);
+  border-color: #38beff66;
+}
+
+.cfg-list-add-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.cfg-textarea-compact {
+  resize: vertical;
+  min-height: 60px !important;
+}
+
+.cfg-list-items {
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  display: flex;
+}
+
+.cfg-list-item {
+  background: var(--oai-bg);
+  border: 1px solid var(--oai-border);
+  border-radius: var(--radius-sm);
+  transition: all .15s var(--ease-ui);
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  display: flex;
+}
+
+.cfg-list-item:hover {
+  border-color: var(--oai-primary);
+  background: #ffffff05;
+}
+
+.cfg-list-item-text {
+  color: var(--oai-text);
+  word-break: break-word;
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.cfg-list-item.cfg-list-item-prompt .cfg-list-item-text {
+  color: var(--oai-text-muted);
+  max-height: 60px;
+  font-size: 12px;
+  overflow-y: auto;
+}
+
+.cfg-list-item-remove {
+  color: var(--oai-text-disabled);
+  cursor: pointer;
+  transition: all .15s var(--ease-ui);
+  background: none;
+  border: none;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 4px;
+  font-size: 14px;
+  display: flex;
+}
+
+.cfg-list-item-remove:hover {
+  color: var(--oai-error);
+  transform: scale(1.1);
+}
+
+.cfg-list-empty {
+  color: var(--oai-text-disabled);
+  margin-top: 8px;
+  padding: 6px 0;
+  font-size: 11px;
+  font-style: italic;
 }
 
 @keyframes tcl-fade-in {

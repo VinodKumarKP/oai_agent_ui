@@ -4253,11 +4253,18 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
     const [name, setName] = (0, $5OpyM$useState)('');
     const [description, setDescription] = (0, $5OpyM$useState)('');
     const [sourceUrl, setSourceUrl] = (0, $5OpyM$useState)('');
+    const [endpoint, setEndpoint] = (0, $5OpyM$useState)('');
+    const [port, setPort] = (0, $5OpyM$useState)('');
+    const [framework, setFramework] = (0, $5OpyM$useState)('langgraph');
+    const [tags, setTags] = (0, $5OpyM$useState)([]);
+    const [tagInput, setTagInput] = (0, $5OpyM$useState)('');
+    const [prompts, setPrompts] = (0, $5OpyM$useState)([]);
+    const [promptInput, setPromptInput] = (0, $5OpyM$useState)('');
     const [active, setActive] = (0, $5OpyM$useState)(true);
     const [isLoading, setIsLoading] = (0, $5OpyM$useState)(false);
     const [error, setError] = (0, $5OpyM$useState)('');
     const [success, setSuccess] = (0, $5OpyM$useState)('');
-    // Derived validation state (shown only when field has been touched)
+    // Touched states for validation
     const [nameTouched, setNameTouched] = (0, $5OpyM$useState)(false);
     const [descTouched, setDescTouched] = (0, $5OpyM$useState)(false);
     const [urlTouched, setUrlTouched] = (0, $5OpyM$useState)(false);
@@ -4276,6 +4283,47 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
     const handleUrlChange = (e)=>{
         setSourceUrl(e.target.value);
         setUrlTouched(true);
+    };
+    const handleFrameworkChange = (e)=>{
+        setFramework(e.target.value);
+    };
+    const handleAddTag = ()=>{
+        const trimmed = tagInput.trim();
+        if (trimmed && !tags.includes(trimmed)) {
+            setTags([
+                ...tags,
+                trimmed
+            ]);
+            setTagInput('');
+        }
+    };
+    const handleRemoveTag = (index)=>{
+        setTags(tags.filter((_, i)=>i !== index));
+    };
+    const handleTagKeyPress = (e)=>{
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleAddTag();
+        }
+    };
+    const handleAddPrompt = ()=>{
+        const trimmed = promptInput.trim();
+        if (trimmed && !prompts.includes(trimmed)) {
+            setPrompts([
+                ...prompts,
+                trimmed
+            ]);
+            setPromptInput('');
+        }
+    };
+    const handleRemovePrompt = (index)=>{
+        setPrompts(prompts.filter((_, i)=>i !== index));
+    };
+    const handlePromptKeyPress = (e)=>{
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleAddPrompt();
+        }
     };
     const validate = ()=>{
         if (!name.trim()) return 'Name is required.';
@@ -4306,9 +4354,14 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
                 body: JSON.stringify({
                     name: name.trim(),
                     description: description.trim(),
-                    source_url: sourceUrl.trim(),
+                    source: sourceUrl.trim(),
+                    endpoint: endpoint.trim() || null,
+                    port: port ? parseInt(port, 10) : null,
+                    framework: framework,
+                    tags: tags,
+                    prompts: prompts,
                     active: active,
-                    registered_via: 'dynamic'
+                    registered_via: 'registry'
                 })
             });
             if (response.ok) {
@@ -4316,13 +4369,19 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
                 setName('');
                 setDescription('');
                 setSourceUrl('');
+                setEndpoint('');
+                setPort('');
+                setFramework('langgraph');
                 setActive(true);
+                setTags([]);
+                setPrompts('');
                 setNameTouched(false);
                 setDescTouched(false);
                 setUrlTouched(false);
             } else {
                 const err = await response.json().catch(()=>({}));
-                setError(err.message || err.detail || `Registration failed (${response.status})`);
+                const errorMsg = err.message || (typeof err.detail === 'string' ? err.detail : err.detail?.msg || JSON.stringify(err.detail)) || `Registration failed (${response.status})`;
+                setError(errorMsg);
             }
         } catch  {
             setError('Network error. Please try again.');
@@ -4486,6 +4545,228 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
                                                 })
                                             ]
                                         })
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                        className: "cfg-field",
+                        children: [
+                            /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-field-label",
+                                        children: "Endpoint"
+                                    }),
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-field-hint",
+                                        children: "Optional \xb7 agent server address"
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                children: /*#__PURE__*/ (0, $5OpyM$jsx)("input", {
+                                    type: "text",
+                                    className: "cfg-input",
+                                    placeholder: "e.g. http://localhost:8000",
+                                    value: endpoint,
+                                    onChange: (e)=>setEndpoint(e.target.value)
+                                })
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                        className: "cfg-field",
+                        children: [
+                            /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-field-label",
+                                        children: "Port"
+                                    }),
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-field-hint",
+                                        children: "Optional \xb7 numeric port number"
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                children: /*#__PURE__*/ (0, $5OpyM$jsx)("input", {
+                                    type: "number",
+                                    className: "cfg-input",
+                                    placeholder: "e.g. 8000",
+                                    value: port,
+                                    onChange: (e)=>setPort(e.target.value),
+                                    min: "1",
+                                    max: "65535"
+                                })
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                        className: "cfg-field",
+                        children: [
+                            /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-field-label",
+                                        children: "Framework"
+                                    }),
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-field-hint",
+                                        children: "Select the agent framework"
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                children: /*#__PURE__*/ (0, $5OpyM$jsxs)("select", {
+                                    className: "cfg-input",
+                                    value: framework,
+                                    onChange: handleFrameworkChange,
+                                    children: [
+                                        /*#__PURE__*/ (0, $5OpyM$jsx)("option", {
+                                            value: "langgraph",
+                                            children: "LangGraph"
+                                        }),
+                                        /*#__PURE__*/ (0, $5OpyM$jsx)("option", {
+                                            value: "strands",
+                                            children: "Strands"
+                                        }),
+                                        /*#__PURE__*/ (0, $5OpyM$jsx)("option", {
+                                            value: "crewai",
+                                            children: "CrewAI"
+                                        }),
+                                        /*#__PURE__*/ (0, $5OpyM$jsx)("option", {
+                                            value: "openai",
+                                            children: "OpenAI"
+                                        })
+                                    ]
+                                })
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                        className: "cfg-field",
+                        children: [
+                            /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-field-label",
+                                        children: "Tags"
+                                    }),
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-field-hint",
+                                        children: "Optional \xb7 add descriptive tags"
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                        className: "cfg-list-input-container",
+                                        children: [
+                                            /*#__PURE__*/ (0, $5OpyM$jsx)("input", {
+                                                type: "text",
+                                                className: "cfg-input",
+                                                placeholder: "Enter a tag and press Enter",
+                                                value: tagInput,
+                                                onChange: (e)=>setTagInput(e.target.value),
+                                                onKeyDown: handleTagKeyPress
+                                            }),
+                                            /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                                type: "button",
+                                                className: "cfg-list-add-btn",
+                                                onClick: handleAddTag,
+                                                disabled: !tagInput.trim(),
+                                                children: "+"
+                                            })
+                                        ]
+                                    }),
+                                    tags.length > 0 && /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-list-items",
+                                        children: tags.map((tag, index)=>/*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                                className: "cfg-list-item",
+                                                children: [
+                                                    /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                                                        className: "cfg-list-item-text",
+                                                        children: tag
+                                                    }),
+                                                    /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                                        type: "button",
+                                                        className: "cfg-list-item-remove",
+                                                        onClick: ()=>handleRemoveTag(index),
+                                                        children: "\u2715"
+                                                    })
+                                                ]
+                                            }, index))
+                                    }),
+                                    tags.length === 0 && /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-list-empty",
+                                        children: "No tags added yet"
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                        className: "cfg-field",
+                        children: [
+                            /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-field-label",
+                                        children: "Prompts"
+                                    }),
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-field-hint",
+                                        children: "Optional \xb7 add system prompts or instructions"
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                        className: "cfg-list-input-container",
+                                        children: [
+                                            /*#__PURE__*/ (0, $5OpyM$jsx)("textarea", {
+                                                className: "cfg-input cfg-textarea-compact",
+                                                placeholder: "Enter a prompt and press Enter",
+                                                value: promptInput,
+                                                onChange: (e)=>setPromptInput(e.target.value),
+                                                onKeyDown: handlePromptKeyPress,
+                                                rows: "2"
+                                            }),
+                                            /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                                type: "button",
+                                                className: "cfg-list-add-btn",
+                                                onClick: handleAddPrompt,
+                                                disabled: !promptInput.trim(),
+                                                children: "+"
+                                            })
+                                        ]
+                                    }),
+                                    prompts.length > 0 && /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-list-items",
+                                        children: prompts.map((prompt, index)=>/*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                                className: "cfg-list-item cfg-list-item-prompt",
+                                                children: [
+                                                    /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                                                        className: "cfg-list-item-text",
+                                                        children: prompt
+                                                    }),
+                                                    /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                                        type: "button",
+                                                        className: "cfg-list-item-remove",
+                                                        onClick: ()=>handleRemovePrompt(index),
+                                                        children: "\u2715"
+                                                    })
+                                                ]
+                                            }, index))
+                                    }),
+                                    prompts.length === 0 && /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        className: "cfg-list-empty",
+                                        children: "No prompts added yet"
                                     })
                                 ]
                             })
