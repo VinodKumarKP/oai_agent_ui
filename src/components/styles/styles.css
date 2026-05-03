@@ -3665,3 +3665,279 @@ html,
   min-width: 40px;
   text-align: center;
 }
+/* ── Version Management UI ───────────────────────────────────────────────── */
+
+.lc-version-section {
+  margin: 14px 0 10px;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--oai-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lc-version-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.lc-version-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--oai-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.lc-version-current-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  background: rgba(56,190,255,0.12);
+  color: var(--oai-accent);
+  border: 1px solid rgba(56,190,255,0.25);
+  letter-spacing: 0.01em;
+}
+
+.lc-version-unknown-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 500;
+  background: rgba(255,255,255,0.04);
+  color: var(--oai-text-dim);
+  border: 1px solid var(--oai-border);
+  font-style: italic;
+}
+
+.lc-version-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.lc-version-select-wrap {
+  flex: 1;
+  min-width: 180px;
+}
+
+.lc-version-select {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  background: var(--oai-input-bg);
+  border: 1px solid var(--oai-input-border);
+  color: var(--oai-text);
+  font-size: 12.5px;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+  transition: border-color 0.15s;
+}
+
+.lc-version-select:focus {
+  border-color: rgba(56,190,255,0.5);
+  box-shadow: 0 0 0 2px rgba(56,190,255,0.1);
+}
+
+.lc-version-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lc-version-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s var(--ease-ui);
+  white-space: nowrap;
+  /* default: neutral reinstall */
+  background: rgba(255,255,255,0.06);
+  color: var(--oai-text);
+  border-color: var(--oai-border);
+}
+
+.lc-version-apply-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.1);
+}
+
+.lc-version-apply-btn--upgrade {
+  background: rgba(56,190,255,0.12);
+  color: var(--oai-accent);
+  border-color: rgba(56,190,255,0.3);
+}
+
+.lc-version-apply-btn--upgrade:hover:not(:disabled) {
+  background: rgba(56,190,255,0.22);
+  border-color: rgba(56,190,255,0.5);
+  box-shadow: 0 0 0 2px rgba(56,190,255,0.1);
+}
+
+.lc-version-apply-btn--downgrade {
+  background: rgba(251,146,60,0.1);
+  color: #fb923c;
+  border-color: rgba(251,146,60,0.3);
+}
+
+.lc-version-apply-btn--downgrade:hover:not(:disabled) {
+  background: rgba(251,146,60,0.2);
+  border-color: rgba(251,146,60,0.5);
+  box-shadow: 0 0 0 2px rgba(251,146,60,0.1);
+}
+
+.lc-version-apply-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.lc-version-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lc-version-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  border: 1px solid var(--oai-border);
+  background: rgba(255,255,255,0.03);
+  color: var(--oai-text-muted);
+  cursor: pointer;
+  transition: all 0.13s;
+  user-select: none;
+}
+
+.lc-version-pill:hover:not(.lc-version-pill--current) {
+  background: rgba(255,255,255,0.07);
+  color: var(--oai-text);
+  border-color: rgba(255,255,255,0.15);
+}
+
+.lc-version-pill--current {
+  background: rgba(56,190,255,0.08);
+  color: var(--oai-accent);
+  border-color: rgba(56,190,255,0.2);
+  cursor: default;
+  font-weight: 500;
+}
+
+.lc-version-pill--selected:not(.lc-version-pill--current) {
+  background: rgba(255,255,255,0.1);
+  color: var(--oai-text-main);
+  border-color: rgba(255,255,255,0.25);
+}
+
+.lc-version-pill-cur-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--oai-accent);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.lc-version-no-options {
+  font-size: 12px;
+  color: var(--oai-text-dim);
+  font-style: italic;
+}
+
+/* ── Version Manager — custom version input ──────────────────────────────── */
+
+.lc-version-custom-toggle {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--oai-border);
+  border-radius: var(--radius-sm);
+  color: var(--oai-text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  padding: 2px 9px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.lc-version-custom-toggle:hover:not(:disabled) {
+  background: rgba(255,255,255,0.06);
+  color: var(--oai-text);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.lc-version-custom-toggle--active {
+  background: rgba(56,190,255,0.08);
+  color: var(--oai-accent);
+  border-color: rgba(56,190,255,0.25);
+}
+
+.lc-version-custom-toggle--active:hover:not(:disabled) {
+  background: rgba(56,190,255,0.15);
+}
+
+.lc-version-custom-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.lc-version-custom-input {
+  flex: 1;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  background: var(--oai-input-bg);
+  border: 1px solid rgba(56,190,255,0.35);
+  color: var(--oai-text);
+  font-size: 12.5px;
+  font-family: var(--font-mono);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(56,190,255,0.08);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.lc-version-custom-input:focus {
+  border-color: rgba(56,190,255,0.6);
+  box-shadow: 0 0 0 3px rgba(56,190,255,0.12);
+}
+
+.lc-version-custom-input::placeholder {
+  color: var(--oai-text-dim);
+  font-style: italic;
+}
+
+.lc-version-custom-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

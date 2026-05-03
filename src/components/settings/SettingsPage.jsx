@@ -495,6 +495,122 @@ function agentAvatarClass(name = '') {
     return LC_AVATAR_PALETTES[hash % LC_AVATAR_PALETTES.length];
 }
 
+/* ── Version Manager (sub-component of AgentLifeCycleTab) ────────────────── */
+function getUpdateLabel(selected, current) {
+    if (!selected || !current) return 'Update';
+    const toNum = v => v.replace(/[^0-9.]/g, '').split('.').map(Number);
+    const a = toNum(selected);
+    const b = toNum(current);
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+        const ai = a[i] || 0;
+        const bi = b[i] || 0;
+        if (ai > bi) return 'Upgrade ↑';
+        if (ai < bi) return 'Downgrade ↓';
+    }
+    return 'Reinstall';
+}
+
+function VersionManager({ agent, selectedVer, isActing, onSelectVersion, onApply }) {
+    const [customVer, setCustomVer] = useState('');
+    const [useCustom, setUseCustom] = useState(false);
+
+    const currentVer    = agent.current_version;
+    const availableVers = agent.available_versions || [];
+    const otherVers     = availableVers.filter(v => v !== currentVer);
+
+    // The version that will actually be submitted
+    const targetVer = useCustom ? customVer.trim() : selectedVer;
+    const btnLabel  = getUpdateLabel(targetVer, currentVer);
+    const isUpgrade   = btnLabel.startsWith('Upgrade');
+    const isDowngrade = btnLabel.startsWith('Downgrade');
+
+    const handleToggleCustom = () => {
+        setUseCustom(prev => !prev);
+        setCustomVer('');
+        if (!useCustom) onSelectVersion(''); // clear dropdown selection when switching to custom
+    };
+
+    return (
+        <div className="lc-version-section">
+            <div className="lc-version-header">
+                <span className="lc-version-title">Container Image Version</span>
+                {currentVer
+                    ? <span className="lc-version-current-badge">{currentVer}</span>
+                    : <span className="lc-version-unknown-badge">No version info</span>
+                }
+                <button
+                    className={`lc-version-custom-toggle ${useCustom ? 'lc-version-custom-toggle--active' : ''}`}
+                    onClick={handleToggleCustom}
+                    disabled={isActing}
+                    title={useCustom ? 'Switch to version picker' : 'Enter a custom version tag'}
+                >
+                    {useCustom ? '← Pick from list' : '+ Custom version'}
+                </button>
+            </div>
+
+            <div className="lc-version-controls">
+                {useCustom ? (
+                    <input
+                        className="lc-version-custom-input"
+                        type="text"
+                        placeholder="e.g. v1.0.6, latest, sha-abc123"
+                        value={customVer}
+                        onChange={e => setCustomVer(e.target.value)}
+                        disabled={isActing}
+                        autoFocus
+                    />
+                ) : otherVers.length > 0 ? (
+                    <div className="lc-version-select-wrap">
+                        <select
+                            className="lc-version-select"
+                            value={selectedVer}
+                            onChange={e => onSelectVersion(e.target.value)}
+                            disabled={isActing}
+                        >
+                            <option value="">— Select target version —</option>
+                            {otherVers.map(v => (
+                                <option key={v} value={v}>{v}</option>
+                            ))}
+                        </select>
+                    </div>
+                ) : (
+                    <div className="lc-version-no-options">
+                        No other versions available — use custom version to specify one.
+                    </div>
+                )}
+
+                <button
+                    className={`lc-version-apply-btn ${isUpgrade ? 'lc-version-apply-btn--upgrade' : ''} ${isDowngrade ? 'lc-version-apply-btn--downgrade' : ''}`}
+                    disabled={!targetVer || isActing}
+                    onClick={() => onApply(targetVer)}
+                >
+                    {btnLabel}
+                </button>
+            </div>
+
+            {availableVers.length > 0 && (
+                <div className="lc-version-pills">
+                    {availableVers.map(v => (
+                        <span
+                            key={v}
+                            className={`lc-version-pill ${v === currentVer ? 'lc-version-pill--current' : ''} ${!useCustom && v === selectedVer ? 'lc-version-pill--selected' : ''}`}
+                            onClick={() => {
+                                if (v === currentVer || isActing) return;
+                                setUseCustom(false);
+                                onSelectVersion(v);
+                            }}
+                            title={v === currentVer ? 'Current version' : `Select ${v}`}
+                        >
+                            {v}
+                            {v === currentVer && <span className="lc-version-pill-cur-dot" />}
+                        </span>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
 function AgentLifeCycleTab({ agentRegistryUrl, authToken }) {
     const [agents, setAgents] = useState([]);
     const [isFetching, setIsFetching] = useState(false);  // true only while GET /info is in-flight
@@ -506,6 +622,9 @@ function AgentLifeCycleTab({ agentRegistryUrl, authToken }) {
     // Per-agent stream state: { [agentName]: { output, isStreaming, isOpen, action } }
     const [agentStreams, setAgentStreams] = useState({});
     const outputRefs = useRef({});
+
+    // Per-agent selected version for upgrade/downgrade: { [agentName]: versionString }
+    const [selectedVersions, setSelectedVersions] = useState({});
 
     useEffect(() => {
         fetchAgents();
@@ -584,6 +703,66 @@ function AgentLifeCycleTab({ agentRegistryUrl, authToken }) {
                         const verb = action === 'redeploy' ? 'redeployed' : `${action}ed`;
                         setSuccess(`Agent '${agentName}' ${verb} successfully.`);
                         // Mark streaming done — panel stays open so user can read the output
+                        setAgentStream(agentName, { isStreaming: false });
+                        fetchAgents();
+                        setIsActing(false);
+                        return;
+                    }
+                    const chunk = decoder.decode(value, { stream: true });
+                    setAgentStreams(prev => ({
+                        ...prev,
+                        [agentName]: {
+                            ...prev[agentName],
+                            output: (prev[agentName]?.output || '') + chunk,
+                        },
+                    }));
+                    read();
+                }).catch(e => {
+                    setError(e.message);
+                    setAgentStream(agentName, { isStreaming: false });
+                    setIsActing(false);
+                });
+            };
+
+            read();
+
+        } catch (e) {
+            setError(e.message);
+            setAgentStream(agentName, { isStreaming: false });
+            setIsActing(false);
+        }
+    };
+
+    const handleVersionUpdate = async (agentName, targetVersion, currentVersion) => {
+        if (!targetVersion) return;
+        const action = 'update';
+        setAgentStream(agentName, { output: '', isStreaming: true, isOpen: true, action: `update → ${targetVersion}` });
+        setIsActing(true);
+        setError('');
+        setSuccess('');
+
+        try {
+            const response = await fetch(`${agentRegistryUrl}/lifecycle/${agentName}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({ action, version: targetVersion, stream_output: true }),
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || `Failed to update agent '${agentName}' to ${targetVersion} (${response.status})`);
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+
+            const read = () => {
+                reader.read().then(({ done, value }) => {
+                    if (done) {
+                        setSuccess(`Agent '${agentName}' updated to ${targetVersion} successfully.`);
                         setAgentStream(agentName, { isStreaming: false });
                         fetchAgents();
                         setIsActing(false);
@@ -948,6 +1127,15 @@ function AgentLifeCycleTab({ agentRegistryUrl, authToken }) {
                                                                 ))}
                                                             </div>
                                                         )}
+
+                                                        {/* Version management */}
+                                                        <VersionManager
+                                                            agent={agent}
+                                                            selectedVer={selectedVersions[agent.name] || ''}
+                                                            isActing={isActing}
+                                                            onSelectVersion={ver => setSelectedVersions(prev => ({ ...prev, [agent.name]: ver }))}
+                                                            onApply={ver => handleVersionUpdate(agent.name, ver, agent.current_version)}
+                                                        />
 
                                                         {/* Stream log panel */}
                                                         {(hasLog || isStreaming) && isLogOpen && (
