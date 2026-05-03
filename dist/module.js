@@ -4219,10 +4219,10 @@ function $1d01d57b5074c4b5$export$aa9349e63a87bac1({ agentEndpoint: agentEndpoin
 
 
 
-// Styles for this component live in styles.css (cfg-* classes)
-/* ── Helpers ─────────────────────────────────────────────────────────────── */ const $2ac663ffd8618082$var$DESCRIPTION_MIN_LENGTH = 20;
-// Parses any URL into display segments; returns null if invalid.
-function $2ac663ffd8618082$var$parseUrl(raw) {
+
+
+/* ── Helpers ─────────────────────────────────────────────────────────────── */ const $f07f82aa3d2327c0$export$60423fe9397f59f0 = 20;
+function $f07f82aa3d2327c0$export$7a5253c0f62e0150(raw) {
     try {
         const u = new URL(raw.trim());
         return {
@@ -4234,8 +4234,7 @@ function $2ac663ffd8618082$var$parseUrl(raw) {
         return null;
     }
 }
-// Returns true for valid Git remote URLs (HTTPS, SSH, and git:// protocols).
-function $2ac663ffd8618082$var$isValidGitUrl(raw) {
+function $f07f82aa3d2327c0$export$70bebcf06f7d915e(raw) {
     const s = raw.trim();
     // HTTPS: https://github.com/user/repo or https://github.com/user/repo.git
     if (/^https?:\/\/.+\/.+\/.+/.test(s)) return true;
@@ -4245,17 +4244,19 @@ function $2ac663ffd8618082$var$isValidGitUrl(raw) {
     if (/^git:\/\/.+/.test(s)) return true;
     return false;
 }
-// Replaces spaces with underscores and lowercases a name string.
-function $2ac663ffd8618082$var$normalizeName(raw) {
+function $f07f82aa3d2327c0$export$a0853eed8a0086e8(raw) {
     return raw.replace(/ /g, '_').toLowerCase();
 }
-/* ── Register Tab ────────────────────────────────────────────────────────── */ function $2ac663ffd8618082$var$RegisterTab({ agentRegistryUrl: agentRegistryUrl, authToken: authToken }) {
+
+
+function $5ae69312acd093ed$export$22e84aab505142f2({ agentRegistryUrl: agentRegistryUrl, authToken: authToken }) {
     const [name, setName] = (0, $5OpyM$useState)('');
     const [description, setDescription] = (0, $5OpyM$useState)('');
     const [sourceUrl, setSourceUrl] = (0, $5OpyM$useState)('');
     const [endpoint, setEndpoint] = (0, $5OpyM$useState)('');
     const [port, setPort] = (0, $5OpyM$useState)('');
     const [framework, setFramework] = (0, $5OpyM$useState)('langgraph');
+    const [deploymentMode, setDeploymentMode] = (0, $5OpyM$useState)('docker');
     const [tags, setTags] = (0, $5OpyM$useState)([]);
     const [tagInput, setTagInput] = (0, $5OpyM$useState)('');
     const [prompts, setPrompts] = (0, $5OpyM$useState)([]);
@@ -4268,12 +4269,12 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
     const [nameTouched, setNameTouched] = (0, $5OpyM$useState)(false);
     const [descTouched, setDescTouched] = (0, $5OpyM$useState)(false);
     const [urlTouched, setUrlTouched] = (0, $5OpyM$useState)(false);
-    const parsedUrl = $2ac663ffd8618082$var$parseUrl(sourceUrl);
-    const gitUrlValid = $2ac663ffd8618082$var$isValidGitUrl(sourceUrl);
+    const parsedUrl = (0, $f07f82aa3d2327c0$export$7a5253c0f62e0150)(sourceUrl);
+    const gitUrlValid = (0, $f07f82aa3d2327c0$export$70bebcf06f7d915e)(sourceUrl);
     const descWordCount = description.trim().split(/\s+/).filter(Boolean).length;
-    const descValid = description.trim().length >= $2ac663ffd8618082$var$DESCRIPTION_MIN_LENGTH;
+    const descValid = description.trim().length >= (0, $f07f82aa3d2327c0$export$60423fe9397f59f0);
     const handleNameChange = (e)=>{
-        setName($2ac663ffd8618082$var$normalizeName(e.target.value));
+        setName((0, $f07f82aa3d2327c0$export$a0853eed8a0086e8)(e.target.value));
         setNameTouched(true);
     };
     const handleDescChange = (e)=>{
@@ -4286,6 +4287,9 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
     };
     const handleFrameworkChange = (e)=>{
         setFramework(e.target.value);
+    };
+    const handleDeploymentModeChange = (e)=>{
+        setDeploymentMode(e.target.value);
     };
     const handleAddTag = ()=>{
         const trimmed = tagInput.trim();
@@ -4327,7 +4331,7 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
     };
     const validate = ()=>{
         if (!name.trim()) return 'Name is required.';
-        if (!descValid) return `Description must be at least ${$2ac663ffd8618082$var$DESCRIPTION_MIN_LENGTH} characters.`;
+        if (!descValid) return `Description must be at least ${0, $f07f82aa3d2327c0$export$60423fe9397f59f0} characters.`;
         if (!sourceUrl.trim()) return 'Source URL is required.';
         if (!gitUrlValid) return 'Source URL must be a valid Git URL (HTTPS, SSH, or git://).';
         return null;
@@ -4358,6 +4362,7 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
                     endpoint: endpoint.trim() || null,
                     port: port ? parseInt(port, 10) : null,
                     framework: framework,
+                    deployment_mode: deploymentMode,
                     tags: tags,
                     prompts: prompts,
                     active: active,
@@ -4372,6 +4377,7 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
                 setEndpoint('');
                 setPort('');
                 setFramework('langgraph');
+                setDeploymentMode('docker');
                 setActive(true);
                 setTags([]);
                 setPrompts('');
@@ -4463,7 +4469,7 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
                                                 className: "cfg-field-hint",
                                                 children: [
                                                     "Min ",
-                                                    $2ac663ffd8618082$var$DESCRIPTION_MIN_LENGTH,
+                                                    (0, $f07f82aa3d2327c0$export$60423fe9397f59f0),
                                                     " characters"
                                                 ]
                                             })
@@ -4484,7 +4490,7 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
                                                     className: "cfg-field-error",
                                                     children: [
                                                         "At least ",
-                                                        $2ac663ffd8618082$var$DESCRIPTION_MIN_LENGTH,
+                                                        (0, $f07f82aa3d2327c0$export$60423fe9397f59f0),
                                                         " characters required (",
                                                         description.trim().length,
                                                         " so far)."
@@ -4655,6 +4661,44 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
                                                 /*#__PURE__*/ (0, $5OpyM$jsx)("option", {
                                                     value: "openai",
                                                     children: "OpenAI"
+                                                })
+                                            ]
+                                        })
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                className: "cfg-field",
+                                children: [
+                                    /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                                className: "cfg-field-label",
+                                                children: "Deployment Mode"
+                                            }),
+                                            /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                                className: "cfg-field-hint",
+                                                children: "Select the agent deployment mode"
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        children: /*#__PURE__*/ (0, $5OpyM$jsxs)("select", {
+                                            className: "cfg-input",
+                                            value: deploymentMode,
+                                            onChange: handleDeploymentModeChange,
+                                            children: [
+                                                /*#__PURE__*/ (0, $5OpyM$jsx)("option", {
+                                                    value: "docker",
+                                                    children: "Docker"
+                                                }),
+                                                /*#__PURE__*/ (0, $5OpyM$jsx)("option", {
+                                                    value: "kubernetes",
+                                                    children: "Kubernetes"
+                                                }),
+                                                /*#__PURE__*/ (0, $5OpyM$jsx)("option", {
+                                                    value: "python_package",
+                                                    children: "Python Package"
                                                 })
                                             ]
                                         })
@@ -4884,25 +4928,146 @@ function $2ac663ffd8618082$var$normalizeName(raw) {
         ]
     });
 }
+
+
+
+
 /* ── Agent Life Cycle Tab ────────────────────────────────────────────────── */ // Derives initials from an agent name for the avatar (e.g. "data_pipeline" → "DP").
-function $2ac663ffd8618082$var$agentInitials(name = '') {
+function $8198219ff0031b60$var$agentInitials(name = '') {
     return name.split(/[_\-\s]+/).filter(Boolean).slice(0, 2).map((w)=>w[0].toUpperCase()).join('');
 }
 // Cycles through a small set of avatar palette classes based on name hash.
-const $2ac663ffd8618082$var$LC_AVATAR_PALETTES = [
+const $8198219ff0031b60$var$LC_AVATAR_PALETTES = [
     'lc-av-blue',
     'lc-av-teal',
     'lc-av-amber',
     'lc-av-coral',
     'lc-av-purple'
 ];
-function $2ac663ffd8618082$var$agentAvatarClass(name = '') {
+function $8198219ff0031b60$var$agentAvatarClass(name = '') {
     const hash = [
         ...name
     ].reduce((acc, ch)=>acc + ch.charCodeAt(0), 0);
-    return $2ac663ffd8618082$var$LC_AVATAR_PALETTES[hash % $2ac663ffd8618082$var$LC_AVATAR_PALETTES.length];
+    return $8198219ff0031b60$var$LC_AVATAR_PALETTES[hash % $8198219ff0031b60$var$LC_AVATAR_PALETTES.length];
 }
-function $2ac663ffd8618082$var$AgentLifeCycleTab({ agentRegistryUrl: agentRegistryUrl, authToken: authToken }) {
+/* ── Version Manager (sub-component of AgentLifeCycleTab) ────────────────── */ function $8198219ff0031b60$var$getUpdateLabel(selected, current) {
+    if (!selected || !current) return 'Update';
+    const toNum = (v)=>v.replace(/[^0-9.]/g, '').split('.').map(Number);
+    const a = toNum(selected);
+    const b = toNum(current);
+    for(let i = 0; i < Math.max(a.length, b.length); i++){
+        const ai = a[i] || 0;
+        const bi = b[i] || 0;
+        if (ai > bi) return "Upgrade \u2191";
+        if (ai < bi) return "Downgrade \u2193";
+    }
+    return 'Reinstall';
+}
+function $8198219ff0031b60$var$VersionManager({ agent: agent, selectedVer: selectedVer, isActing: isActing, onSelectVersion: onSelectVersion, onApply: onApply }) {
+    const [customVer, setCustomVer] = (0, $5OpyM$useState)('');
+    const [useCustom, setUseCustom] = (0, $5OpyM$useState)(false);
+    const currentVer = agent.current_version;
+    const availableVers = agent.available_versions || [];
+    const otherVers = availableVers.filter((v)=>v !== currentVer);
+    // The version that will actually be submitted
+    const targetVer = useCustom ? customVer.trim() : selectedVer;
+    const btnLabel = $8198219ff0031b60$var$getUpdateLabel(targetVer, currentVer);
+    const isUpgrade = btnLabel.startsWith('Upgrade');
+    const isDowngrade = btnLabel.startsWith('Downgrade');
+    const handleToggleCustom = ()=>{
+        setUseCustom((prev)=>!prev);
+        setCustomVer('');
+        if (!useCustom) onSelectVersion(''); // clear dropdown selection when switching to custom
+    };
+    return /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+        className: "lc-version-section",
+        children: [
+            /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                className: "lc-version-header",
+                children: [
+                    /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                        className: "lc-version-title",
+                        children: "Container Image Version"
+                    }),
+                    currentVer ? /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                        className: "lc-version-current-badge",
+                        children: currentVer
+                    }) : /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                        className: "lc-version-unknown-badge",
+                        children: "No version info"
+                    }),
+                    /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                        className: `lc-version-custom-toggle ${useCustom ? 'lc-version-custom-toggle--active' : ''}`,
+                        onClick: handleToggleCustom,
+                        disabled: isActing,
+                        title: useCustom ? 'Switch to version picker' : 'Enter a custom version tag',
+                        children: useCustom ? "\u2190 Pick from list" : '+ Custom version'
+                    })
+                ]
+            }),
+            /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                className: "lc-version-controls",
+                children: [
+                    useCustom ? /*#__PURE__*/ (0, $5OpyM$jsx)("input", {
+                        className: "lc-version-custom-input",
+                        type: "text",
+                        placeholder: "e.g. v1.0.6, latest, sha-abc123",
+                        value: customVer,
+                        onChange: (e)=>setCustomVer(e.target.value),
+                        disabled: isActing,
+                        autoFocus: true
+                    }) : otherVers.length > 0 ? /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                        className: "lc-version-select-wrap",
+                        children: /*#__PURE__*/ (0, $5OpyM$jsxs)("select", {
+                            className: "lc-version-select",
+                            value: selectedVer,
+                            onChange: (e)=>onSelectVersion(e.target.value),
+                            disabled: isActing,
+                            children: [
+                                /*#__PURE__*/ (0, $5OpyM$jsx)("option", {
+                                    value: "",
+                                    children: "\u2014 Select target version \u2014"
+                                }),
+                                otherVers.map((v)=>/*#__PURE__*/ (0, $5OpyM$jsx)("option", {
+                                        value: v,
+                                        children: v
+                                    }, v))
+                            ]
+                        })
+                    }) : /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                        className: "lc-version-no-options",
+                        children: "No other versions available \u2014 use custom version to specify one."
+                    }),
+                    /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                        className: `lc-version-apply-btn ${isUpgrade ? 'lc-version-apply-btn--upgrade' : ''} ${isDowngrade ? 'lc-version-apply-btn--downgrade' : ''}`,
+                        disabled: !targetVer || isActing,
+                        onClick: ()=>onApply(targetVer),
+                        children: btnLabel
+                    })
+                ]
+            }),
+            availableVers.length > 0 && /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                className: "lc-version-pills",
+                children: availableVers.map((v)=>/*#__PURE__*/ (0, $5OpyM$jsxs)("span", {
+                        className: `lc-version-pill ${v === currentVer ? 'lc-version-pill--current' : ''} ${!useCustom && v === selectedVer ? 'lc-version-pill--selected' : ''}`,
+                        onClick: ()=>{
+                            if (v === currentVer || isActing) return;
+                            setUseCustom(false);
+                            onSelectVersion(v);
+                        },
+                        title: v === currentVer ? 'Current version' : `Select ${v}`,
+                        children: [
+                            v,
+                            v === currentVer && /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                                className: "lc-version-pill-cur-dot"
+                            })
+                        ]
+                    }, v))
+            })
+        ]
+    });
+}
+function $8198219ff0031b60$export$ddee814a694c1fcc({ agentRegistryUrl: agentRegistryUrl, authToken: authToken }) {
     const [agents, setAgents] = (0, $5OpyM$useState)([]);
     const [isFetching, setIsFetching] = (0, $5OpyM$useState)(false); // true only while GET /info is in-flight
     const [isActing, setIsActing] = (0, $5OpyM$useState)(false); // true while a lifecycle action is running
@@ -4912,6 +5077,8 @@ function $2ac663ffd8618082$var$AgentLifeCycleTab({ agentRegistryUrl: agentRegist
     // Per-agent stream state: { [agentName]: { output, isStreaming, isOpen, action } }
     const [agentStreams, setAgentStreams] = (0, $5OpyM$useState)({});
     const outputRefs = (0, $5OpyM$useRef)({});
+    // Per-agent selected version for upgrade/downgrade: { [agentName]: versionString }
+    const [selectedVersions, setSelectedVersions] = (0, $5OpyM$useState)({});
     (0, $5OpyM$useEffect)(()=>{
         fetchAgents();
     }, []);
@@ -4995,6 +5162,76 @@ function $2ac663ffd8618082$var$AgentLifeCycleTab({ agentRegistryUrl: agentRegist
                         const verb = action === 'redeploy' ? 'redeployed' : `${action}ed`;
                         setSuccess(`Agent '${agentName}' ${verb} successfully.`);
                         // Mark streaming done — panel stays open so user can read the output
+                        setAgentStream(agentName, {
+                            isStreaming: false
+                        });
+                        fetchAgents();
+                        setIsActing(false);
+                        return;
+                    }
+                    const chunk = decoder.decode(value, {
+                        stream: true
+                    });
+                    setAgentStreams((prev)=>({
+                            ...prev,
+                            [agentName]: {
+                                ...prev[agentName],
+                                output: (prev[agentName]?.output || '') + chunk
+                            }
+                        }));
+                    read();
+                }).catch((e)=>{
+                    setError(e.message);
+                    setAgentStream(agentName, {
+                        isStreaming: false
+                    });
+                    setIsActing(false);
+                });
+            };
+            read();
+        } catch (e) {
+            setError(e.message);
+            setAgentStream(agentName, {
+                isStreaming: false
+            });
+            setIsActing(false);
+        }
+    };
+    const handleVersionUpdate = async (agentName, targetVersion, currentVersion)=>{
+        if (!targetVersion) return;
+        const action = 'update';
+        setAgentStream(agentName, {
+            output: '',
+            isStreaming: true,
+            isOpen: true,
+            action: `update \u{2192} ${targetVersion}`
+        });
+        setIsActing(true);
+        setError('');
+        setSuccess('');
+        try {
+            const response = await fetch(`${agentRegistryUrl}/lifecycle/${agentName}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    action: action,
+                    version: targetVersion,
+                    stream_output: true
+                })
+            });
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || `Failed to update agent '${agentName}' to ${targetVersion} (${response.status})`);
+            }
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            const read = ()=>{
+                reader.read().then(({ done: done, value: value })=>{
+                    if (done) {
+                        setSuccess(`Agent '${agentName}' updated to ${targetVersion} successfully.`);
                         setAgentStream(agentName, {
                             isStreaming: false
                         });
@@ -5367,8 +5604,8 @@ function $2ac663ffd8618082$var$AgentLifeCycleTab({ agentRegistryUrl: agentRegist
                                     /*#__PURE__*/ (0, $5OpyM$jsx)("tbody", {
                                         children: pageAgents.map((agent, index)=>{
                                             const status = (agent.status || 'unknown').toLowerCase();
-                                            const initials = $2ac663ffd8618082$var$agentInitials(agent.name);
-                                            const avatarCls = $2ac663ffd8618082$var$agentAvatarClass(agent.name || '');
+                                            const initials = $8198219ff0031b60$var$agentInitials(agent.name);
+                                            const avatarCls = $8198219ff0031b60$var$agentAvatarClass(agent.name || '');
                                             const stream = agentStreams[agent.name] || {};
                                             const isStreaming = !!stream.isStreaming;
                                             const isLogOpen = !!stream.isOpen;
@@ -5590,6 +5827,16 @@ function $2ac663ffd8618082$var$AgentLifeCycleTab({ agentRegistryUrl: agentRegist
                                                                                 ]
                                                                             }, tag))
                                                                     }),
+                                                                    /*#__PURE__*/ (0, $5OpyM$jsx)($8198219ff0031b60$var$VersionManager, {
+                                                                        agent: agent,
+                                                                        selectedVer: selectedVersions[agent.name] || '',
+                                                                        isActing: isActing,
+                                                                        onSelectVersion: (ver)=>setSelectedVersions((prev)=>({
+                                                                                    ...prev,
+                                                                                    [agent.name]: ver
+                                                                                })),
+                                                                        onApply: (ver)=>handleVersionUpdate(agent.name, ver, agent.current_version)
+                                                                    }),
                                                                     (hasLog || isStreaming) && isLogOpen && /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
                                                                         className: "lc-stream-panel",
                                                                         children: [
@@ -5722,7 +5969,11 @@ function $2ac663ffd8618082$var$AgentLifeCycleTab({ agentRegistryUrl: agentRegist
         ]
     });
 }
-/* ── Token Tab ───────────────────────────────────────────────────────────── */ function $2ac663ffd8618082$var$TokenTab() {
+
+
+
+
+function $379ef37eb3f3ccfb$export$cd8ed73ab24942a3() {
     return /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
         className: "cfg-card",
         children: /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
@@ -5748,6 +5999,8 @@ function $2ac663ffd8618082$var$AgentLifeCycleTab({ agentRegistryUrl: agentRegist
         })
     });
 }
+
+
 function $2ac663ffd8618082$export$8f6dcfe950367406({ onBack: onBack, agentRegistryUrl: agentRegistryUrl, authToken: authToken }) {
     const [activeTab, setActiveTab] = (0, $5OpyM$useState)('register');
     const tabs = [
@@ -5836,15 +6089,15 @@ function $2ac663ffd8618082$export$8f6dcfe950367406({ onBack: onBack, agentRegist
             /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
                 className: "cfg-body",
                 children: [
-                    activeTab === 'register' && /*#__PURE__*/ (0, $5OpyM$jsx)($2ac663ffd8618082$var$RegisterTab, {
+                    activeTab === 'register' && /*#__PURE__*/ (0, $5OpyM$jsx)((0, $5ae69312acd093ed$export$22e84aab505142f2), {
                         agentRegistryUrl: agentRegistryUrl,
                         authToken: authToken
                     }),
-                    activeTab === 'lifecycle' && /*#__PURE__*/ (0, $5OpyM$jsx)($2ac663ffd8618082$var$AgentLifeCycleTab, {
+                    activeTab === 'lifecycle' && /*#__PURE__*/ (0, $5OpyM$jsx)((0, $8198219ff0031b60$export$ddee814a694c1fcc), {
                         agentRegistryUrl: agentRegistryUrl,
                         authToken: authToken
                     }),
-                    activeTab === 'token' && /*#__PURE__*/ (0, $5OpyM$jsx)($2ac663ffd8618082$var$TokenTab, {})
+                    activeTab === 'token' && /*#__PURE__*/ (0, $5OpyM$jsx)((0, $379ef37eb3f3ccfb$export$cd8ed73ab24942a3), {})
                 ]
             })
         ]
