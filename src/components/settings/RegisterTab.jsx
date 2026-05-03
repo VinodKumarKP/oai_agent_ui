@@ -1,5 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { parseUrl, isValidGitUrl, normalizeName, DESCRIPTION_MIN_LENGTH } from './helpers';
+
+/* ── Log-line helpers ────────────────────────────────────────────────────── */
+let _logId = 0;
+function makeLogLine(raw) {
+    // Try to parse JSON lines (common for structured streams)
+    let level = 'info';
+    let text  = raw;
+    try {
+        const obj = JSON.parse(raw);
+        text  = obj.message ?? obj.msg ?? obj.text ?? obj.log ?? raw;
+        level = (obj.level ?? obj.severity ?? 'info').toLowerCase();
+    } catch { /* plain text line */ }
+
+    if (!level || !['info','warn','warning','error','success','debug'].includes(level)) {
+        // Heuristic: colour lines that look like errors/warnings
+        const lower = text.toLowerCase();
+        if (/\b(error|fail|exception|traceback)\b/.test(lower)) level = 'error';
+        else if (/\b(warn|warning)\b/.test(lower))               level = 'warn';
+        else if (/\b(success|done|complete|finished)\b/.test(lower)) level = 'success';
+    }
+    if (level === 'warning') level = 'warn';
+
+    return { id: ++_logId, level, text };
+}
 
 /* ── Register Tab ────────────────────────────────────────────────────────── */
 export function RegisterTab({ agentRegistryUrl, authToken }) {
@@ -18,6 +42,20 @@ export function RegisterTab({ agentRegistryUrl, authToken }) {
     const [isLoading, setIsLoading]     = useState(false);
     const [error, setError]             = useState('');
     const [success, setSuccess]         = useState('');
+
+    // Streaming log state
+    const [logLines, setLogLines]       = useState([]);
+    const [logOpen, setLogOpen]         = useState(false);
+    const [streaming, setStreaming]     = useState(false);
+    const logEndRef                     = useRef(null);
+    const abortRef                      = useRef(null);
+
+    // Auto-scroll log panel to bottom as new lines arrive
+    useEffect(() => {
+        if (logOpen && logEndRef.current) {
+            logEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [logLines, logOpen]);
 
     // Touched states for validation
     const [nameTouched, setNameTouched]           = useState(false);
@@ -98,17 +136,34 @@ export function RegisterTab({ agentRegistryUrl, authToken }) {
         return null;
     };
 
-    const handleRegister = async () => {
+    const resetForm = () => {
+        setName(''); setDescription(''); setSourceUrl(''); setEndpoint(''); setPort('');
+        setFramework('langgraph'); setDeploymentMode('docker'); setActive(true); setTags([]); setPrompts([]);
+        setNameTouched(false); setDescTouched(false); setUrlTouched(false);
+    };
+
+    const handleRegister = useCallback(async () => {
         setNameTouched(true); setDescTouched(true); setUrlTouched(true);
         const validationError = validate();
         if (validationError) { setError(validationError); return; }
 
+        // Abort any previous stream
+        if (abortRef.current) abortRef.current.abort();
+        const controller = new AbortController();
+        abortRef.current  = controller;
+
         setIsLoading(true);
+        setStreaming(true);
         setError('');
         setSuccess('');
+        setLogLines([]);
+        setLogOpen(true);
+
+        const url = new URL(`${agentRegistryUrl}/register`);
+        url.searchParams.set('stream_output', 'true');
 
         try {
-            const response = await fetch(`${agentRegistryUrl}/register`, {
+            const response = await fetch(url.toString(), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -127,23 +182,68 @@ export function RegisterTab({ agentRegistryUrl, authToken }) {
                     active,
                     registered_via: 'registry',
                 }),
+                signal: controller.signal,
             });
 
-            if (response.ok) {
-                setSuccess('Agent registered successfully.');
-                setName(''); setDescription(''); setSourceUrl(''); setEndpoint(''); setPort('');
-                setFramework('langgraph'); setDeploymentMode('docker'); setActive(true); setTags([]); setPrompts('');
-                setNameTouched(false); setDescTouched(false); setUrlTouched(false);
-            } else {
+            if (!response.ok) {
                 const err = await response.json().catch(() => ({}));
-                const errorMsg = err.message || (typeof err.detail === 'string' ? err.detail : err.detail?.msg || JSON.stringify(err.detail)) || `Registration failed (${response.status})`;
+                const errorMsg = err.message
+                    || (typeof err.detail === 'string' ? err.detail : err.detail?.msg || JSON.stringify(err.detail))
+                    || `Registration failed (${response.status})`;
                 setError(errorMsg);
+                setStreaming(false);
+                setIsLoading(false);
+                return;
             }
-        } catch {
-            setError('Network error. Please try again.');
+
+            // --- Read the stream line by line ---
+            const reader  = response.body.getReader();
+            const decoder = new TextDecoder();
+            let   buffer  = '';
+            let   done    = false;
+
+            while (!done) {
+                const { value, done: streamDone } = await reader.read();
+                done = streamDone;
+                if (value) buffer += decoder.decode(value, { stream: true });
+
+                // Flush complete lines
+                const lines = buffer.split('\n');
+                buffer = lines.pop(); // keep incomplete last segment
+
+                const newLines = lines
+                    .map(l => l.trim())
+                    .filter(Boolean)
+                    .map(makeLogLine);
+
+                if (newLines.length) {
+                    setLogLines(prev => [...prev, ...newLines]);
+                }
+            }
+
+            // Flush any remaining buffer content
+            if (buffer.trim()) {
+                setLogLines(prev => [...prev, makeLogLine(buffer.trim())]);
+            }
+
+            setSuccess('Agent registered successfully.');
+            resetForm();
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                setError('Network error. Please try again.');
+            }
         } finally {
+            setStreaming(false);
             setIsLoading(false);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [name, description, sourceUrl, endpoint, port, framework, deploymentMode, tags, prompts, active, agentRegistryUrl, authToken]);
+
+    const handleAbort = () => {
+        if (abortRef.current) abortRef.current.abort();
+        setStreaming(false);
+        setIsLoading(false);
+        setLogLines(prev => [...prev, { id: ++_logId, level: 'warn', text: 'Registration cancelled by user.' }]);
     };
 
     return (
@@ -448,24 +548,90 @@ export function RegisterTab({ agentRegistryUrl, authToken }) {
                         </div>
                     )}
                 </div>
-                <button
-                    className="cfg-submit-btn"
-                    onClick={handleRegister}
-                    disabled={isLoading}
-                >
-                    {isLoading ? (
-                        <>
-                            <div className="cfg-spinner" />
-                            Registering…
-                        </>
-                    ) : (
-                        <>
-                            <span className="cfg-submit-icon">↑</span>
-                            Register Agent
-                        </>
+                <div className="cfg-action-btns">
+                    {streaming && (
+                        <button
+                            className="cfg-cancel-btn"
+                            onClick={handleAbort}
+                        >
+                            <span>✕</span>
+                            Cancel
+                        </button>
                     )}
-                </button>
+                    <button
+                        className="cfg-submit-btn"
+                        onClick={handleRegister}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <>
+                                <div className="cfg-spinner" />
+                                Registering…
+                            </>
+                        ) : (
+                            <>
+                                <span className="cfg-submit-icon">↑</span>
+                                Register Agent
+                            </>
+                        )}
+                    </button>
+                </div>
             </div>
+
+            {/* ── Streaming Log Panel ───────────────────────────────────────── */}
+            {logLines.length > 0 && (
+                <div className="reg-log-card">
+                    <button
+                        className="reg-log-header"
+                        onClick={() => setLogOpen(o => !o)}
+                        aria-expanded={logOpen}
+                    >
+                        <span className="reg-log-header-left">
+                            {streaming && <span className="reg-log-pulse" />}
+                            <span className="reg-log-title">
+                                {streaming ? 'Registering…' : 'Registration Log'}
+                            </span>
+                            <span className="reg-log-count">{logLines.length} lines</span>
+                        </span>
+                        <span className="reg-log-chevron" style={{ transform: logOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                            ▾
+                        </span>
+                    </button>
+
+                    {logOpen && (
+                        <div className="reg-log-body">
+                            <div className="reg-log-toolbar">
+                                <button
+                                    className="reg-log-clear-btn"
+                                    onClick={() => setLogLines([])}
+                                    disabled={streaming}
+                                >
+                                    Clear
+                                </button>
+                                <button
+                                    className="reg-log-copy-btn"
+                                    onClick={() => {
+                                        const text = logLines.map(l => `[${l.level.toUpperCase()}] ${l.text}`).join('\n');
+                                        navigator.clipboard.writeText(text);
+                                    }}
+                                >
+                                    Copy all
+                                </button>
+                            </div>
+                            <div className="reg-log-lines">
+                                {logLines.map((line, i) => (
+                                    <div key={line.id} className={`reg-log-line reg-log-line--${line.level}`}>
+                                        <span className="reg-log-lineno">{String(i + 1).padStart(3, '0')}</span>
+                                        <span className="reg-log-badge reg-log-badge--{line.level}">{line.level.toUpperCase()}</span>
+                                        <span className="reg-log-text">{line.text}</span>
+                                    </div>
+                                ))}
+                                <div ref={logEndRef} />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
         </>
     );
 }
