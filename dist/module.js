@@ -4249,6 +4249,37 @@ function $f07f82aa3d2327c0$export$a0853eed8a0086e8(raw) {
 }
 
 
+/* ── Log-line helpers ────────────────────────────────────────────────────── */ let $5ae69312acd093ed$var$_logId = 0;
+function $5ae69312acd093ed$var$makeLogLine(raw) {
+    // Try to parse JSON lines (common for structured streams)
+    let level = 'info';
+    let text = raw;
+    try {
+        const obj = JSON.parse(raw);
+        text = obj.message ?? obj.msg ?? obj.text ?? obj.log ?? raw;
+        level = (obj.level ?? obj.severity ?? 'info').toLowerCase();
+    } catch  {}
+    if (!level || ![
+        'info',
+        'warn',
+        'warning',
+        'error',
+        'success',
+        'debug'
+    ].includes(level)) {
+        // Heuristic: colour lines that look like errors/warnings
+        const lower = text.toLowerCase();
+        if (/\b(error|fail|exception|traceback)\b/.test(lower)) level = 'error';
+        else if (/\b(warn|warning)\b/.test(lower)) level = 'warn';
+        else if (/\b(success|done|complete|finished)\b/.test(lower)) level = 'success';
+    }
+    if (level === 'warning') level = 'warn';
+    return {
+        id: ++$5ae69312acd093ed$var$_logId,
+        level: level,
+        text: text
+    };
+}
 function $5ae69312acd093ed$export$22e84aab505142f2({ agentRegistryUrl: agentRegistryUrl, authToken: authToken }) {
     const [name, setName] = (0, $5OpyM$useState)('');
     const [description, setDescription] = (0, $5OpyM$useState)('');
@@ -4265,6 +4296,21 @@ function $5ae69312acd093ed$export$22e84aab505142f2({ agentRegistryUrl: agentRegi
     const [isLoading, setIsLoading] = (0, $5OpyM$useState)(false);
     const [error, setError] = (0, $5OpyM$useState)('');
     const [success, setSuccess] = (0, $5OpyM$useState)('');
+    // Streaming log state
+    const [logLines, setLogLines] = (0, $5OpyM$useState)([]);
+    const [logOpen, setLogOpen] = (0, $5OpyM$useState)(false);
+    const [streaming, setStreaming] = (0, $5OpyM$useState)(false);
+    const logEndRef = (0, $5OpyM$useRef)(null);
+    const abortRef = (0, $5OpyM$useRef)(null);
+    // Auto-scroll log panel to bottom as new lines arrive
+    (0, $5OpyM$useEffect)(()=>{
+        if (logOpen && logEndRef.current) logEndRef.current.scrollIntoView({
+            behavior: 'smooth'
+        });
+    }, [
+        logLines,
+        logOpen
+    ]);
     // Touched states for validation
     const [nameTouched, setNameTouched] = (0, $5OpyM$useState)(false);
     const [descTouched, setDescTouched] = (0, $5OpyM$useState)(false);
@@ -4336,7 +4382,22 @@ function $5ae69312acd093ed$export$22e84aab505142f2({ agentRegistryUrl: agentRegi
         if (!gitUrlValid) return 'Source URL must be a valid Git URL (HTTPS, SSH, or git://).';
         return null;
     };
-    const handleRegister = async ()=>{
+    const resetForm = ()=>{
+        setName('');
+        setDescription('');
+        setSourceUrl('');
+        setEndpoint('');
+        setPort('');
+        setFramework('langgraph');
+        setDeploymentMode('docker');
+        setActive(true);
+        setTags([]);
+        setPrompts([]);
+        setNameTouched(false);
+        setDescTouched(false);
+        setUrlTouched(false);
+    };
+    const handleRegister = (0, $5OpyM$useCallback)(async ()=>{
         setNameTouched(true);
         setDescTouched(true);
         setUrlTouched(true);
@@ -4345,11 +4406,20 @@ function $5ae69312acd093ed$export$22e84aab505142f2({ agentRegistryUrl: agentRegi
             setError(validationError);
             return;
         }
+        // Abort any previous stream
+        if (abortRef.current) abortRef.current.abort();
+        const controller = new AbortController();
+        abortRef.current = controller;
         setIsLoading(true);
+        setStreaming(true);
         setError('');
         setSuccess('');
+        setLogLines([]);
+        setLogOpen(true);
+        const url = new URL(`${agentRegistryUrl}/register`);
+        url.searchParams.set('stream_output', 'true');
         try {
-            const response = await fetch(`${agentRegistryUrl}/register`, {
+            const response = await fetch(url.toString(), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -4367,33 +4437,77 @@ function $5ae69312acd093ed$export$22e84aab505142f2({ agentRegistryUrl: agentRegi
                     prompts: prompts,
                     active: active,
                     registered_via: 'registry'
-                })
+                }),
+                signal: controller.signal
             });
-            if (response.ok) {
-                setSuccess('Agent registered successfully.');
-                setName('');
-                setDescription('');
-                setSourceUrl('');
-                setEndpoint('');
-                setPort('');
-                setFramework('langgraph');
-                setDeploymentMode('docker');
-                setActive(true);
-                setTags([]);
-                setPrompts('');
-                setNameTouched(false);
-                setDescTouched(false);
-                setUrlTouched(false);
-            } else {
+            if (!response.ok) {
                 const err = await response.json().catch(()=>({}));
                 const errorMsg = err.message || (typeof err.detail === 'string' ? err.detail : err.detail?.msg || JSON.stringify(err.detail)) || `Registration failed (${response.status})`;
                 setError(errorMsg);
+                setStreaming(false);
+                setIsLoading(false);
+                return;
             }
-        } catch  {
-            setError('Network error. Please try again.');
+            // --- Read the stream line by line ---
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let done = false;
+            while(!done){
+                const { value: value, done: streamDone } = await reader.read();
+                done = streamDone;
+                if (value) buffer += decoder.decode(value, {
+                    stream: true
+                });
+                // Flush complete lines
+                const lines = buffer.split('\n');
+                buffer = lines.pop(); // keep incomplete last segment
+                const newLines = lines.map((l)=>l.trim()).filter(Boolean).map($5ae69312acd093ed$var$makeLogLine);
+                if (newLines.length) setLogLines((prev)=>[
+                        ...prev,
+                        ...newLines
+                    ]);
+            }
+            // Flush any remaining buffer content
+            if (buffer.trim()) setLogLines((prev)=>[
+                    ...prev,
+                    $5ae69312acd093ed$var$makeLogLine(buffer.trim())
+                ]);
+            setSuccess('Agent registered successfully.');
+            resetForm();
+        } catch (err) {
+            if (err.name !== 'AbortError') setError('Network error. Please try again.');
         } finally{
+            setStreaming(false);
             setIsLoading(false);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        name,
+        description,
+        sourceUrl,
+        endpoint,
+        port,
+        framework,
+        deploymentMode,
+        tags,
+        prompts,
+        active,
+        agentRegistryUrl,
+        authToken
+    ]);
+    const handleAbort = ()=>{
+        if (abortRef.current) abortRef.current.abort();
+        setStreaming(false);
+        setIsLoading(false);
+        setLogLines((prev)=>[
+                ...prev,
+                {
+                    id: ++$5ae69312acd093ed$var$_logId,
+                    level: 'warn',
+                    text: 'Registration cancelled by user.'
+                }
+            ]);
     };
     return /*#__PURE__*/ (0, $5OpyM$jsxs)((0, $5OpyM$Fragment), {
         children: [
@@ -4902,26 +5016,128 @@ function $5ae69312acd093ed$export$22e84aab505142f2({ agentRegistryUrl: agentRegi
                             })
                         ]
                     }),
-                    /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
-                        className: "cfg-submit-btn",
-                        onClick: handleRegister,
-                        disabled: isLoading,
-                        children: isLoading ? /*#__PURE__*/ (0, $5OpyM$jsxs)((0, $5OpyM$Fragment), {
-                            children: [
-                                /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
-                                    className: "cfg-spinner"
-                                }),
-                                "Registering\u2026"
-                            ]
-                        }) : /*#__PURE__*/ (0, $5OpyM$jsxs)((0, $5OpyM$Fragment), {
-                            children: [
-                                /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
-                                    className: "cfg-submit-icon",
-                                    children: "\u2191"
-                                }),
-                                "Register Agent"
-                            ]
-                        })
+                    /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                        className: "cfg-action-btns",
+                        children: [
+                            streaming && /*#__PURE__*/ (0, $5OpyM$jsxs)("button", {
+                                className: "cfg-cancel-btn",
+                                onClick: handleAbort,
+                                children: [
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                                        children: "\u2715"
+                                    }),
+                                    "Cancel"
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                className: "cfg-submit-btn",
+                                onClick: handleRegister,
+                                disabled: isLoading,
+                                children: isLoading ? /*#__PURE__*/ (0, $5OpyM$jsxs)((0, $5OpyM$Fragment), {
+                                    children: [
+                                        /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                            className: "cfg-spinner"
+                                        }),
+                                        "Registering\u2026"
+                                    ]
+                                }) : /*#__PURE__*/ (0, $5OpyM$jsxs)((0, $5OpyM$Fragment), {
+                                    children: [
+                                        /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                                            className: "cfg-submit-icon",
+                                            children: "\u2191"
+                                        }),
+                                        "Register Agent"
+                                    ]
+                                })
+                            })
+                        ]
+                    })
+                ]
+            }),
+            logLines.length > 0 && /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                className: "reg-log-card",
+                children: [
+                    /*#__PURE__*/ (0, $5OpyM$jsxs)("button", {
+                        className: "reg-log-header",
+                        onClick: ()=>setLogOpen((o)=>!o),
+                        "aria-expanded": logOpen,
+                        children: [
+                            /*#__PURE__*/ (0, $5OpyM$jsxs)("span", {
+                                className: "reg-log-header-left",
+                                children: [
+                                    streaming && /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                                        className: "reg-log-pulse"
+                                    }),
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                                        className: "reg-log-title",
+                                        children: streaming ? "Registering\u2026" : 'Registration Log'
+                                    }),
+                                    /*#__PURE__*/ (0, $5OpyM$jsxs)("span", {
+                                        className: "reg-log-count",
+                                        children: [
+                                            logLines.length,
+                                            " lines"
+                                        ]
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                                className: "reg-log-chevron",
+                                style: {
+                                    transform: logOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                                },
+                                children: "\u25BE"
+                            })
+                        ]
+                    }),
+                    logOpen && /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                        className: "reg-log-body",
+                        children: [
+                            /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                className: "reg-log-toolbar",
+                                children: [
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                        className: "reg-log-clear-btn",
+                                        onClick: ()=>setLogLines([]),
+                                        disabled: streaming,
+                                        children: "Clear"
+                                    }),
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("button", {
+                                        className: "reg-log-copy-btn",
+                                        onClick: ()=>{
+                                            const text = logLines.map((l)=>`[${l.level.toUpperCase()}] ${l.text}`).join('\n');
+                                            navigator.clipboard.writeText(text);
+                                        },
+                                        children: "Copy all"
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                className: "reg-log-lines",
+                                children: [
+                                    logLines.map((line, i)=>/*#__PURE__*/ (0, $5OpyM$jsxs)("div", {
+                                            className: `reg-log-line reg-log-line--${line.level}`,
+                                            children: [
+                                                /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                                                    className: "reg-log-lineno",
+                                                    children: String(i + 1).padStart(3, '0')
+                                                }),
+                                                /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                                                    className: "reg-log-badge reg-log-badge--{line.level}",
+                                                    children: line.level.toUpperCase()
+                                                }),
+                                                /*#__PURE__*/ (0, $5OpyM$jsx)("span", {
+                                                    className: "reg-log-text",
+                                                    children: line.text
+                                                })
+                                            ]
+                                        }, line.id)),
+                                    /*#__PURE__*/ (0, $5OpyM$jsx)("div", {
+                                        ref: logEndRef
+                                    })
+                                ]
+                            })
+                        ]
                     })
                 ]
             })
