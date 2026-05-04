@@ -145,6 +145,9 @@ export function SidebarLayout(props) {
                         <button className="sl-refresh-btn" onClick={() => setShowSettings(true)} title="Settings">
                             Settings
                         </button>
+                        <button className="sl-refresh-btn" onClick={fetchAgents} title="Refresh">
+                            Refresh
+                        </button>
                     </div>
                     <div className="sl-search-wrap">
                         <input
