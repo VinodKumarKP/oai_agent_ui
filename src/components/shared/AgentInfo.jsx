@@ -149,116 +149,118 @@ export function AgentInfo({ agentName, agentEndpoint, authToken, onBack }) {
     const subAgents = agent_config?.agent_list ? Object.keys(agent_config.agent_list) : [];
 
     return (
-        <div className="ai-root">
+        <div className="ai-scroll-container" style={{ height: '85%', overflowY: 'auto', padding: '1.5rem' }}>
+            <div className="ai-root">
 
-            {/* ── Hero header ── */}
-            <div className="ai-hero">
-                <div className="ai-hero-avatar">
-                    {(agentInfo.agent_name ?? agentName).charAt(0).toUpperCase()}
-                </div>
-                <div className="ai-hero-text">
-                    <h1 className="ai-hero-name">{agentInfo.agent_name ?? agentName}</h1>
-                    {description && <p className="ai-hero-desc">{description}</p>}
-                    <div className="ai-hero-badges">
-                        <StatusBadge initialized={initialized} />
-                        {framework && <FrameworkBadge value={framework} />}
-                        {cloud_provider && (
-                            <span className="ai-cloud-badge">{cloud_provider}</span>
-                        )}
+                {/* ── Hero header ── */}
+                <div className="ai-hero">
+                    <div className="ai-hero-avatar">
+                        {(agentInfo.agent_name ?? agentName).charAt(0).toUpperCase()}
+                    </div>
+                    <div className="ai-hero-text">
+                        <h1 className="ai-hero-name">{agentInfo.agent_name ?? agentName}</h1>
+                        {description && <p className="ai-hero-desc">{description}</p>}
+                        <div className="ai-hero-badges">
+                            <StatusBadge initialized={initialized} />
+                            {framework && <FrameworkBadge value={framework} />}
+                            {cloud_provider && (
+                                <span className="ai-cloud-badge">{cloud_provider}</span>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* ── Quick stats bar ── */}
-            <div className="ai-stats-bar">
-                <Stat label="Auth" value={auth_enabled ? 'On' : 'Off'} />
-                <div className="ai-stats-divider" />
-                <Stat label="Isolation" value={request_isolation ? 'On' : 'Off'} />
-                <div className="ai-stats-divider" />
-                <Stat label="Tags" value={tags.length} />
-                <div className="ai-stats-divider" />
-                <Stat label="Prompts" value={prompts.length} />
-                {subAgents.length > 0 && <>
+                {/* ── Quick stats bar ── */}
+                <div className="ai-stats-bar">
+                    <Stat label="Auth" value={auth_enabled ? 'On' : 'Off'} />
                     <div className="ai-stats-divider" />
-                    <Stat label="Sub-Agents" value={subAgents.length} />
-                </>}
-            </div>
+                    <Stat label="Isolation" value={request_isolation ? 'On' : 'Off'} />
+                    <div className="ai-stats-divider" />
+                    <Stat label="Tags" value={tags.length} />
+                    <div className="ai-stats-divider" />
+                    <Stat label="Prompts" value={prompts.length} />
+                    {subAgents.length > 0 && <>
+                        <div className="ai-stats-divider" />
+                        <Stat label="Sub-Agents" value={subAgents.length} />
+                    </>}
+                </div>
 
-            {/* ── Runtime section ── */}
-            <SectionCard title="Runtime">
-                <MetaRow label="Endpoint">
-                    <code className="ai-mono-val">{endpoint}</code>
-                </MetaRow>
-                <MetaRow label="Authentication"><BoolBadge value={auth_enabled} /></MetaRow>
-                <MetaRow label="Request Isolation"><BoolBadge value={request_isolation} /></MetaRow>
-                {cloud_provider && (
-                    <MetaRow label="Cloud Provider">
-                        <span className="ai-plain-val">{cloud_provider}</span>
+                {/* ── Runtime section ── */}
+                <SectionCard title="Runtime">
+                    <MetaRow label="Endpoint">
+                        <code className="ai-mono-val">{endpoint}</code>
                     </MetaRow>
+                    <MetaRow label="Authentication"><BoolBadge value={auth_enabled} /></MetaRow>
+                    <MetaRow label="Request Isolation"><BoolBadge value={request_isolation} /></MetaRow>
+                    {cloud_provider && (
+                        <MetaRow label="Cloud Provider">
+                            <span className="ai-plain-val">{cloud_provider}</span>
+                        </MetaRow>
+                    )}
+                </SectionCard>
+
+                {/* ── Agent config section ── */}
+                {agent_config && (
+                    <SectionCard title="Configuration">
+                        {agent_config.type && (
+                            <MetaRow label="Type">
+                                <span className="ai-plain-val">{agent_config.type}</span>
+                            </MetaRow>
+                        )}
+                        {agent_config.source && (
+                            <MetaRow label="Source">
+                                <code className="ai-mono-val">{agent_config.source}</code>
+                            </MetaRow>
+                        )}
+                        {agent_config.model && (
+                            <MetaRow label="Model">
+                                <span className="ai-model-chip">
+                                    <span className="ai-model-id">{agent_config.model.model_id}</span>
+                                    {agent_config.model.temperature != null && (
+                                        <span className="ai-model-temp">
+                                            temp {agent_config.model.temperature}
+                                        </span>
+                                    )}
+                                </span>
+                            </MetaRow>
+                        )}
+                    </SectionCard>
                 )}
-            </SectionCard>
 
-            {/* ── Agent config section ── */}
-            {agent_config && (
-                <SectionCard title="Configuration">
-                    {agent_config.type && (
-                        <MetaRow label="Type">
-                            <span className="ai-plain-val">{agent_config.type}</span>
-                        </MetaRow>
-                    )}
-                    {agent_config.source && (
-                        <MetaRow label="Source">
-                            <code className="ai-mono-val">{agent_config.source}</code>
-                        </MetaRow>
-                    )}
-                    {agent_config.model && (
-                        <MetaRow label="Model">
-                            <span className="ai-model-chip">
-                                <span className="ai-model-id">{agent_config.model.model_id}</span>
-                                {agent_config.model.temperature != null && (
-                                    <span className="ai-model-temp">
-                                        temp {agent_config.model.temperature}
-                                    </span>
-                                )}
-                            </span>
-                        </MetaRow>
-                    )}
-                </SectionCard>
-            )}
+                {/* ── Sub-agents ── */}
+                {subAgents.length > 0 && (
+                    <SectionCard title="Sub-Agents">
+                        <div className="ai-subagent-grid">
+                            {subAgents.map((sa) => (
+                                <div key={sa} className="ai-subagent-chip">
+                                    <span className="ai-subagent-dot" />
+                                    {sa}
+                                </div>
+                            ))}
+                        </div>
+                    </SectionCard>
+                )}
 
-            {/* ── Sub-agents ── */}
-            {subAgents.length > 0 && (
-                <SectionCard title="Sub-Agents">
-                    <div className="ai-subagent-grid">
-                        {subAgents.map((sa) => (
-                            <div key={sa} className="ai-subagent-chip">
-                                <span className="ai-subagent-dot" />
-                                {sa}
-                            </div>
-                        ))}
-                    </div>
-                </SectionCard>
-            )}
+                {/* ── Tags ── */}
+                {tags.length > 0 && (
+                    <SectionCard title="Tags">
+                        <div className="ai-pill-row">
+                            {tags.map((t, i) => <TagPill key={i}>{t}</TagPill>)}
+                        </div>
+                    </SectionCard>
+                )}
 
-            {/* ── Tags ── */}
-            {tags.length > 0 && (
-                <SectionCard title="Tags">
-                    <div className="ai-pill-row">
-                        {tags.map((t, i) => <TagPill key={i}>{t}</TagPill>)}
-                    </div>
-                </SectionCard>
-            )}
-
-            {/* ── Prompts ── */}
-            {prompts.length > 0 && (
-                <SectionCard title="Example Prompts">
-                    <div className="ai-prompt-list">
-                        {prompts.map((p, i) => (
-                            <PromptCard key={i} text={p} index={i} />
-                        ))}
-                    </div>
-                </SectionCard>
-            )}
+                {/* ── Prompts ── */}
+                {prompts.length > 0 && (
+                    <SectionCard title="Example Prompts">
+                        <div className="ai-prompt-list">
+                            {prompts.map((p, i) => (
+                                <PromptCard key={i} text={p} index={i} />
+                            ))}
+                        </div>
+                    </SectionCard>
+                )}
+            </div>
         </div>
     );
 }
