@@ -6254,49 +6254,44 @@ function $86b15e9fc93b58c4$export$8f6dcfe950367406({ onBack: onBack, agentRegist
             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
                 className: "cfg-header",
                 children: [
-                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
                         className: "cfg-header-top",
-                        children: [
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
-                                        className: "cfg-breadcrumb",
-                                        children: [
-                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
-                                                children: "Registry"
-                                            }),
-                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
-                                                className: "cfg-breadcrumb-sep",
-                                                children: "\u203A"
-                                            }),
-                                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
-                                                className: "cfg-breadcrumb-cur",
-                                                children: "Settings"
-                                            })
-                                        ]
-                                    }),
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-title",
-                                        children: "Settings"
-                                    }),
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
-                                        className: "cfg-subtitle",
-                                        children: "Manage agent registry and authentication tokens"
-                                    })
-                                ]
-                            }),
-                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("button", {
-                                className: "cfg-back-btn",
-                                onClick: onBack,
-                                children: [
-                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
-                                        className: "cfg-back-arrow",
-                                        children: "\u2190"
-                                    }),
-                                    "Back to Registry"
-                                ]
-                            })
-                        ]
+                        children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                            children: [
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                    className: "cfg-breadcrumb",
+                                    children: [
+                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("button", {
+                                            className: "cfg-back-btn",
+                                            onClick: onBack,
+                                            children: [
+                                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                                    className: "cfg-back-arrow",
+                                                    children: "\u2190"
+                                                }),
+                                                "Registry"
+                                            ]
+                                        }),
+                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                            className: "cfg-breadcrumb-sep",
+                                            children: "\u203A"
+                                        }),
+                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                            className: "cfg-breadcrumb-cur",
+                                            children: "Settings"
+                                        })
+                                    ]
+                                }),
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                    className: "cfg-title",
+                                    children: "Settings"
+                                }),
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                    className: "cfg-subtitle",
+                                    children: "Manage agent registry and authentication tokens"
+                                })
+                            ]
+                        })
                     }),
                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
                         className: "cfg-tabs",
@@ -6329,6 +6324,383 @@ function $86b15e9fc93b58c4$export$8f6dcfe950367406({ onBack: onBack, agentRegist
                 ]
             })
         ]
+    });
+}
+
+
+
+
+/* ── Helpers ─────────────────────────────────────────────────────────────── */ function $847a683fb9dfe59a$var$StatusBadge({ initialized: initialized }) {
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+        className: `ai-status-badge ${initialized ? 'ai-status-badge--ok' : 'ai-status-badge--off'}`,
+        children: [
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                className: "ai-status-dot"
+            }),
+            initialized ? 'Initialized' : 'Not Initialized'
+        ]
+    });
+}
+function $847a683fb9dfe59a$var$BoolBadge({ value: value }) {
+    const on = value === true || value === 'true' || value === 1;
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+        className: `ai-bool-badge ${on ? 'ai-bool-badge--on' : 'ai-bool-badge--off'}`,
+        children: on ? "\u2713 Enabled" : "\u2715 Disabled"
+    });
+}
+function $847a683fb9dfe59a$var$FrameworkBadge({ value: value }) {
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+        className: "ai-fw-badge",
+        children: value
+    });
+}
+function $847a683fb9dfe59a$var$MetaRow({ label: label, children: children }) {
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+        className: "ai-meta-row",
+        children: [
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                className: "ai-meta-label",
+                children: label
+            }),
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                className: "ai-meta-value",
+                children: children
+            })
+        ]
+    });
+}
+function $847a683fb9dfe59a$var$TagPill({ children: children }) {
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+        className: "ai-pill",
+        children: children
+    });
+}
+function $847a683fb9dfe59a$var$PromptCard({ text: text, index: index }) {
+    const [expanded, setExpanded] = (0, $gXNCa$react.useState)(false);
+    const isLong = text.length > 120;
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+        className: "ai-prompt-card",
+        children: [
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                className: "ai-prompt-index",
+                children: String(index + 1).padStart(2, '0')
+            }),
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("p", {
+                className: `ai-prompt-text ${!expanded && isLong ? 'ai-prompt-text--clamp' : ''}`,
+                children: text
+            }),
+            isLong && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                className: "ai-prompt-expand",
+                onClick: ()=>setExpanded((e)=>!e),
+                children: expanded ? "Show less \u2191" : "Show more \u2193"
+            })
+        ]
+    });
+}
+function $847a683fb9dfe59a$var$SectionCard({ title: title, accent: accent, children: children }) {
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+        className: `ai-section-card ${accent ? `ai-section-card--${accent}` : ''}`,
+        children: [
+            title && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                className: "ai-section-title",
+                children: title
+            }),
+            children
+        ]
+    });
+}
+function $847a683fb9dfe59a$var$Stat({ label: label, value: value, mono: mono }) {
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+        className: "ai-stat",
+        children: [
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                className: "ai-stat-value",
+                style: mono ? {
+                    fontFamily: 'var(--font-mono)'
+                } : {},
+                children: value
+            }),
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                className: "ai-stat-label",
+                children: label
+            })
+        ]
+    });
+}
+function $847a683fb9dfe59a$export$8be561ade2b12cd5({ agentName: agentName, agentEndpoint: agentEndpoint, authToken: authToken, onBack: onBack }) {
+    const [agentInfo, setAgentInfo] = (0, $gXNCa$react.useState)(null);
+    const [isLoading, setIsLoading] = (0, $gXNCa$react.useState)(true);
+    const [error, setError] = (0, $gXNCa$react.useState)('');
+    (0, $gXNCa$react.useEffect)(()=>{
+        const fetchAgentInfo = async ()=>{
+            setIsLoading(true);
+            setError('');
+            try {
+                const baseUrl = agentEndpoint.replace(/\/a2a\/?$/, '');
+                const response = await fetch(`${baseUrl}/info`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setAgentInfo(data);
+                } else {
+                    const err = await response.json().catch(()=>({}));
+                    setError(err.message || `Failed to fetch agent info for '${agentName}' (${response.status})`);
+                }
+            } catch (e) {
+                setError(`Network error: ${e.message}`);
+            } finally{
+                setIsLoading(false);
+            }
+        };
+        if (agentName) fetchAgentInfo();
+    }, [
+        agentName,
+        agentEndpoint,
+        authToken
+    ]);
+    /* ── Loading ── */ if (isLoading) return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+        className: "ai-loading",
+        children: [
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                className: "ai-loading-ring"
+            }),
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+                className: "ai-loading-label",
+                children: [
+                    "Loading ",
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("strong", {
+                        children: agentName
+                    }),
+                    "\u2026"
+                ]
+            })
+        ]
+    });
+    /* ── Error ── */ if (error) return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+        className: "ai-error-block",
+        children: [
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                className: "ai-error-icon",
+                children: "\u26A0"
+            }),
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                children: [
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                        className: "ai-error-title",
+                        children: "Failed to load agent"
+                    }),
+                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                        className: "ai-error-msg",
+                        children: error
+                    })
+                ]
+            })
+        ]
+    });
+    if (!agentInfo) return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+        className: "cfg-list-empty",
+        children: "No information available for this agent."
+    });
+    const { description: description, cloud_provider: cloud_provider, initialized: initialized, agent_config: agent_config, auth_enabled: auth_enabled, request_isolation: request_isolation, endpoint: endpoint, framework: framework } = agentInfo;
+    const tags = agent_config?.tags ?? [];
+    const prompts = agent_config?.prompts ?? [];
+    const subAgents = agent_config?.agent_list ? Object.keys(agent_config.agent_list) : [];
+    return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+        className: "ai-scroll-container",
+        style: {
+            height: '85%',
+            overflowY: 'auto',
+            padding: '1.5rem'
+        },
+        children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+            className: "ai-root",
+            children: [
+                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                    className: "ai-hero",
+                    children: [
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                            className: "ai-hero-avatar",
+                            children: (agentInfo.agent_name ?? agentName).charAt(0).toUpperCase()
+                        }),
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                            className: "ai-hero-text",
+                            children: [
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("h1", {
+                                    className: "ai-hero-name",
+                                    children: agentInfo.agent_name ?? agentName
+                                }),
+                                description && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("p", {
+                                    className: "ai-hero-desc",
+                                    children: description
+                                }),
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                    className: "ai-hero-badges",
+                                    children: [
+                                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$StatusBadge, {
+                                            initialized: initialized
+                                        }),
+                                        framework && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$FrameworkBadge, {
+                                            value: framework
+                                        }),
+                                        cloud_provider && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                            className: "ai-cloud-badge",
+                                            children: cloud_provider
+                                        })
+                                    ]
+                                })
+                            ]
+                        })
+                    ]
+                }),
+                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                    className: "ai-stats-bar",
+                    children: [
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$Stat, {
+                            label: "Auth",
+                            value: auth_enabled ? 'On' : 'Off'
+                        }),
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                            className: "ai-stats-divider"
+                        }),
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$Stat, {
+                            label: "Isolation",
+                            value: request_isolation ? 'On' : 'Off'
+                        }),
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                            className: "ai-stats-divider"
+                        }),
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$Stat, {
+                            label: "Tags",
+                            value: tags.length
+                        }),
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                            className: "ai-stats-divider"
+                        }),
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$Stat, {
+                            label: "Prompts",
+                            value: prompts.length
+                        }),
+                        subAgents.length > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)((0, $gXNCa$reactjsxruntime.Fragment), {
+                            children: [
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                    className: "ai-stats-divider"
+                                }),
+                                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$Stat, {
+                                    label: "Sub-Agents",
+                                    value: subAgents.length
+                                })
+                            ]
+                        })
+                    ]
+                }),
+                /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)($847a683fb9dfe59a$var$SectionCard, {
+                    title: "Runtime",
+                    children: [
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$MetaRow, {
+                            label: "Endpoint",
+                            children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("code", {
+                                className: "ai-mono-val",
+                                children: endpoint
+                            })
+                        }),
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$MetaRow, {
+                            label: "Authentication",
+                            children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$BoolBadge, {
+                                value: auth_enabled
+                            })
+                        }),
+                        /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$MetaRow, {
+                            label: "Request Isolation",
+                            children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$BoolBadge, {
+                                value: request_isolation
+                            })
+                        }),
+                        cloud_provider && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$MetaRow, {
+                            label: "Cloud Provider",
+                            children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                className: "ai-plain-val",
+                                children: cloud_provider
+                            })
+                        })
+                    ]
+                }),
+                agent_config && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)($847a683fb9dfe59a$var$SectionCard, {
+                    title: "Configuration",
+                    children: [
+                        agent_config.type && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$MetaRow, {
+                            label: "Type",
+                            children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                className: "ai-plain-val",
+                                children: agent_config.type
+                            })
+                        }),
+                        agent_config.source && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$MetaRow, {
+                            label: "Source",
+                            children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("code", {
+                                className: "ai-mono-val",
+                                children: agent_config.source
+                            })
+                        }),
+                        agent_config.model && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$MetaRow, {
+                            label: "Model",
+                            children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+                                className: "ai-model-chip",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                        className: "ai-model-id",
+                                        children: agent_config.model.model_id
+                                    }),
+                                    agent_config.model.temperature != null && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
+                                        className: "ai-model-temp",
+                                        children: [
+                                            "temp ",
+                                            agent_config.model.temperature
+                                        ]
+                                    })
+                                ]
+                            })
+                        })
+                    ]
+                }),
+                subAgents.length > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$SectionCard, {
+                    title: "Sub-Agents",
+                    children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                        className: "ai-subagent-grid",
+                        children: subAgents.map((sa)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
+                                className: "ai-subagent-chip",
+                                children: [
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
+                                        className: "ai-subagent-dot"
+                                    }),
+                                    sa
+                                ]
+                            }, sa))
+                    })
+                }),
+                tags.length > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$SectionCard, {
+                    title: "Tags",
+                    children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                        className: "ai-pill-row",
+                        children: tags.map((t, i)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$TagPill, {
+                                children: t
+                            }, i))
+                    })
+                }),
+                prompts.length > 0 && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$SectionCard, {
+                    title: "Example Prompts",
+                    children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                        className: "ai-prompt-list",
+                        children: prompts.map((p, i)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($847a683fb9dfe59a$var$PromptCard, {
+                                text: p,
+                                index: i
+                            }, i))
+                    })
+                })
+            ]
+        })
     });
 }
 
@@ -6414,6 +6786,11 @@ function $af5fd50f157de9d8$var$SubTabBar({ currentView: currentView, setCurrentV
                 children: "Chat"
             }),
             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                className: `sl-sub-tab ${currentView === 'info' ? 'sl-sub-tab-active' : ''}`,
+                onClick: ()=>setCurrentView('info'),
+                children: "Info"
+            }),
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
                 className: `sl-sub-tab ${currentView === 'metrics' ? 'sl-sub-tab-active' : ''}`,
                 onClick: ()=>setCurrentView('metrics'),
                 children: "Metrics"
@@ -6433,7 +6810,7 @@ function $af5fd50f157de9d8$var$SubTabBar({ currentView: currentView, setCurrentV
 }
 function $af5fd50f157de9d8$export$8295a33ab8a36876(props) {
     const { agents: agents, filteredAgents: filteredAgents, selectedAgent: selectedAgent, selectedAgentId: selectedAgentId, message: message, searchQuery: searchQuery, attachedFiles: attachedFiles, currentMessages: currentMessages, currentTraceLogs: currentTraceLogs, showTrace: showTrace, isLoading: isLoading, chatEndRef: chatEndRef, traceEndRef: traceEndRef, textareaRef: textareaRef, fileInputRef: fileInputRef, fetchAgents: fetchAgents, handleSelectAgent: handleSelectAgent, handleClearSession: handleClearSession, handleMessageChange: handleMessageChange, handleFileSelect: handleFileSelect, removeAttachment: removeAttachment, handleStopGeneration: handleStopGeneration, handleSendMessage: handleSendMessage, setSearchQuery: setSearchQuery, setShowTrace: setShowTrace, evaluations: evaluations, expandedEvaluations: expandedEvaluations, toggleEvaluation: toggleEvaluation, agentEvals: agentEvals, authToken: authToken, agentRegistryUrl: agentRegistryUrl } = props;
-    const [currentView, setCurrentView] = (0, $gXNCa$react.useState)('chat');
+    const [currentView, setCurrentView] = (0, $gXNCa$react.useState)('info');
     const [showSettings, setShowSettings] = (0, $gXNCa$react.useState)(false);
     const [agentPage, setAgentPage] = (0, $gXNCa$react.useState)(1);
     const agentsPerPage = 15;
@@ -6482,6 +6859,12 @@ function $af5fd50f157de9d8$export$8295a33ab8a36876(props) {
                                         onClick: ()=>setShowSettings(true),
                                         title: "Settings",
                                         children: "Settings"
+                                    }),
+                                    /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                        className: "sl-refresh-btn",
+                                        onClick: fetchAgents,
+                                        title: "Refresh",
+                                        children: "Refresh"
                                     })
                                 ]
                             }),
@@ -6640,6 +7023,15 @@ function $af5fd50f157de9d8$export$8295a33ab8a36876(props) {
                                 })
                             ]
                         }),
+                        currentView === 'info' && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                            className: "sl-info-view",
+                            children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)((0, $847a683fb9dfe59a$export$8be561ade2b12cd5), {
+                                agentName: selectedAgent.name,
+                                agentEndpoint: selectedAgent.endpoint,
+                                authToken: authToken,
+                                onBack: ()=>{}
+                            })
+                        }),
                         currentView === 'metrics' && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
                             className: "sl-metrics",
                             children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)((0, $9fb5e7b00778612c$export$bfaab4c9bb3364f), {
@@ -6691,6 +7083,7 @@ function $af5fd50f157de9d8$export$8295a33ab8a36876(props) {
  * When no agent tabs are open, the center shows the card-grid launcher.
  * Receives all props from useAgentCore() via AgentUI.js.
  */ 
+
 
 
 
@@ -6844,6 +7237,11 @@ function $449b860f472a3c1e$var$SubTabBar({ currentView: currentView, setCurrentV
                 className: `tcl-sub-tab ${currentView === 'chat' ? 'tcl-sub-tab-active' : ''}`,
                 onClick: ()=>setCurrentView('chat'),
                 children: "Chat"
+            }),
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                className: `tcl-sub-tab ${currentView === 'info' ? 'tcl-sub-tab-active' : ''}`,
+                onClick: ()=>setCurrentView('info'),
+                children: "Info"
             }),
             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
                 className: `tcl-sub-tab ${currentView === 'metrics' ? 'tcl-sub-tab-active' : ''}`,
@@ -7085,7 +7483,7 @@ function $449b860f472a3c1e$var$CardGridLauncher({ agents: agents, searchQuery: s
 function $449b860f472a3c1e$export$1806ed9300cedcd4(props) {
     const { agents: agents, filteredAgents: filteredAgents, openAgents: openAgents, selectedAgent: selectedAgent, selectedAgentId: selectedAgentId, message: message, searchQuery: searchQuery, attachedFiles: attachedFiles, currentMessages: currentMessages, currentTraceLogs: currentTraceLogs, showTrace: showTrace, isLoading: isLoading, unreadCounts: unreadCounts, chatEndRef: chatEndRef, traceEndRef: traceEndRef, textareaRef: textareaRef, fileInputRef: fileInputRef, fetchAgents: fetchAgents, handleSelectAgent: handleSelectAgent, handleCloseTab: handleCloseTab, handleClearSession: handleClearSession, handleMessageChange: handleMessageChange, handleFileSelect: handleFileSelect, removeAttachment: removeAttachment, handleStopGeneration: handleStopGeneration, handleSendMessage: handleSendMessage, setSearchQuery: setSearchQuery, setShowTrace: setShowTrace, evaluations: evaluations, expandedEvaluations: expandedEvaluations, toggleEvaluation: toggleEvaluation, authToken: authToken, agentRegistryUrl: agentRegistryUrl } = props;
     const [panelCollapsed, setPanelCollapsed] = (0, $gXNCa$react.useState)(false);
-    const [currentView, setCurrentView] = (0, $gXNCa$react.useState)('chat');
+    const [currentView, setCurrentView] = (0, $gXNCa$react.useState)('info');
     const [showSettings, setShowSettings] = (0, $gXNCa$react.useState)(false);
     const hasOpenTabs = openAgents.length > 0;
     const selectedIndex = agents.findIndex((a)=>a.id === selectedAgentId);
@@ -7209,6 +7607,15 @@ function $449b860f472a3c1e$export$1806ed9300cedcd4(props) {
                                             })
                                         ]
                                     }),
+                                    currentView === 'info' && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                        className: "sl-info-view",
+                                        children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)((0, $847a683fb9dfe59a$export$8be561ade2b12cd5), {
+                                            agentName: selectedAgent.name,
+                                            agentEndpoint: selectedAgent.endpoint,
+                                            authToken: authToken,
+                                            onBack: ()=>{}
+                                        })
+                                    }),
                                     currentView === 'metrics' && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
                                         className: "metrics",
                                         children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)((0, $9fb5e7b00778612c$export$bfaab4c9bb3364f), {
@@ -7302,6 +7709,7 @@ function $be7488c82e1128c3$export$880f9f4aae674e9a({ messages: messages, agentNa
         ]
     });
 }
+
 
 
 
@@ -7424,6 +7832,11 @@ function $f9ec7352374a6877$var$SubTabBar({ currentView: currentView, setCurrentV
                 className: `ccl-sub-tab ${currentView === 'chat' ? 'ccl-sub-tab-active' : ''}`,
                 onClick: ()=>setCurrentView('chat'),
                 children: "Chat"
+            }),
+            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                className: `ccl-sub-tab ${currentView === 'info' ? 'ccl-sub-tab-active' : ''}`,
+                onClick: ()=>setCurrentView('info'),
+                children: "Info"
             }),
             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
                 className: `ccl-sub-tab ${currentView === 'metrics' ? 'ccl-sub-tab-active' : ''}`,
@@ -7634,7 +8047,7 @@ function $f9ec7352374a6877$var$AgentRegistry({ agents: agents, searchQuery: sear
 }
 function $f9ec7352374a6877$export$f1bb7d87e7dd8c29(props) {
     const { agents: agents, selectedAgent: selectedAgent, selectedAgentId: selectedAgentId, message: message, searchQuery: searchQuery, attachedFiles: attachedFiles, currentMessages: currentMessages, currentTraceLogs: currentTraceLogs, showTrace: showTrace, isLoading: isLoading, registryError: registryError, chatEndRef: chatEndRef, traceEndRef: traceEndRef, textareaRef: textareaRef, fileInputRef: fileInputRef, handleSelectAgent: handleSelectAgent, handleClearSession: handleClearSession, handleMessageChange: handleMessageChange, handleFileSelect: handleFileSelect, removeAttachment: removeAttachment, handleStopGeneration: handleStopGeneration, handleSendMessage: handleSendMessage, setSearchQuery: setSearchQuery, setShowTrace: setShowTrace, evaluations: evaluations, expandedEvaluations: expandedEvaluations, toggleEvaluation: toggleEvaluation, authToken: authToken, agentRegistryUrl: agentRegistryUrl } = props;
-    const [currentView, setCurrentView] = (0, $gXNCa$react.useState)('chat');
+    const [currentView, setCurrentView] = (0, $gXNCa$react.useState)('info');
     const [showSettings, setShowSettings] = (0, $gXNCa$react.useState)(false);
     // If an agent is selected, show the chat view
     if (selectedAgent) {
@@ -7733,6 +8146,15 @@ function $f9ec7352374a6877$export$f1bb7d87e7dd8c29(props) {
                                     evaluations: evaluations,
                                     expandedEvaluations: expandedEvaluations,
                                     onToggleEvaluation: toggleEvaluation
+                                }),
+                                currentView === 'info' && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
+                                    className: "sl-info-view",
+                                    children: /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)((0, $847a683fb9dfe59a$export$8be561ade2b12cd5), {
+                                        agentName: selectedAgent.name,
+                                        agentEndpoint: selectedAgent.endpoint,
+                                        authToken: authToken,
+                                        onBack: ()=>{}
+                                    })
                                 }),
                                 currentView === 'metrics' && /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("div", {
                                     className: "metrics",
