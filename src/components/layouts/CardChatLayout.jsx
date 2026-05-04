@@ -299,7 +299,7 @@ export function CardChatLayout(props) {
         agentRegistryUrl,
     } = props;
 
-    const [currentView, setCurrentView] = useState('chat');
+    const [currentView, setCurrentView] = useState('info');
     const [showSettings, setShowSettings] = useState(false);
 
     // If an agent is selected, show the chat view

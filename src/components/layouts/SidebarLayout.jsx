@@ -107,7 +107,7 @@ export function SidebarLayout(props) {
         agentRegistryUrl
     } = props;
 
-    const [currentView, setCurrentView] = useState('chat');
+    const [currentView, setCurrentView] = useState('info');
     const [showSettings, setShowSettings] = useState(false);
     const [agentPage, setAgentPage] = useState(1);
     const agentsPerPage = 15;

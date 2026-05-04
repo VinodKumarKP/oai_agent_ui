@@ -385,7 +385,7 @@ export function TabCardLayout(props) {
     } = props;
 
     const [panelCollapsed, setPanelCollapsed] = useState(false);
-    const [currentView, setCurrentView] = useState('chat');
+    const [currentView, setCurrentView] = useState('info');
     const [showSettings, setShowSettings] = useState(false);
     const hasOpenTabs = openAgents.length > 0;
 
