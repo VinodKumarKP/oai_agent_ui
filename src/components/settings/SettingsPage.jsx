@@ -22,17 +22,16 @@ export function SettingsPage({ onBack, agentRegistryUrl, authToken }) {
                 <div className="cfg-header-top">
                     <div>
                         <div className="cfg-breadcrumb">
-                            <span>Registry</span>
+                            <button className="cfg-back-btn" onClick={onBack}>
+                                <span className="cfg-back-arrow">←</span>
+                                Registry
+                            </button>
                             <span className="cfg-breadcrumb-sep">›</span>
                             <span className="cfg-breadcrumb-cur">Settings</span>
                         </div>
                         <div className="cfg-title">Settings</div>
                         <div className="cfg-subtitle">Manage agent registry and authentication tokens</div>
                     </div>
-                    <button className="cfg-back-btn" onClick={onBack}>
-                        <span className="cfg-back-arrow">←</span>
-                        Back to Registry
-                    </button>
                 </div>
 
                 <div className="cfg-tabs">
