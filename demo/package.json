@@ -1,0 +1,16 @@
+{
+  "name": "a2a-react-ui-demo",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@a2a-js/sdk": "^0.3.13",
+    "react-markdown": "^8.0.7",
+    "recharts": "^3.8.1",
+    "remark-gfm": "^3.0.1"
+  },
+  "@parcel/resolver-default": {
+    "packageExports": true
+  }
+}
