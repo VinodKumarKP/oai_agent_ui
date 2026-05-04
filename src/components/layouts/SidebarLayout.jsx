@@ -20,6 +20,7 @@ import { AgentEvaluationMetrics } from '../shared/AgentEvaluationMetrics.jsx';
 import { AgentLogs } from '../shared/AgentLogs.jsx';
 import { TokenManager } from '../shared/TokenManager.jsx';
 import { SettingsPage } from '../settings/SettingsPage.jsx';
+import { AgentInfo } from '../shared/AgentInfo.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
 
 
@@ -53,6 +54,12 @@ function SubTabBar({ currentView, setCurrentView }) {
                 onClick={() => setCurrentView('chat')}
             >
                 Chat
+            </button>
+            <button
+                className={`sl-sub-tab ${currentView === 'info' ? 'sl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('info')}
+            >
+                Info
             </button>
             <button
                 className={`sl-sub-tab ${currentView === 'metrics' ? 'sl-sub-tab-active' : ''}`}
@@ -266,6 +273,17 @@ export function SidebarLayout(props) {
                                     onRemoveAttachment={removeAttachment}
                                 />
                             </>
+                        )}
+
+                        {currentView === 'info' && (
+                            <div className="sl-info-view">
+                                <AgentInfo
+                                    agentName={selectedAgent.name}
+                                    agentEndpoint={selectedAgent.endpoint}
+                                    authToken={authToken}
+                                    onBack={() => {}} // No back button needed here
+                                />
+                            </div>
                         )}
 
                         {currentView === 'metrics' && (
