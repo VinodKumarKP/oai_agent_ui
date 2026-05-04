@@ -6,6 +6,7 @@ import { AgentLogs } from '../shared/AgentLogs.jsx';
 import { TokenManager } from '../shared/TokenManager.jsx';
 import { SettingsPage } from '../settings/SettingsPage.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
+import {AgentInfo} from "../shared/AgentInfo";
 
 // ---------------------------------------------------------------------------
 // Helpers / Sub-components
@@ -81,6 +82,12 @@ function SubTabBar({ currentView, setCurrentView }) {
                 onClick={() => setCurrentView('chat')}
             >
                 Chat
+            </button>
+            <button
+                className={`ccl-sub-tab ${currentView === 'info' ? 'ccl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('info')}
+            >
+                Info
             </button>
             <button
                 className={`ccl-sub-tab ${currentView === 'metrics' ? 'ccl-sub-tab-active' : ''}`}
@@ -364,6 +371,17 @@ export function CardChatLayout(props) {
                                 expandedEvaluations={expandedEvaluations}
                                 onToggleEvaluation={toggleEvaluation}
                             />
+                        )}
+
+                        {currentView === 'info' && (
+                            <div className="sl-info-view">
+                                <AgentInfo
+                                    agentName={selectedAgent.name}
+                                    agentEndpoint={selectedAgent.endpoint}
+                                    authToken={authToken}
+                                    onBack={() => {}} // No back button needed here
+                                />
+                            </div>
                         )}
 
                         {currentView === 'metrics' && (

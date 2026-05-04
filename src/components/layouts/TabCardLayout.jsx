@@ -25,6 +25,7 @@ import { AgentLogs } from '../shared/AgentLogs.jsx';
 import { TokenManager } from '../shared/TokenManager.jsx';
 import { SettingsPage } from '../settings/SettingsPage.jsx';
 import { agentInitials, avatarStyle } from '../shared/utils.js';
+import {AgentInfo} from "../shared/AgentInfo";
 
 // ---------------------------------------------------------------------------
 // StatusPill
@@ -135,6 +136,12 @@ function SubTabBar({ currentView, setCurrentView }) {
                 onClick={() => setCurrentView('chat')}
             >
                 Chat
+            </button>
+            <button
+                className={`tcl-sub-tab ${currentView === 'info' ? 'tcl-sub-tab-active' : ''}`}
+                onClick={() => setCurrentView('info')}
+            >
+                Info
             </button>
             <button
                 className={`tcl-sub-tab ${currentView === 'metrics' ? 'tcl-sub-tab-active' : ''}`}
@@ -479,6 +486,17 @@ export function TabCardLayout(props) {
                                                 onRemoveAttachment={removeAttachment}
                                             />
                                         </>
+                                    )}
+
+                                    {currentView === 'info' && (
+                                        <div className="sl-info-view">
+                                            <AgentInfo
+                                                agentName={selectedAgent.name}
+                                                agentEndpoint={selectedAgent.endpoint}
+                                                authToken={authToken}
+                                                onBack={() => {}} // No back button needed here
+                                            />
+                                        </div>
                                     )}
 
                                     {currentView === 'metrics' && (

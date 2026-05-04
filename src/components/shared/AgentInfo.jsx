@@ -104,7 +104,7 @@ export function AgentInfo({ agentName, agentEndpoint, authToken, onBack }) {
             }
         };
         if (agentName) fetchAgentInfo();
-    }, [agentEndpoint, authToken]);
+    }, [agentName, agentEndpoint, authToken]);
 
     /* ── Loading ── */
     if (isLoading) {
