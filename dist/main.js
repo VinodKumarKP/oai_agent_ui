@@ -3243,9 +3243,10 @@ function $cd708fec58e77911$var$EvalSection({ evaluation_data: evaluation_data })
 // ---------------------------------------------------------------------------
 // LogEntry — single collapsible row
 // ---------------------------------------------------------------------------
-function $cd708fec58e77911$var$LogEntry({ log: log }) {
+function $cd708fec58e77911$var$LogEntry({ log: log, agentEndpoint: agentEndpoint, authToken: authToken }) {
     const [isExpanded, setIsExpanded] = (0, $gXNCa$react.useState)(false);
-    const { input_message: input_message, output_response: output_response, timestamp: timestamp, status: status, response_time_ms: response_time_ms, model_info: model_info, token_usage: token_usage, evaluation_data: evaluation_data } = log;
+    const [isDownloading, setIsDownloading] = (0, $gXNCa$react.useState)(false);
+    const { input_message: input_message, output_response: output_response, timestamp: timestamp, status: status, response_time_ms: response_time_ms, model_info: model_info, token_usage: token_usage, evaluation_data: evaluation_data, interaction_id: interaction_id } = log;
     const ts = new Date(timestamp);
     const tsStr = ts.toLocaleDateString('en-US', {
         month: 'short',
@@ -3256,6 +3257,38 @@ function $cd708fec58e77911$var$LogEntry({ log: log }) {
         second: '2-digit'
     });
     const dur = (response_time_ms / 1000).toFixed(2) + 's';
+    const handleDownload = async (e)=>{
+        e.stopPropagation();
+        setIsDownloading(true);
+        try {
+            const baseUrl = agentEndpoint.replace(/\/a2a\/?$/, '');
+            const response = await fetch(`${baseUrl}/logs/activity/interaction/${interaction_id}`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            if (!response.ok) throw new Error(`Download failed: ${response.status}`);
+            const data = await response.json();
+            const blob = new Blob([
+                JSON.stringify(data, null, 2)
+            ], {
+                type: 'application/json'
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `log_${interaction_id}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Download error:", error);
+            alert(error.message);
+        } finally{
+            setIsDownloading(false);
+        }
+    };
     return /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("div", {
         className: `sl-log-item ${isExpanded ? 'sl-log-expanded' : ''}`,
         children: [
@@ -3278,6 +3311,13 @@ function $cd708fec58e77911$var$LogEntry({ log: log }) {
                     /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsxs)("span", {
                         className: "sl-log-dur-wrap",
                         children: [
+                            /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("button", {
+                                className: "sl-log-download-btn",
+                                onClick: handleDownload,
+                                disabled: isDownloading,
+                                title: "Download full interaction log",
+                                children: isDownloading ? '...' : "\u2193"
+                            }),
                             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)("span", {
                                 className: "sl-log-duration",
                                 children: dur
@@ -3535,7 +3575,9 @@ function $cd708fec58e77911$export$3c32ca1728ea32f2({ selectedAgent: selectedAgen
                     className: "sl-logs-empty",
                     children: "No logs found for this agent."
                 }) : logs.map((log)=>/*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($cd708fec58e77911$var$LogEntry, {
-                        log: log
+                        log: log,
+                        agentEndpoint: selectedAgent.endpoint,
+                        authToken: authToken
                     }, log.id))
             }),
             /*#__PURE__*/ (0, $gXNCa$reactjsxruntime.jsx)($cd708fec58e77911$var$PaginationBar, {
