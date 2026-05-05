@@ -134,18 +134,46 @@ function EvalSection({ evaluation_data }) {
 // ---------------------------------------------------------------------------
 // LogEntry — single collapsible row
 // ---------------------------------------------------------------------------
-function LogEntry({ log }) {
+function LogEntry({ log, agentEndpoint, authToken }) {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     const {
         input_message, output_response, timestamp,
-        status, response_time_ms, model_info, token_usage, evaluation_data,
+        status, response_time_ms, model_info, token_usage, evaluation_data, interaction_id
     } = log;
 
     const ts = new Date(timestamp);
     const tsStr = ts.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
         + ' ' + ts.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     const dur = (response_time_ms / 1000).toFixed(2) + 's';
+
+    const handleDownload = async (e) => {
+        e.stopPropagation();
+        setIsDownloading(true);
+        try {
+            const baseUrl = agentEndpoint.replace(/\/a2a\/?$/, '');
+            const response = await fetch(`${baseUrl}/logs/activity/interaction/${interaction_id}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            if (!response.ok) throw new Error(`Download failed: ${response.status}`);
+            const data = await response.json();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `log_${interaction_id}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Download error:", error);
+            alert(error.message);
+        } finally {
+            setIsDownloading(false);
+        }
+    };
 
     return (
         <div className={`sl-log-item ${isExpanded ? 'sl-log-expanded' : ''}`}>
@@ -154,6 +182,14 @@ function LogEntry({ log }) {
                 <span className="sl-log-input">{input_message}</span>
                 <span className={`sl-log-status sl-status-${status}`}>{status}</span>
                 <span className="sl-log-dur-wrap">
+                    <button
+                        className="sl-log-download-btn"
+                        onClick={handleDownload}
+                        disabled={isDownloading}
+                        title="Download full interaction log"
+                    >
+                        {isDownloading ? '...' : '↓'}
+                    </button>
                     <span className="sl-log-duration">{dur}</span>
                     <span className={`sl-log-chevron ${isExpanded ? 'sl-chevron-open' : ''}`}>▼</span>
                 </span>
@@ -359,7 +395,7 @@ export function AgentLogs({ selectedAgent, authToken }) {
                 ) : logs.length === 0 ? (
                     <div className="sl-logs-empty">No logs found for this agent.</div>
                 ) : (
-                    logs.map((log) => <LogEntry key={log.id} log={log} />)
+                    logs.map((log) => <LogEntry key={log.id} log={log} agentEndpoint={selectedAgent.endpoint} authToken={authToken} />)
                 )}
             </div>
 
